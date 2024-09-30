@@ -1,4 +1,5 @@
 use currency::{CurrencyDef, MemberOf};
+use finance::error::Error as FinanceError;
 use lpp::stub::loan::LppLoan as LppLoanTrait;
 use oracle_platform::Oracle as OracleTrait;
 use sdk::cosmwasm_std::Timestamp;
@@ -39,9 +40,14 @@ impl WithLease for LeaseState {
         LppLoan: LppLoanTrait<LpnCurrency, LpnCurrencies>,
         Oracle: OracleTrait<LeasePaymentCurrencies, QuoteC = LpnCurrency, QuoteG = LpnCurrencies>,
     {
-        Ok(StateResponse::opened_from(
-            lease.state(self.now),
-            self.in_progress,
-        ))
+        lease
+            .state(self.now)
+            .ok_or(ContractError::FinanceError(FinanceError::Overflow(
+                format!(
+                    "Failed to calculate the lease state at the specified time: {:?}",
+                    self.now
+                ),
+            )))
+            .map(|open_lease| StateResponse::opened_from(open_lease, self.in_progress))
     }
 }

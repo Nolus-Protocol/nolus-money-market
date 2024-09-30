@@ -66,4 +66,7 @@ pub enum ContractError {
 
     #[error("[Treasury] Invalid time configuration. Current reward distribution time is before the last distribution time")]
     InvalidTimeConfiguration {},
+
+    #[error("[Treasury] Error calculating interest: {0}")]
+    InterestCalculation(#[from] finance::error::Error),
 }

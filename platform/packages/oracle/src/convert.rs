@@ -41,7 +41,7 @@ mod impl_ {
     use std::marker::PhantomData;
 
     use currency::{Currency, CurrencyDef, Group, MemberOf};
-    use finance::{coin::Coin, price};
+    use finance::{coin::Coin, error::Error as FinanceErr, price};
 
     use crate::{error::Error, Oracle};
 
@@ -83,9 +83,15 @@ mod impl_ {
         where
             OracleImpl: Oracle<OutG, QuoteC = InC, QuoteG = InG>,
         {
-            oracle
-                .price_of::<OutC>()
-                .map(|price| price::total(self.in_amount, price.inv()))
+            oracle.price_of::<OutC>().and_then(|price| {
+                price::total(self.in_amount, price.inv()).ok_or(Error::Finance(
+                    FinanceErr::overflow_err(
+                        "while calculating the total",
+                        self.in_amount,
+                        price.inv(),
+                    ),
+                ))
+            })
         }
 
         pub(super) fn with_quote_out<OracleImpl>(
@@ -95,9 +101,13 @@ mod impl_ {
         where
             OracleImpl: Oracle<InG, QuoteC = OutC, QuoteG = OutG>,
         {
-            oracle
-                .price_of::<InC>()
-                .map(|price| price::total(self.in_amount, price))
+            oracle.price_of::<InC>().and_then(|price| {
+                price::total(self.in_amount, price).ok_or(Error::Finance(FinanceErr::overflow_err(
+                    "while calculating the total",
+                    self.in_amount,
+                    price,
+                )))
+            })
         }
     }
 }

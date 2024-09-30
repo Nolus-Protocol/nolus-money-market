@@ -37,26 +37,48 @@ mod test {
     };
 
     #[test]
-    fn safe_mul() {
+    fn checked_mul() {
         use crate::fractionable::Fractionable;
         assert_eq!(
             Coin::<SuperGroupTestC1>::new(30),
-            Coin::<SuperGroupTestC1>::new(3).safe_mul(&Percent::from_percent(1000))
+            Fractionable::<u32>::checked_mul(
+                Coin::<SuperGroupTestC1>::new(3),
+                &Percent::from_percent(1000)
+            )
+            .unwrap()
         );
 
         assert_eq!(
             Coin::<SuperGroupTestC1>::new(1000),
-            Fractionable::<u32>::safe_mul(
+            Fractionable::<u32>::checked_mul(
                 Coin::<SuperGroupTestC1>::new(2),
                 &Rational::new(1000u32, 2u32)
             )
+            .unwrap()
         );
 
         assert_eq!(
             Coin::<SuperGroupTestC1>::new(2 * Amount::from(u32::MAX)),
-            Fractionable::<u32>::safe_mul(
+            Fractionable::<u32>::checked_mul(
                 Coin::<SuperGroupTestC1>::new(2),
                 &Rational::new(u32::MAX, 1u32)
+            )
+            .unwrap()
+        );
+
+        assert_eq!(
+            None,
+            Fractionable::<u128>::checked_mul(
+                Coin::<SuperGroupTestC1>::new(u128::MAX),
+                &Rational::new(2, 1u128)
+            )
+        );
+
+        assert_eq!(
+            None,
+            Fractionable::<u128>::checked_mul(
+                Coin::<SuperGroupTestC1>::new(3),
+                &Rational::new(u128::MAX, 2u128)
             )
         );
     }

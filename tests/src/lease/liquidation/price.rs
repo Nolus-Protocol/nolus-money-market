@@ -19,7 +19,7 @@ use crate::{
     lease::{self as lease_mod, LeaseTestCase, LpnCurrency},
 };
 
-use super::{LeaseCoin, LeaseCurrency, Lpnoin, PaymentCurrency, DOWNPAYMENT};
+use super::{LeaseCoin, LeaseCurrency, LpnCoin, PaymentCurrency, DOWNPAYMENT};
 
 #[test]
 #[should_panic = "No liquidation warning emitted!"]
@@ -126,7 +126,7 @@ fn full_liquidation() {
 
     assert_eq!(
         transfer_amount,
-        to_cosmwasm_on_dex(Lpnoin::new(liq_outcome))
+        to_cosmwasm_on_dex(LpnCoin::new(liq_outcome))
     );
 
     let response: AppResponse = ibc::do_transfer(
@@ -170,7 +170,7 @@ fn full_liquidation() {
     )
 }
 
-fn liquidation_warning(base: LeaseCoin, quote: Lpnoin, liability: Percent, level: &str) {
+fn liquidation_warning(base: LeaseCoin, quote: LpnCoin, liability: Percent, level: &str) {
     let mut test_case = lease_mod::create_test_case::<PaymentCurrency>();
     let lease = lease_mod::open_lease(&mut test_case, DOWNPAYMENT, None);
 
@@ -220,7 +220,7 @@ fn deliver_new_price(
     test_case: &mut LeaseTestCase,
     lease: Addr,
     base: LeaseCoin,
-    quote: Lpnoin,
+    quote: LpnCoin,
 ) -> ResponseWithInterChainMsgs<'_, AppResponse> {
     common::oracle::feed_price(test_case, Addr::unchecked(ADMIN), base, quote);
 

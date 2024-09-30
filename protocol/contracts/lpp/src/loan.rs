@@ -33,7 +33,7 @@ where
 impl<Lpn> Loan<Lpn> {
     const STORAGE: Map<'static, Addr, Loan<Lpn>> = Map::new("loans");
 
-    pub fn interest_due(&self, by: &Timestamp) -> Coin<Lpn> {
+    pub fn interest_due(&self, by: &Timestamp) -> Option<Coin<Lpn>> {
         interest::interest(
             self.annual_interest_rate,
             self.principal_due,
@@ -41,14 +41,28 @@ impl<Lpn> Loan<Lpn> {
         )
     }
 
-    pub fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> RepayShares<Lpn> {
-        let (paid_for, interest_change) = interest::pay(
+    pub fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> Option<RepayShares<Lpn>> {
+        interest::pay(
             self.annual_interest_rate,
             self.principal_due,
             repayment,
             self.due_period(by),
-        );
+        )
+        .map(|(paid_for, interest_change)| {
+            self.settle_repayment(interest_change, repayment, paid_for)
+        })
+    }
 
+    fn due_period(&self, by: &Timestamp) -> Duration {
+        Duration::between(&self.interest_paid, by.max(&self.interest_paid))
+    }
+
+    fn settle_repayment(
+        &mut self,
+        interest_change: Coin<Lpn>,
+        repayment: Coin<Lpn>,
+        paid_for: Duration,
+    ) -> RepayShares<Lpn> {
         let interest_paid = repayment - interest_change;
         let principal_paid = interest_change.min(self.principal_due);
         let excess = interest_change - principal_paid;
@@ -61,10 +75,6 @@ impl<Lpn> Loan<Lpn> {
             principal: principal_paid,
             excess,
         }
-    }
-
-    fn due_period(&self, by: &Timestamp) -> Duration {
-        Duration::between(&self.interest_paid, by.max(&self.interest_paid))
     }
 }
 
@@ -125,11 +135,14 @@ mod test {
 
         assert_eq!(
             Coin::<Lpn>::from(50),
-            l.interest_due(&(l.interest_paid + Duration::YEAR))
+            l.interest_due(&(l.interest_paid + Duration::YEAR)).unwrap()
         );
 
-        assert_eq!(Coin::ZERO, l.interest_due(&l.interest_paid));
-        assert_eq!(Coin::ZERO, l.interest_due(&l.interest_paid.minus_nanos(1)));
+        assert_eq!(Coin::ZERO, l.interest_due(&l.interest_paid).unwrap());
+        assert_eq!(
+            Coin::ZERO,
+            l.interest_due(&l.interest_paid.minus_nanos(1)).unwrap()
+        );
     }
 
     #[test]
@@ -151,7 +164,7 @@ mod test {
                 principal: payment1,
                 excess: Coin::ZERO
             },
-            l.repay(&interest_paid, payment1)
+            l.repay(&interest_paid, payment1).unwrap()
         );
         assert_eq!(
             Loan {
@@ -173,7 +186,7 @@ mod test {
             interest_paid: Timestamp::from_nanos(200),
         };
 
-        let interest_a_year = interest.of(principal_start);
+        let interest_a_year = interest.of(principal_start).unwrap();
         let at_first_year_end = l.interest_paid + Duration::YEAR;
         assert_eq!(
             RepayShares {
@@ -181,7 +194,7 @@ mod test {
                 principal: Coin::ZERO,
                 excess: Coin::ZERO
             },
-            l.repay(&at_first_year_end, interest_a_year)
+            l.repay(&at_first_year_end, interest_a_year).unwrap()
         );
         assert_eq!(
             Loan {
@@ -203,7 +216,7 @@ mod test {
             interest_paid: Timestamp::from_nanos(200),
         };
 
-        let interest_a_year = interest.of(principal_start);
+        let interest_a_year = interest.of(principal_start).unwrap();
         let at_first_hour_end = l.interest_paid + Duration::HOUR;
         let exp_interest = interest_a_year.checked_div(365 * 24).unwrap();
         let excess = 12441.into();
@@ -214,6 +227,7 @@ mod test {
                 excess,
             },
             l.repay(&at_first_hour_end, exp_interest + principal_start + excess)
+                .unwrap()
         );
         assert_eq!(
             Loan {
@@ -253,11 +267,11 @@ mod test {
                 Loan::load(deps.as_ref().storage, addr.clone()).expect("should load loan");
 
             time = Timestamp::from_nanos(Duration::YEAR.nanos() / 2);
-            let interest: Coin<Lpn> = loan.interest_due(&time);
+            let interest: Coin<Lpn> = loan.interest_due(&time).unwrap();
             assert_eq!(interest, 100u128.into());
 
             // partial repay
-            let payment = loan.repay(&time, 600u128.into());
+            let payment = loan.repay(&time, 600u128.into()).unwrap();
             assert_eq!(payment.interest, 100u128.into());
             assert_eq!(payment.principal, 500u128.into());
             assert_eq!(payment.excess, 0u128.into());
@@ -269,7 +283,7 @@ mod test {
                 Loan::load(deps.as_ref().storage, addr.clone()).expect("should load loan");
 
             // repay with excess, should close the loan
-            let payment = loan.repay(&time, 600u128.into());
+            let payment = loan.repay(&time, 600u128.into()).unwrap();
             assert_eq!(payment.interest, 0u128.into());
             assert_eq!(payment.principal, 500u128.into());
             assert_eq!(payment.excess, 100u128.into());

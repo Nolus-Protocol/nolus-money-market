@@ -15,9 +15,10 @@ mod usize;
 
 pub trait Fractionable<U> {
     #[track_caller]
-    fn safe_mul<F>(self, fraction: &F) -> Self
+    fn checked_mul<F>(self, fraction: &F) -> Option<Self>
     where
-        F: Ratio<U>;
+        F: Ratio<U>,
+        Self: Sized;
 }
 
 // TODO revisit its usability
@@ -41,20 +42,19 @@ where
     U: Zero + PartialEq + Into<D>,
 {
     #[track_caller]
-    fn safe_mul<R>(self, ratio: &R) -> Self
+    fn checked_mul<R>(self, ratio: &R) -> Option<Self>
     where
         R: Ratio<U>,
     {
         // TODO debug_assert_eq!(T::BITS * 2, D::BITS);
 
         if ratio.parts() == ratio.total() {
-            self
+            Some(self)
         } else {
             let res_double: D = self.into() * ratio.parts().into();
             let res_double = res_double / ratio.total().into();
-            let res_intermediate: DIntermediate =
-                res_double.try_into().expect("unexpected overflow");
-            res_intermediate.into()
+            let res_intermediate: Option<DIntermediate> = res_double.try_into().ok();
+            res_intermediate.map(Into::into)
         }
     }
 }

@@ -11,11 +11,11 @@ where
     C: Currency,
     QuoteC: Currency,
 {
-    fn safe_mul<F>(self, fraction: &F) -> Self
+    fn checked_mul<F>(self, fraction: &F) -> Option<Self>
     where
         F: Ratio<PercentUnits>,
     {
-        self.lossy_mul(&RatioUpcast(PhantomData, fraction))
+        Some(self.lossy_mul(&RatioUpcast(PhantomData, fraction)))
     }
 }
 
@@ -24,11 +24,11 @@ where
     C: Currency,
     QuoteC: Currency,
 {
-    fn safe_mul<F>(self, fraction: &F) -> Self
+    fn checked_mul<F>(self, fraction: &F) -> Option<Self>
     where
         F: Ratio<usize>,
     {
-        self.lossy_mul(&RatioTryUpcast(fraction))
+        Some(self.lossy_mul(&RatioTryUpcast(fraction)))
     }
 }
 
@@ -81,14 +81,17 @@ mod test {
         fn greater_than_one() {
             let price = price::total_of(c(1)).is(q(1000));
             let permille = Percent::from_permille(1);
-            assert_eq!(permille.of(price), price::total_of(c(1)).is(q(1)));
+            assert_eq!(permille.of(price).unwrap(), price::total_of(c(1)).is(q(1)));
         }
 
         #[test]
         fn less_than_one() {
             let price = price::total_of(c(10)).is(q(1));
             let twenty_percents = Percent::from_percent(20);
-            assert_eq!(twenty_percents.of(price), price::total_of(c(50)).is(q(1)));
+            assert_eq!(
+                twenty_percents.of(price).unwrap(),
+                price::total_of(c(50)).is(q(1))
+            );
         }
     }
     mod usize_ratio {
@@ -147,7 +150,7 @@ mod test {
             let price = price::total_of(amount1).is(quote1);
             let ratio = Rational::new(nominator, denominator);
             assert_eq!(
-                Fraction::<usize>::of(&ratio, price),
+                Fraction::<usize>::of(&ratio, price).unwrap(),
                 price::total_of(amount_exp).is(quote_exp)
             );
         }

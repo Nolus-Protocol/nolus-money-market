@@ -59,7 +59,9 @@ impl Config {
     }
 
     pub fn min_feeders(&self, total: usize) -> usize {
-        self.min_feeders.of(total)
+        self.min_feeders
+            .of(total)
+            .expect("Expected valid min_feeders")
     }
 
     pub fn sample_period(&self) -> Duration {

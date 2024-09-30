@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 
 use serde::{Deserialize, Serialize};
 
@@ -36,14 +36,15 @@ where
 
 impl<U, T> Fraction<U> for Rational<T>
 where
+    T: Display,
     Self: Ratio<U>,
 {
     #[track_caller]
-    fn of<A>(&self, whole: A) -> A
+    fn of<A>(&self, whole: A) -> Option<A>
     where
-        A: Fractionable<U>,
+        A: Fractionable<U> + Display + Clone,
     {
-        whole.safe_mul(self)
+        whole.clone().checked_mul(self)
     }
 }
 
@@ -57,5 +58,11 @@ where
 
     fn total(&self) -> U {
         self.denominator.into()
+    }
+}
+
+impl<T: Display> Display for Rational<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}/{}", self.nominator, self.denominator)
     }
 }

@@ -36,12 +36,12 @@ impl Overdue {
         max_due: Duration,
         margin_interest: Percent,
         lpp_loan: &LppLoan,
-    ) -> Self
+    ) -> Option<Self>
     where
         LppLoan: LppLoanTrait<LpnCurrency, LpnCurrencies>,
     {
         if due_period_margin.length() < max_due {
-            Self::StartIn(max_due - due_period_margin.length())
+            Some(Self::StartIn(max_due - due_period_margin.length()))
         } else {
             // due to the right-opened nature of intervals, if '==' then the due period end is the overdue period start
             let overdue_period = if due_period_margin.length() == max_due {
@@ -52,14 +52,16 @@ impl Overdue {
             };
 
             // TODO consider using the `trait InterestDue`
-            let margin = interest::interest(
+            interest::interest(
                 margin_interest,
                 lpp_loan.principal_due(),
                 overdue_period.length(),
-            );
-            let interest = lpp_loan.interest_due(&overdue_period.till());
-
-            Self::Accrued { interest, margin }
+            )
+            .and_then(|margin| {
+                lpp_loan
+                    .interest_due(&overdue_period.till())
+                    .map(|interest| Self::Accrued { interest, margin })
+            })
         }
     }
 
@@ -123,7 +125,8 @@ mod test {
             max_due,
             MARGIN_INTEREST_RATE,
             &LppLoanLocal::new(LOAN),
-        );
+        )
+        .unwrap();
         assert_eq!(Overdue::StartIn(max_due - due_period_length), overdue);
         assert!(overdue.interest().is_zero());
         assert!(overdue.margin().is_zero());
@@ -140,7 +143,8 @@ mod test {
             max_due,
             MARGIN_INTEREST_RATE,
             &LppLoanLocal::new(LOAN),
-        );
+        )
+        .unwrap();
         assert_eq!(
             Overdue::Accrued {
                 interest: 0.into(),
@@ -161,11 +165,13 @@ mod test {
         let overdue_period = due_period_length - max_due;
 
         let lpp_loan = LppLoanLocal::new(LOAN);
-        let overdue = Overdue::new(&due_period_margin, max_due, MARGIN_INTEREST_RATE, &lpp_loan);
-        let exp_interest =
-            lpp_loan.interest_due(&(LOAN.interest_paid + due_period_length - max_due));
+        let overdue =
+            Overdue::new(&due_period_margin, max_due, MARGIN_INTEREST_RATE, &lpp_loan).unwrap();
+        let exp_interest = lpp_loan
+            .interest_due(&(LOAN.interest_paid + due_period_length - max_due))
+            .unwrap();
         let exp_margin =
-            interest::interest(MARGIN_INTEREST_RATE, LOAN.principal_due, overdue_period);
+            interest::interest(MARGIN_INTEREST_RATE, LOAN.principal_due, overdue_period).unwrap();
         assert_eq!(
             Overdue::Accrued {
                 interest: exp_interest,

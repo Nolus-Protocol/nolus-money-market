@@ -181,7 +181,7 @@ fn test_quote() {
     assert_eq!(resp.borrow.try_into(), Ok(borrow));
     assert_eq!(
         resp.total.try_into(),
-        Ok(total(downpayment + borrow, price_lease_lpn.inv()))
+        Ok(total(downpayment + borrow, price_lease_lpn.inv()).unwrap())
     );
 
     /*   TODO: test with different time periods and amounts in LPP
@@ -296,9 +296,10 @@ fn common_quote_with_conversion(
     assert_eq!(
         resp.total.try_into(),
         Ok(total(
-            total(downpayment, dpn_lpn_price) + borrow_after_mul2,
+            total(downpayment, dpn_lpn_price).unwrap() + borrow_after_mul2,
             lpn_asset_price
-        )),
+        )
+        .unwrap()),
         "Total amount is different!"
     );
 }

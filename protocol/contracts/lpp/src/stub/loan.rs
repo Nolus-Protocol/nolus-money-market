@@ -19,13 +19,13 @@ where
     Self: TryInto<LppBatch<LppRef<Lpn, Lpns>>, Error = ContractError>,
 {
     fn principal_due(&self) -> Coin<Lpn>;
-    fn interest_due(&self, by: &Timestamp) -> Coin<Lpn>;
+    fn interest_due(&self, by: &Timestamp) -> Option<Coin<Lpn>>;
     /// Repay the due interest and principal by the specified time
     ///
     /// First, the provided 'repayment' is used to repay the due interest,
     /// and then, if there is any remaining amount, to repay the principal.
     /// Amount 0 is acceptable although does not change the loan.
-    fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> RepayShares<Lpn>;
+    fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> Option<RepayShares<Lpn>>;
     fn annual_interest_rate(&self) -> Percent;
 }
 
@@ -71,11 +71,11 @@ where
         self.loan.principal_due
     }
 
-    fn interest_due(&self, by: &Timestamp) -> Coin<Lpn> {
+    fn interest_due(&self, by: &Timestamp) -> Option<Coin<Lpn>> {
         self.loan.interest_due(by)
     }
 
-    fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> RepayShares<Lpn> {
+    fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> Option<RepayShares<Lpn>> {
         self.repayment += repayment;
         self.loan.repay(by, repayment)
     }
@@ -136,7 +136,7 @@ mod test {
                 interest_paid: start,
             },
         );
-        loan.repay(&(start + Duration::YEAR), Coin::ZERO);
+        loan.repay(&(start + Duration::YEAR), Coin::ZERO).unwrap();
         let batch: LppBatch<LppRef<Lpn, Lpns>> = loan.try_into().unwrap();
 
         assert_eq!(lpp_ref, batch.lpp_ref);
@@ -157,8 +157,8 @@ mod test {
         );
         let payment1 = 8.into();
         let payment2 = 4.into();
-        loan.repay(&(start + Duration::YEAR), payment1);
-        loan.repay(&(start + Duration::YEAR), payment2);
+        loan.repay(&(start + Duration::YEAR), payment1).unwrap();
+        loan.repay(&(start + Duration::YEAR), payment2).unwrap();
         let batch: LppBatch<LppRef<Lpn, Lpns>> = loan.try_into().unwrap();
 
         assert_eq!(lpp_ref, batch.lpp_ref);

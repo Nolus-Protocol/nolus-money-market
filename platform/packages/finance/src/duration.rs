@@ -92,19 +92,21 @@ impl Duration {
     }
 
     #[track_caller]
-    pub fn annualized_slice_of<T>(&self, annual_amount: T) -> T
+    pub fn annualized_slice_of<T>(&self, annual_amount: T) -> Option<T>
     where
-        T: TimeSliceable,
+        T: TimeSliceable + Display + Clone,
     {
-        annual_amount.safe_mul(&Rational::new(self.nanos(), Self::YEAR.nanos()))
+        let self_a_year = Rational::new(self.nanos(), Self::YEAR.nanos());
+        annual_amount.clone().checked_mul(&self_a_year)
     }
 
-    pub fn into_slice_per_ratio<U>(self, amount: U, annual_amount: U) -> Self
+    pub fn into_slice_per_ratio<U>(self, amount: U, annual_amount: U) -> Option<Self>
     where
         Self: Fractionable<U>,
-        U: Zero + Debug + PartialEq + Copy,
+        U: Zero + Debug + PartialEq + Copy + Display,
     {
-        Rational::new(amount, annual_amount).of(self)
+        let ratio = Rational::new(amount, annual_amount);
+        ratio.of(self)
     }
 }
 
@@ -204,9 +206,15 @@ impl Display for Duration {
 
 #[cfg(test)]
 mod tests {
+    use std::u64;
+
+    use currency::test::SubGroupTestC10;
     use sdk::cosmwasm_std::Timestamp as T;
 
-    use crate::duration::{Duration as D, Units};
+    use crate::{
+        coin::Coin,
+        duration::{Duration as D, Units},
+    };
 
     #[test]
     fn add() {
@@ -320,5 +328,42 @@ mod tests {
             None,
             D::from_nanos(Units::MAX / Units::from(u16::MAX) + 1).checked_mul(u16::MAX)
         );
+    }
+
+    #[test]
+    fn annualized_slice_of() {
+        let duration = D::from_nanos(D::YEAR.nanos());
+        let res = duration.annualized_slice_of(u64::MAX).unwrap();
+
+        assert_eq!(u64::MAX, res);
+    }
+
+    #[test]
+    fn annualized_slice_of_overlow() {
+        let duration = D::from_nanos(D::YEAR.nanos() + 1);
+        let res = duration.annualized_slice_of(u64::MAX);
+
+        assert!(res.is_none())
+    }
+
+    #[test]
+    fn into_slice_per_ratio() {
+        let duration = D::from_nanos(D::YEAR.nanos());
+        let res = duration
+            .into_slice_per_ratio::<Coin<SubGroupTestC10>>(584.into(), 1.into())
+            .unwrap();
+
+        assert_eq!(
+            D::from_nanos(D::YEAR.nanos().checked_mul(584).unwrap()),
+            res
+        );
+    }
+
+    #[test]
+    fn into_slice_per_ratio_overflow() {
+        let duration = D::from_nanos(D::YEAR.nanos());
+        let res = duration.into_slice_per_ratio::<Coin<SubGroupTestC10>>(585.into(), 1.into());
+
+        assert!(res.is_none())
     }
 }

@@ -115,7 +115,7 @@ mod tests {
         let liability_alarm_on = FIRST_LIQ_WARN;
         let due = {
             let lease = &lease;
-            lease.loan.state(&now)
+            lease.loan.state(&now).unwrap()
         };
         let alarm_msgs = lease
             .reschedule(
@@ -137,7 +137,7 @@ mod tests {
                 funds: vec![],
             });
 
-            let below_alarm = total_of(liability_alarm_on.of(asset)).is(due.total_due());
+            let below_alarm = total_of(liability_alarm_on.of(asset).unwrap()).is(due.total_due());
             batch.schedule_execute_no_reply(WasmMsg::Execute {
                 contract_addr: ORACLE_ADDR.into(),
                 msg: to_json_binary(&AddPriceAlarm::<LeaseGroup, TestLpn, Lpns> {
@@ -170,9 +170,12 @@ mod tests {
 
         let zone = Zone::second(SECOND_LIQ_WARN, THIRD_LIQ_WARN);
         let total_due = price::total(
-            (SECOND_LIQ_WARN + Percent::from_percent(1)).of(lease_amount),
+            (SECOND_LIQ_WARN + Percent::from_percent(1))
+                .of(lease_amount)
+                .unwrap(),
             Price::identity(),
-        );
+        )
+        .unwrap();
         let alarm_msgs = lease
             .reschedule(
                 &reschedule_at,
@@ -184,8 +187,8 @@ mod tests {
             )
             .unwrap();
 
-        let exp_below = total_of(zone.high().ltv().of(lease_amount)).is(total_due);
-        let exp_above = total_of(zone.low().unwrap().ltv().of(lease_amount)).is(total_due);
+        let exp_below = total_of(zone.high().ltv().of(lease_amount).unwrap()).is(total_due);
+        let exp_above = total_of(zone.low().unwrap().ltv().of(lease_amount).unwrap()).is(total_due);
 
         assert_eq!(alarm_msgs, {
             let mut batch = Batch::default();

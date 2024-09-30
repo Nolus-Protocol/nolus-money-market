@@ -43,16 +43,20 @@ fn general_interest_rate(
     addon_rate: Percent,
     optimal_rate: Percent,
 ) -> Percent {
-    let utilization_rate = Percent::from_ratio(loan, balance).min(Percent::from_ratio(
-        optimal_rate.units(),
-        (Percent::HUNDRED - optimal_rate).units(),
-    ));
+    let utilization_rate = Percent::from_ratio(loan, balance).unwrap().min(
+        Percent::from_ratio(
+            optimal_rate.units(),
+            (Percent::HUNDRED - optimal_rate).units(),
+        )
+        .unwrap(),
+    );
 
     base_rate
         + Fraction::<PercentUnits>::of(
             &Rational::new(addon_rate.units(), optimal_rate.units()),
             utilization_rate,
         )
+        .unwrap()
 }
 
 #[test]
@@ -284,7 +288,7 @@ fn deposit_and_withdraw() {
         .query_wasm_smart(test_case.address_book.lpp().clone(), &LppQueryMsg::Price())
         .unwrap();
     assert_eq!(
-        price::total(Coin::new(1_000), price.0),
+        price::total(Coin::new(1_000), price.0).unwrap(),
         Coin::<Lpn>::new(1_000 * pushed_price)
     );
 
@@ -317,7 +321,7 @@ fn deposit_and_withdraw() {
         .query_wasm_smart(test_case.address_book.lpp().clone(), &LppQueryMsg::Price())
         .unwrap();
     assert_eq!(
-        price::total(balance_nlpn.balance.into(), price.0),
+        price::total(balance_nlpn.balance.into(), price.0).unwrap(),
         Coin::<Lpn>::new(test_deposit - rounding_error)
     );
 
@@ -349,7 +353,7 @@ fn deposit_and_withdraw() {
         .query_wasm_smart(test_case.address_book.lpp().clone(), &LppQueryMsg::Price())
         .unwrap();
     assert_eq!(
-        price::total(balance_nlpn.balance.into(), price.0),
+        price::total(balance_nlpn.balance.into(), price.0).unwrap(),
         Coin::<Lpn>::new(test_deposit - rounding_error)
     );
 
@@ -390,7 +394,7 @@ fn deposit_and_withdraw() {
         .query_wasm_smart(test_case.address_book.lpp().clone(), &LppQueryMsg::Price())
         .unwrap();
     assert_eq!(
-        price::total(balance_nlpn2.balance.into(), price.0),
+        price::total(balance_nlpn2.balance.into(), price.0).unwrap(),
         Coin::<Lpn>::new(test_deposit - rounding_error)
     );
 
@@ -644,7 +648,7 @@ fn loan_open_and_repay() {
 
     test_case.app.time_shift(Duration::from_nanos(YEAR / 2));
 
-    let total_interest_due_u32 = interest1.of(loan1_u32) / 2;
+    let total_interest_due_u32 = interest1.of(loan1_u32).unwrap() / 2;
     let total_interest_due = Amount::from(total_interest_due_u32);
 
     let resp: LppBalanceResponse<Lpns> = test_case
@@ -708,8 +712,10 @@ fn loan_open_and_repay() {
     assert_eq!(loan1_resp.principal_due, loan1.into());
     assert_eq!(loan1_resp.annual_interest_rate, interest1);
     assert_eq!(
-        loan1_resp.interest_due(&block_time(&test_case.app)),
-        interest1.of(loan1).into()
+        loan1_resp
+            .interest_due(&block_time(&test_case.app))
+            .unwrap(),
+        interest1.of(loan1).unwrap().into()
     );
 
     // repay from other addr
@@ -780,8 +786,10 @@ fn loan_open_and_repay() {
     let loan1_resp = maybe_loan1.unwrap();
     assert_eq!(loan1_resp.principal_due, loan1.into());
     assert_eq!(
-        loan1_resp.interest_due(&block_time(&test_case.app)),
-        (interest1.of(loan1) - repay_interest_part).into()
+        loan1_resp
+            .interest_due(&block_time(&test_case.app))
+            .unwrap(),
+        (interest1.of(loan1).unwrap() - repay_interest_part).into()
     );
 
     // repay interest + due part
@@ -792,7 +800,7 @@ fn loan_open_and_repay() {
             test_case.address_book.lpp().clone(),
             &LppExecuteMsg::RepayLoan(),
             &[lpn_cwcoin(
-                interest1.of(loan1) - repay_interest_part + repay_due_part,
+                interest1.of(loan1).unwrap() - repay_interest_part + repay_due_part,
             )],
         )
         .unwrap()
@@ -812,7 +820,9 @@ fn loan_open_and_repay() {
     let loan1_resp = maybe_loan1.unwrap();
     assert_eq!(loan1_resp.principal_due, (loan1 - repay_due_part).into());
     assert_eq!(
-        loan1_resp.interest_due(&block_time(&test_case.app)),
+        loan1_resp
+            .interest_due(&block_time(&test_case.app))
+            .unwrap(),
         Coin::new(0)
     );
 
@@ -843,7 +853,10 @@ fn loan_open_and_repay() {
 
     // repay excess is returned
     let balance = bank::balance::<_, Lpns>(&loan_addr1, test_case.app.query()).unwrap();
-    assert_eq!(balance, Coin::<Lpn>::from(loan1 - interest1.of(loan1)));
+    assert_eq!(
+        balance,
+        Coin::<Lpn>::from(loan1 - interest1.of(loan1).unwrap())
+    );
 
     let resp: LppBalanceResponse<Lpns> = test_case
         .app
@@ -857,12 +870,12 @@ fn loan_open_and_repay() {
     // total unpaid interest
     assert_eq!(
         resp.total_interest_due,
-        Coin::<Lpn>::from(interest2.of(loan2) / 2u128).into()
+        Coin::<Lpn>::from(interest2.of(loan2).unwrap() / 2u128).into()
     );
     assert_eq!(resp.total_principal_due, Coin::<Lpn>::from(loan2).into());
     assert_eq!(
         resp.balance,
-        Coin::<Lpn>::from(init_deposit + interest1.of(loan1) - loan2).into()
+        Coin::<Lpn>::from(init_deposit + interest1.of(loan1).unwrap() - loan2).into()
     );
 }
 
@@ -1009,7 +1022,7 @@ fn compare_lpp_states() {
 
     test_case.app.time_shift(Duration::from_nanos(YEAR / 2));
 
-    let total_interest_due_u32 = interest1.of(loan1_u32) / 2;
+    let total_interest_due_u32 = interest1.of(loan1_u32).unwrap() / 2;
     let total_interest_due = Amount::from(total_interest_due_u32);
 
     let resp: LppBalanceResponse<Lpns> = test_case
@@ -1079,8 +1092,10 @@ fn compare_lpp_states() {
     assert_eq!(loan1_resp.principal_due, loan1.into());
     assert_eq!(loan1_resp.annual_interest_rate, interest1);
     assert_eq!(
-        loan1_resp.interest_due(&block_time(&test_case.app)),
-        interest1.of(loan1).into()
+        loan1_resp
+            .interest_due(&block_time(&test_case.app))
+            .unwrap(),
+        interest1.of(loan1).unwrap().into()
     );
 
     // repay from other addr
@@ -1151,8 +1166,10 @@ fn compare_lpp_states() {
     let loan1_resp = maybe_loan1.unwrap();
     assert_eq!(loan1_resp.principal_due, loan1.into());
     assert_eq!(
-        loan1_resp.interest_due(&block_time(&test_case.app)),
-        (interest1.of(loan1) - repay_interest_part).into()
+        loan1_resp
+            .interest_due(&block_time(&test_case.app))
+            .unwrap(),
+        (interest1.of(loan1).unwrap() - repay_interest_part).into()
     );
 
     // repay interest + due part
@@ -1163,7 +1180,7 @@ fn compare_lpp_states() {
             test_case.address_book.lpp().clone(),
             &LppExecuteMsg::RepayLoan(),
             &[lpn_cwcoin(
-                interest1.of(loan1) - repay_interest_part + repay_due_part,
+                interest1.of(loan1).unwrap() - repay_interest_part + repay_due_part,
             )],
         )
         .unwrap()
@@ -1183,7 +1200,9 @@ fn compare_lpp_states() {
     let loan1_resp = maybe_loan1.unwrap();
     assert_eq!(loan1_resp.principal_due, (loan1 - repay_due_part).into());
     assert_eq!(
-        loan1_resp.interest_due(&block_time(&test_case.app)),
+        loan1_resp
+            .interest_due(&block_time(&test_case.app))
+            .unwrap(),
         Coin::new(0)
     );
 
@@ -1214,7 +1233,10 @@ fn compare_lpp_states() {
 
     // repay excess is returned
     let balance = bank::balance::<_, Lpns>(&loan_addr1, test_case.app.query()).unwrap();
-    assert_eq!(balance, Coin::<Lpn>::from(loan1 - interest1.of(loan1)));
+    assert_eq!(
+        balance,
+        Coin::<Lpn>::from(loan1 - interest1.of(loan1).unwrap())
+    );
 
     let resp: LppBalanceResponse<Lpns> = test_case
         .app
@@ -1228,12 +1250,12 @@ fn compare_lpp_states() {
     // total unpaid interest
     assert_eq!(
         resp.total_interest_due,
-        Coin::<Lpn>::from(interest2.of(loan2) / 2u128).into()
+        Coin::<Lpn>::from(interest2.of(loan2).unwrap() / 2u128).into()
     );
     assert_eq!(resp.total_principal_due, Coin::<Lpn>::from(loan2).into());
     assert_eq!(
         resp.balance,
-        Coin::<Lpn>::from(init_deposit + interest1.of(loan1) - loan2).into()
+        Coin::<Lpn>::from(init_deposit + interest1.of(loan1).unwrap() - loan2).into()
     );
 }
 

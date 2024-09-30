@@ -92,22 +92,23 @@ where
         )
     }
 
-    pub(crate) fn state(&self, now: Timestamp) -> State<Asset> {
-        let loan = self.loan.state(&now);
-        let overdue_collect_in = self.position.overdue_collection_in(&loan);
-
-        State {
-            amount: self.position.amount(),
-            interest_rate: loan.annual_interest,
-            interest_rate_margin: loan.annual_interest_margin,
-            principal_due: loan.principal_due,
-            overdue_margin: loan.overdue.margin(),
-            overdue_interest: loan.overdue.interest(),
-            overdue_collect_in,
-            due_margin: loan.due_margin_interest,
-            due_interest: loan.due_interest,
-            validity: now,
-        }
+    pub(crate) fn state(&self, now: Timestamp) -> Option<State<Asset>> {
+        self.loan.state(&now).and_then(|loan| {
+            self.position
+                .overdue_collection_in(&loan)
+                .map(|overdue_collect_in| State {
+                    amount: self.position.amount(),
+                    interest_rate: loan.annual_interest,
+                    interest_rate_margin: loan.annual_interest_margin,
+                    principal_due: loan.principal_due,
+                    overdue_margin: loan.overdue.margin(),
+                    overdue_interest: loan.overdue.interest(),
+                    overdue_collect_in,
+                    due_margin: loan.due_margin_interest,
+                    due_interest: loan.due_interest,
+                    validity: now,
+                })
+        })
     }
 }
 
@@ -217,11 +218,11 @@ mod tests {
             self.loan.principal_due
         }
 
-        fn interest_due(&self, by: &Timestamp) -> Coin<Lpn> {
+        fn interest_due(&self, by: &Timestamp) -> Option<Coin<Lpn>> {
             self.loan.interest_due(by)
         }
 
-        fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> RepayShares<Lpn> {
+        fn repay(&mut self, by: &Timestamp, repayment: Coin<Lpn>) -> Option<RepayShares<Lpn>> {
             self.loan.repay(by, repayment)
         }
 
@@ -351,7 +352,7 @@ mod tests {
 
         let state_since_open = Duration::from_nanos(150);
         let state_at = LEASE_START.add(state_since_open);
-        let res = lease.state(state_at);
+        let res = lease.state(state_at).unwrap();
         let exp = State {
             amount: lease_amount,
             interest_rate,

@@ -1,4 +1,4 @@
-use std::ops::Sub;
+use std::{fmt::Display, ops::Sub};
 
 use serde::{Deserialize, Serialize};
 
@@ -104,39 +104,44 @@ impl Liability {
         self.recalc_time
     }
 
-    pub fn init_borrow_amount<P>(&self, downpayment: P, may_max_ltd: Option<Percent>) -> P
+    pub fn init_borrow_amount<P>(&self, downpayment: P, may_max_ltd: Option<Percent>) -> Option<P>
     where
-        P: Percentable + Ord + Copy,
+        P: Percentable + Ord + Copy + Display,
     {
         debug_assert!(self.initial > Percent::ZERO);
         debug_assert!(self.initial < Percent::HUNDRED);
 
         let default_ltd = Rational::new(self.initial, Percent::HUNDRED - self.initial);
-        let default_borrow = default_ltd.of(downpayment);
-        may_max_ltd
-            .map(|max_ltd| max_ltd.of(downpayment))
-            .map(|requested_borrow| requested_borrow.min(default_borrow))
-            .unwrap_or(default_borrow)
+        default_ltd.of(downpayment).and_then(|default_borrow| {
+            may_max_ltd.map_or(Some(default_borrow), |max_ltd| {
+                max_ltd
+                    .of(downpayment)
+                    .map(|requested_borrow| requested_borrow.min(default_borrow))
+            })
+        })
     }
 
     /// Post-assert: (total_due - amount_to_liquidate) / (lease_amount - amount_to_liquidate) ~= self.healthy_percent(), if total_due < lease_amount.
     /// Otherwise, amount_to_liquidate == total_due
-    pub fn amount_to_liquidate<P>(&self, lease_amount: P, total_due: P) -> P
+    pub fn amount_to_liquidate<P>(&self, lease_amount: P, total_due: P) -> Option<P>
     where
-        P: Percentable + Copy + Ord + Sub<Output = P> + Zero,
+        P: Percentable + Copy + Ord + Sub<Output = P> + Zero + Display,
     {
-        if total_due < self.max.of(lease_amount) {
-            return P::ZERO;
-        }
-        if lease_amount <= total_due {
-            return lease_amount;
-        }
-
-        // from 'due - liquidation = healthy% of (lease - liquidation)' follows
-        // liquidation = 100% / (100% - healthy%) of (due - healthy% of lease)
-        let multiplier = Rational::new(Percent::HUNDRED, Percent::HUNDRED - self.healthy);
-        let extra_liability_lpn = total_due - total_due.min(self.healthy.of(lease_amount));
-        Fraction::<Units>::of(&multiplier, extra_liability_lpn)
+        self.max.of(lease_amount).and_then(|max_lease| {
+            if total_due < max_lease {
+                Some(P::ZERO)
+            } else if lease_amount <= total_due {
+                Some(lease_amount)
+            } else {
+                // from 'due - liquidation = healthy% of (lease - liquidation)' follows
+                // liquidation = 100% / (100% - healthy%) of (due - healthy% of lease)
+                let multiplier = Rational::new(Percent::HUNDRED, Percent::HUNDRED - self.healthy);
+                self.healthy.of(lease_amount).and_then(|healthy_lease| {
+                    let extra_liability_lpn = total_due - total_due.min(healthy_lease);
+                    Fraction::<Units>::of(&multiplier, extra_liability_lpn)
+                })
+            }
+        })
     }
 
     fn invariant_held(&self) -> Result<()> {
@@ -355,8 +360,8 @@ mod test {
             recalc_time: Duration::from_secs(20000),
         };
         let lease_amount: Amount = 100;
-        let healthy_amount = Percent::from_percent(healthy).of(lease_amount);
-        let max_amount = Percent::from_percent(max).of(lease_amount);
+        let healthy_amount = Percent::from_percent(healthy).of(lease_amount).unwrap();
+        let max_amount = Percent::from_percent(max).of(lease_amount).unwrap();
         amount_to_liquidate_int(liability, lease_amount, Amount::ZERO, Amount::ZERO);
         amount_to_liquidate_int(liability, lease_amount, healthy_amount - 10, Amount::ZERO);
         amount_to_liquidate_int(liability, lease_amount, healthy_amount - 1, Amount::ZERO);
@@ -374,11 +379,16 @@ mod test {
 
     #[track_caller]
     fn amount_to_liquidate_int(liability: Liability, lease: Amount, due: Amount, exp: Amount) {
-        let liq = liability.amount_to_liquidate(lease, due);
+        let liq = liability.amount_to_liquidate(lease, due).unwrap();
         assert_eq!(exp, liq);
-        if due.clamp(liability.max.of(lease), lease) == due {
+        if due.clamp(liability.max.of(lease).unwrap(), lease) == due {
             assert!(
-                liability.healthy.of(lease - exp).abs_diff(due - exp) <= 1,
+                liability
+                    .healthy
+                    .of(lease - exp)
+                    .unwrap()
+                    .abs_diff(due - exp)
+                    <= 1,
                 "Lease = {lease}, due = {due}, exp = {exp}"
             );
         }
@@ -417,7 +427,8 @@ mod test {
             third_liq_warn: Percent::from_permille(998),
             recalc_time: Duration::from_secs(20000),
         }
-        .init_borrow_amount(downpayment, max_p);
+        .init_borrow_amount(downpayment, max_p)
+        .unwrap();
 
         assert_eq!(calculated, Coin::<Currency>::new(exp));
     }

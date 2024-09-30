@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result};
+
 use finance::{coin::Coin, duration::Duration, zero::Zero};
 
 use crate::finance::LpnCoin;
@@ -15,9 +17,10 @@ pub trait Due {
     /// Usually, the interest is accrued as per a fixed interest rate.
     /// If the accrued interest is not paid until some configured amount of time elapses it becomes overdue.
     /// When overdue interest amount goes above a configured minimum then the interest becomes collectable.
-    fn overdue_collection(&self, min_amount: LpnCoin) -> OverdueCollection;
+    fn overdue_collection(&self, min_amount: LpnCoin) -> Option<OverdueCollection>;
 }
 
+#[derive(PartialEq, Debug)]
 pub enum OverdueCollection {
     /// No collectable overdue interest yet
     ///
@@ -43,6 +46,19 @@ impl OverdueCollection {
         match self {
             OverdueCollection::StartIn(_) => Coin::ZERO,
             OverdueCollection::Overdue(amount) => *amount,
+        }
+    }
+}
+
+impl Display for OverdueCollection {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self {
+            OverdueCollection::StartIn(duration) => {
+                write!(f, "Start in: {}", duration)
+            }
+            OverdueCollection::Overdue(coin) => {
+                write!(f, "Overdue amount: {}", coin)
+            }
         }
     }
 }

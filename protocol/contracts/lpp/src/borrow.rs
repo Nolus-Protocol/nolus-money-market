@@ -56,23 +56,30 @@ impl InterestRate {
         self.addon_optimal_interest_rate
     }
 
-    pub fn calculate<Lpn>(&self, total_liability: Coin<Lpn>, balance: Coin<Lpn>) -> Percent {
-        let utilization_max = Percent::from_ratio(
+    pub fn calculate<Lpn>(&self, total_liability: Coin<Lpn>, balance: Coin<Lpn>) -> Option<Percent>
+    where
+        Lpn: PartialEq,
+    {
+        Percent::from_ratio(
             self.utilization_optimal.units(),
             (Percent::HUNDRED - self.utilization_optimal).units(),
-        );
-        let utilization = if balance.is_zero() {
-            utilization_max
-        } else {
-            Percent::from_ratio(total_liability, balance).min(utilization_max)
-        };
+        )
+        .and_then(|utilization_max| {
+            let config = Rational::new(
+                self.addon_optimal_interest_rate.units(),
+                self.utilization_optimal.units(),
+            );
 
-        let config = Rational::new(
-            self.addon_optimal_interest_rate.units(),
-            self.utilization_optimal.units(),
-        );
-
-        self.base_interest_rate + Fraction::<Units>::of(&config, utilization)
+            if balance.is_zero() {
+                Some(utilization_max)
+            } else {
+                Percent::from_ratio(total_liability, balance)
+                    .map(|utilization| utilization.min(utilization_max))
+            }
+            .and_then(|utilization| {
+                Fraction::<Units>::of(&config, utilization).map(|res| self.base_interest_rate + res)
+            })
+        })
     }
 
     fn validate(&self) -> bool {
@@ -194,7 +201,7 @@ mod tests {
         }
 
         fn ratio(n: Units, d: Units) -> Percent {
-            Percent::from_ratio(n, d)
+            Percent::from_ratio(n, d).unwrap()
         }
 
         #[derive(Copy, Clone)]
@@ -207,7 +214,7 @@ mod tests {
         fn do_test_calculate(rate: InterestRate, in_out_set: &[InOut]) {
             for ((liability, balance), output) in in_out_set.iter().copied().map(in_out) {
                 assert_eq!(
-                    rate.calculate(liability, balance),
+                    rate.calculate(liability, balance).unwrap(),
                     output,
                     "Interest rate: {rate:?}\nLiability: {liability}\nBalance: {balance}",
                 );

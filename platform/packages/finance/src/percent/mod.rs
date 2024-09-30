@@ -5,13 +5,10 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use sdk::{
-    cosmwasm_std::{OverflowError, OverflowOperation},
-    schemars::{self, JsonSchema},
-};
+use sdk::schemars::{self, JsonSchema};
 
 use crate::{
-    error::Result as FinanceResult,
+    error::{Error, Result as FinanceResult},
     fraction::Fraction,
     fractionable::Fractionable,
     ratio::{Ratio, Rational},
@@ -43,12 +40,17 @@ impl Percent {
         Self(permille)
     }
 
-    pub fn from_ratio<FractionUnit>(nominator: FractionUnit, denominator: FractionUnit) -> Self
+    pub fn from_ratio<FractionUnit>(
+        nominator: FractionUnit,
+        denominator: FractionUnit,
+    ) -> Option<Self>
     where
-        FractionUnit: Zero + Debug + Copy + PartialEq,
+        FractionUnit: Zero + Debug + Copy + PartialEq + Display,
         Self: Fractionable<FractionUnit>,
     {
-        Rational::new(nominator, denominator).of(Percent::HUNDRED)
+        let ratio = Rational::new(nominator, denominator);
+
+        ratio.of(Percent::HUNDRED)
     }
 
     pub const fn units(&self) -> Units {
@@ -63,14 +65,14 @@ impl Percent {
         self.0
             .checked_add(other.0)
             .map(Self::from_permille)
-            .ok_or_else(|| OverflowError::new(OverflowOperation::Add, self, other).into())
+            .ok_or(Error::overflow_err("while adding", self, other))
     }
 
     pub fn checked_sub(self, other: Self) -> FinanceResult<Self> {
         self.0
             .checked_sub(other.0)
             .map(Self::from_permille)
-            .ok_or_else(|| OverflowError::new(OverflowOperation::Sub, self, other).into())
+            .ok_or(Error::overflow_err("while subtracting", self, other))
     }
 }
 
@@ -80,11 +82,11 @@ impl Zero for Percent {
 
 impl Fraction<Units> for Percent {
     #[track_caller]
-    fn of<A>(&self, whole: A) -> A
+    fn of<A>(&self, whole: A) -> Option<A>
     where
-        A: Fractionable<Units>,
+        A: Fractionable<Units> + Display + Clone,
     {
-        whole.safe_mul(self)
+        whole.clone().checked_mul(self)
     }
 }
 
@@ -206,20 +208,20 @@ pub(super) mod test {
         let c1 = Coin::<SubGroupTestC10>::new(a1);
         let c2 = Coin::<SubGroupTestC10>::new(a2);
         let c3 = Coin::<SubGroupTestC10>::new(a3);
-        assert_eq!(Percent::ZERO, Percent::from_ratio(c1, c2));
+        assert_eq!(Percent::ZERO, Percent::from_ratio(c1, c2).unwrap());
 
-        assert_eq!(from_parts(a3, a2), Percent::from_ratio(c3, c2));
+        assert_eq!(from_parts(a3, a2), Percent::from_ratio(c3, c2).unwrap());
 
-        assert_eq!(Percent::HUNDRED, Percent::from_ratio(c3, c3));
+        assert_eq!(Percent::HUNDRED, Percent::from_ratio(c3, c3).unwrap());
 
-        assert_eq!(from_parts(a2, a3), Percent::from_ratio(c2, c3));
+        assert_eq!(from_parts(a2, a3), Percent::from_ratio(c2, c3).unwrap());
     }
 
     #[test]
     fn test_zero() {
         assert_eq!(
             Coin::<SubGroupTestC10>::new(0),
-            Percent::ZERO.of(Coin::<SubGroupTestC10>::new(10))
+            Percent::ZERO.of(Coin::<SubGroupTestC10>::new(10)).unwrap()
         )
     }
 
@@ -228,7 +230,9 @@ pub(super) mod test {
         let amount = 123;
         assert_eq!(
             Coin::<SubGroupTestC10>::new(amount),
-            Percent::HUNDRED.of(Coin::<SubGroupTestC10>::new(amount))
+            Percent::HUNDRED
+                .of(Coin::<SubGroupTestC10>::new(amount))
+                .unwrap()
         )
     }
 
@@ -300,17 +304,19 @@ pub(super) mod test {
     }
 
     #[test]
-    #[should_panic]
     fn of_overflow() {
         use crate::fraction::Fraction;
-        Percent::from_permille(1001).of(Percent::from_permille(Units::MAX));
+        assert_eq!(
+            None,
+            Percent::from_permille(1001).of(Percent::from_permille(Units::MAX))
+        );
     }
 
     #[test]
     fn rational_of_percents() {
         let v = 14u32;
         let r = Rational::new(Percent::HUNDRED, Percent::HUNDRED);
-        assert_eq!(v, Fraction::<u32>::of(&r, v));
+        assert_eq!(v, Fraction::<u32>::of(&r, v).unwrap());
     }
 
     #[test]
@@ -318,7 +324,7 @@ pub(super) mod test {
         let n: Units = 189;
         let d: Units = 1890;
         let r = Rational::new(n, d);
-        let res: Percent = Fraction::<Units>::of(&r, Percent::HUNDRED);
+        let res: Percent = Fraction::<Units>::of(&r, Percent::HUNDRED).unwrap();
         assert_eq!(Percent::from_permille(n * 1000 / d), res);
     }
 
@@ -329,7 +335,7 @@ pub(super) mod test {
         let perm = Percent::from_permille(permille);
         assert_eq!(
             exp,
-            perm.of(quantity.clone()),
+            perm.of(quantity.clone()).unwrap(),
             "Calculating {} of {}",
             perm,
             quantity

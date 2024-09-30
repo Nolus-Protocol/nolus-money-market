@@ -1,7 +1,10 @@
 use std::{iter, marker::PhantomData, ops::Deref};
 
 use currency::{Currency, CurrencyDef, Group, MemberOf};
-use finance::price::{self, base::with_price::WithPrice, Price};
+use finance::{
+    error::Error as FinanceError,
+    price::{self, base::with_price::WithPrice, Price},
+};
 use marketprice::alarms::{errors::AlarmError, AlarmsIterator, PriceAlarms};
 use sdk::cosmwasm_std::{Addr, Storage};
 
@@ -135,11 +138,20 @@ where
         C: CurrencyDef,
         C::Group: MemberOf<Self::PriceG>,
     {
-        Ok(self
-            .alarms
+        self.alarms
             .alarms(price)
-            .map::<ContractResult<Addr>, AlarmIterMapFn>(|result: Result<Addr, AlarmError>| {
-                result.map_err(Into::into)
-            }))
+            .ok_or_else(|| {
+                ContractError::AlarmError(AlarmError::CreatingNormalizedPrice(
+                    FinanceError::Overflow(format!(
+                        "Overflow occurred while normalizing the price: {:?}",
+                        price
+                    )),
+                ))
+            })
+            .map(|alarms_iter| {
+                alarms_iter.map::<ContractResult<Addr>, AlarmIterMapFn>(
+                    |result: Result<Addr, AlarmError>| result.map_err(Into::into),
+                )
+            })
     }
 }

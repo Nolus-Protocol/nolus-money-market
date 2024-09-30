@@ -1,7 +1,7 @@
 use platform::{bank::FixedAddressSender, batch::Batch};
 
 use currency::{CurrencyDef, MemberOf};
-use finance::coin::Coin;
+use finance::{coin::Coin, error::Error as FinanceError};
 use lpp::stub::loan::LppLoan as LppLoanTrait;
 use oracle_platform::Oracle as OracleTrait;
 use reserve::stub::Reserve as ReserveTrait;
@@ -72,31 +72,40 @@ where
         Reserve: ReserveTrait<LpnCurrency>,
         ContractError: From<Reserve::Error>,
     {
-        let total_due = self.state(now).total_due();
-        let payment = if total_due > payment {
-            reserve.cover_liquidation_losses(total_due - payment);
-            total_due
-        } else {
-            payment
-        };
-        let receipt = self.repay(payment, &now, &mut profit)?;
-        debug_assert!(receipt.close());
+        self.state(now)
+            .ok_or(ContractError::FinanceError(FinanceError::Overflow(
+                format!(
+                    "Failed to calculate the lease state at the specified time: {:?}",
+                    now
+                ),
+            )))
+            .and_then(|state| {
+                let total_due = state.total_due();
+                let payment = if total_due > payment {
+                    reserve.cover_liquidation_losses(total_due - payment);
+                    total_due
+                } else {
+                    payment
+                };
+                let receipt = self.repay(payment, &now, &mut profit)?;
+                debug_assert!(receipt.close());
 
-        change_recipient.send(receipt.change());
+                change_recipient.send(receipt.change());
 
-        reserve
-            .try_into()
-            .map_err(Into::into)
-            .and_then(|reserve_messages| {
-                self.try_into_messages().map(|lease_messages| {
-                    FullRepayReceipt::new(
-                        receipt,
-                        reserve_messages
-                            .merge(lease_messages) // these should go *after* any reserve messages as to allow for covering losses
-                            .merge(profit.into())
-                            .merge(change_recipient.into()),
-                    )
-                })
+                reserve
+                    .try_into()
+                    .map_err(Into::into)
+                    .and_then(|reserve_messages| {
+                        self.try_into_messages().map(|lease_messages| {
+                            FullRepayReceipt::new(
+                                receipt,
+                                reserve_messages
+                                    .merge(lease_messages) // these should go *after* any reserve messages as to allow for covering losses
+                                    .merge(profit.into())
+                                    .merge(change_recipient.into()),
+                            )
+                        })
+                    })
             })
     }
 }

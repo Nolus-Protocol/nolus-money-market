@@ -11,7 +11,7 @@ use crate::common::{
 };
 
 use super::{
-    heal, repay, LeaseCoin, LeaseCurrency, LeaseTestCase, Lpnoin, PaymentCoin, PaymentCurrency,
+    heal, repay, LeaseCoin, LeaseCurrency, LeaseTestCase, LpnCoin, PaymentCoin, PaymentCurrency,
     DOWNPAYMENT,
 };
 
@@ -20,13 +20,14 @@ fn state_closed() {
     let mut test_case: LeaseTestCase = super::create_test_case::<PaymentCurrency>();
     let downpayment: PaymentCoin = DOWNPAYMENT;
     let lease_addr: Addr = super::open_lease(&mut test_case, downpayment, None);
-    let borrowed_lpn: Lpnoin = super::quote_borrow(&test_case, downpayment);
+    let borrowed_lpn: LpnCoin = super::quote_borrow(&test_case, downpayment);
     let borrowed: PaymentCoin =
-        price::total(borrowed_lpn, super::price_lpn_of::<PaymentCurrency>().inv());
+        price::total(borrowed_lpn, super::price_lpn_of::<PaymentCurrency>().inv()).unwrap();
     let lease_amount: LeaseCoin = price::total(
-        price::total(downpayment, super::price_lpn_of()) + borrowed_lpn,
+        price::total(downpayment, super::price_lpn_of()).unwrap() + borrowed_lpn,
         super::price_lpn_of::<LeaseCurrency>().inv(),
-    );
+    )
+    .unwrap();
     repay::repay(&mut test_case, lease_addr.clone(), borrowed);
 
     let customer_addr: Addr = Addr::unchecked(USER);

@@ -55,4 +55,7 @@ pub enum AlarmError {
 
     #[error("[Market Price; Alarm] Alarms delivery queue is not empty! Cause: {0}")]
     NonEmptyAlarmsInDeliveryQueue(String),
+
+    #[error("[Market Price; Alarm] Failed to create a normalized price! Cause: {0}")]
+    CreatingNormalizedPrice(finance::error::Error),
 }
