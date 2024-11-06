@@ -25,8 +25,7 @@ impl Borrow {
         Leases::cache_open_req(storage, &customer)
             .and_then(|()| Config::load(storage))
             .and_then(|config| {
-                let mut batch = Batch::default();
-                batch
+                Batch::default()
                     .schedule_instantiate_wasm_reply_on_success(
                         config.lease_code,
                         &Self::open_lease_msg(customer, config, currency, max_ltd, finalizer),
@@ -35,7 +34,6 @@ impl Borrow {
                         Some(admin), // allows lease migrations from this contract
                         Default::default(),
                     )
-                    .map(|()| batch)
                     .map_err(Into::into)
             })
             .map(Into::into)

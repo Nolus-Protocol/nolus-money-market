@@ -31,7 +31,7 @@ pub trait BankAccount
 where
     Self: BankAccountView + Into<Batch>,
 {
-    fn send<C>(&mut self, amount: Coin<C>, to: Addr)
+    fn send<C>(self, amount: Coin<C>, to: Addr) -> Self
     where
         C: CurrencyDef;
 }
@@ -209,9 +209,7 @@ pub fn bank_send<C>(to: Addr, amount: Coin<C>) -> Batch
 where
     C: CurrencyDef,
 {
-    let mut batch = Batch::default();
-    bank_send_impl(&mut batch, to, &[amount]);
-    batch
+    bank_send_impl(Batch::default(), to, &[amount])
 }
 
 impl<View> BankAccountView for BankStub<View>
@@ -242,12 +240,15 @@ where
     Self: BankAccountView + Into<Batch>,
     View: BankAccountView,
 {
-    fn send<C>(&mut self, amount: Coin<C>, to: Addr)
+    fn send<C>(self, amount: Coin<C>, to: Addr) -> Self
     where
         C: CurrencyDef,
     {
         debug_assert!(!amount.is_zero());
-        bank_send_impl(&mut self.batch, to, &[amount])
+        Self {
+            view: self.view,
+            batch: bank_send_impl(self.batch, to, &[amount]),
+        }
     }
 }
 
@@ -282,7 +283,7 @@ where
     }
 }
 
-fn bank_send_impl<C>(batch: &mut Batch, to: Addr, amount: &[Coin<C>])
+fn bank_send_impl<C>(batch: Batch, to: Addr, amount: &[Coin<C>]) -> Batch
 where
     C: CurrencyDef,
 {
@@ -296,11 +297,11 @@ where
     )
 }
 
-fn bank_send_cosmwasm(batch: &mut Batch, to: Addr, amount: Vec<CwCoin>) {
+fn bank_send_cosmwasm(batch: Batch, to: Addr, amount: Vec<CwCoin>) -> Batch {
     batch.schedule_execute_no_reply(BankMsg::Send {
         amount,
         to_address: to.into(),
-    });
+    })
 }
 
 pub struct LazySenderStub {
@@ -333,13 +334,11 @@ where
 
 impl From<LazySenderStub> for Batch {
     fn from(stub: LazySenderStub) -> Self {
-        let mut batch = Batch::default();
-
         if !stub.amounts.is_empty() {
-            bank_send_cosmwasm(&mut batch, stub.receiver, stub.amounts);
+            bank_send_cosmwasm(Batch::default(), stub.receiver, stub.amounts)
+        } else {
+            Batch::default()
         }
-
-        batch
     }
 }
 

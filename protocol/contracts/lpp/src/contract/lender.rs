@@ -81,14 +81,18 @@ where
         .ok_or(ContractError::NoDeposit {})?
         .withdraw(deps.storage, amount_nlpn)?;
 
-    let mut bank = bank::account(&env.contract.address, deps.querier);
-    bank.send(payment_lpn, lender_addr.clone());
+    let bank =
+        bank::account(&env.contract.address, deps.querier).send(payment_lpn, lender_addr.clone());
 
-    if let Some(reward) = maybe_reward {
+    let bank = if let Some(reward) = maybe_reward {
         if !reward.is_zero() {
-            bank.send(reward, lender_addr.clone());
+            bank.send(reward, lender_addr.clone())
+        } else {
+            bank
         }
-    }
+    } else {
+        bank
+    };
 
     let batch: Batch = bank.into();
     Ok(MessageResponse::messages_with_events(

@@ -62,14 +62,14 @@ impl Pool for MockPool {
             DistributeRewards::None => {
                 unreachable!("calling Pool::distribute_rewards is not expected")
             }
-            DistributeRewards::Pass => {
-                let mut msgs = Batch::default();
-                msgs.schedule_execute_wasm_no_reply_no_funds(Addr::unchecked("DEADCODE"), "msg1")
-                    .map_err(ContractError::SerializeResponse)?;
-                let events =
-                    Emitter::of_type("test-distribution").emit_percent_amount("attr_apr", apr);
-                Ok(Response::messages_with_events(msgs, events))
-            }
+            DistributeRewards::Pass => Batch::default()
+                .schedule_execute_wasm_no_reply_no_funds(Addr::unchecked("DEADCODE"), "msg1")
+                .map_err(ContractError::SerializeResponse)
+                .map(|msgs| {
+                    let events =
+                        Emitter::of_type("test-distribution").emit_percent_amount("attr_apr", apr);
+                    Response::messages_with_events(msgs, events)
+                }),
             DistributeRewards::Fail => Err(ContractError::DistributeLppReward(
                 lpp_platform::error::Error::Std(StdError::generic_err("Error from the MockPool")),
             )),

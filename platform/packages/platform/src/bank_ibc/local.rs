@@ -112,12 +112,9 @@ fn new_msg(
 
 impl<'c> From<Sender<'c>> for Batch {
     fn from(sender: Sender<'c>) -> Self {
-        let mut batch = Self::default();
-
         sender
             .into_ibc_msgs()
-            .for_each(|msg| batch.schedule_execute_no_reply(msg));
-        batch
+            .fold(Self::default(), Self::schedule_execute_no_reply)
     }
 }
 
@@ -161,32 +158,31 @@ mod test {
         funds_sender.send::<SuperGroup>(&coin2.into()).unwrap();
 
         assert_eq!(Batch::from(funds_sender), {
-            let mut batch = Batch::default();
-            batch.schedule_execute_no_reply(new_msg(
-                channel,
-                sender.clone(),
-                receiver.clone(),
-                coin_legacy::to_cosmwasm_impl(coin1),
-                timeout,
-                (
-                    coin_legacy::to_cosmwasm_impl(ack_fee),
-                    coin_legacy::to_cosmwasm_impl(timeout_fee),
-                ),
-                "MEMO".into(),
-            ));
-            batch.schedule_execute_no_reply(new_msg(
-                channel,
-                sender,
-                receiver,
-                coin_legacy::to_cosmwasm_impl(coin2),
-                timeout,
-                (
-                    coin_legacy::to_cosmwasm_impl(ack_fee),
-                    coin_legacy::to_cosmwasm_impl(timeout_fee),
-                ),
-                "MEMO".into(),
-            ));
-            batch
+            Batch::default()
+                .schedule_execute_no_reply(new_msg(
+                    channel,
+                    sender.clone(),
+                    receiver.clone(),
+                    coin_legacy::to_cosmwasm_impl(coin1),
+                    timeout,
+                    (
+                        coin_legacy::to_cosmwasm_impl(ack_fee),
+                        coin_legacy::to_cosmwasm_impl(timeout_fee),
+                    ),
+                    "MEMO".into(),
+                ))
+                .schedule_execute_no_reply(new_msg(
+                    channel,
+                    sender,
+                    receiver,
+                    coin_legacy::to_cosmwasm_impl(coin2),
+                    timeout,
+                    (
+                        coin_legacy::to_cosmwasm_impl(ack_fee),
+                        coin_legacy::to_cosmwasm_impl(timeout_fee),
+                    ),
+                    "MEMO".into(),
+                ))
         });
     }
 }

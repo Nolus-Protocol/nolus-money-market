@@ -57,13 +57,13 @@ impl Lpp for DummyLpp {
             )));
         }
 
-        let mut msgs = Batch::default();
+        Batch::default()
+            .schedule_execute_wasm_no_reply(Addr::unchecked("Dummy_Lpp"), "message", Some(reward))
+            .map_err(Into::into)
+            .map(|msgs| {
+                let events = Emitter::of_type("eventX").emit_coin("reward", reward);
 
-        msgs.schedule_execute_wasm_no_reply(Addr::unchecked("Dummy_Lpp"), "message", Some(reward))
-            .map_err(platform::error::Error::from)?;
-
-        let events = Emitter::of_type("eventX").emit_coin("reward", reward);
-
-        Ok(MessageResponse::messages_with_events(msgs, events))
+                MessageResponse::messages_with_events(msgs, events)
+            })
     }
 }

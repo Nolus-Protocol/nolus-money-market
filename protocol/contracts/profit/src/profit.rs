@@ -16,7 +16,7 @@ impl Profit {
     pub const IBC_FEE_RESERVE: Coin<Nls> = Coin::new(100);
 
     pub(crate) fn transfer_nls<B>(
-        mut from_my_account: B,
+        from_my_account: B,
         to_treasury: Addr,
         mut amount: Coin<Nls>,
         env: &Env,
@@ -29,10 +29,8 @@ impl Profit {
         if amount.is_zero() {
             PlatformResponse::messages_only(from_my_account.into())
         } else {
-            from_my_account.send(amount, to_treasury);
-
             PlatformResponse::messages_with_events(
-                from_my_account.into(),
+                from_my_account.send(amount, to_treasury).into(),
                 Emitter::of_type("tr-profit")
                     .emit_tx_info(env)
                     .emit_coin("profit-amount", amount),

@@ -48,7 +48,7 @@ impl<'a> WithLppLender<LpnCurrency, LpnCurrencies> for OpenLoanReq<'a> {
 
     type Error = ContractError;
 
-    fn exec<LppLender>(self, mut lpp: LppLender) -> Result<Self::Output, Self::Error>
+    fn exec<LppLender>(self, lpp: LppLender) -> Result<Self::Output, Self::Error>
     where
         LppLender: LppLenderTrait<LpnCurrency, LpnCurrencies>,
     {
@@ -68,10 +68,7 @@ impl<'a> WithLppLender<LpnCurrency, LpnCurrencies> for OpenLoanReq<'a> {
         PositionSpec::try_from(self.position_spec)
             .and_then(|spec| spec.calc_borrow_amount(downpayment_lpn, self.max_ltd))
             .and_then(|borrow_lpn| lpp.open_loan_req(borrow_lpn).map_err(ContractError::from))
-            .map(|()| Self::Output {
-                batch: lpp.into().batch,
-                downpayment,
-            })
+            .map(|batch| Self::Output { batch, downpayment })
     }
 }
 

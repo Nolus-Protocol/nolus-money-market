@@ -66,11 +66,11 @@ mod test {
 
     #[test]
     fn no_events() {
-        let mut b = Batch::default();
-        b.schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::ClearAdmin {
-            contract_addr: "".to_string(),
-        }));
-        let resp: Response = super::response_only_messages(b);
+        let resp: Response = super::response_only_messages(
+            Batch::default().schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::ClearAdmin {
+                contract_addr: "".to_string(),
+            })),
+        );
         assert_eq!(1, resp.messages.len());
         assert_eq!(0, resp.attributes.len());
         assert_eq!(0, resp.events.len());
@@ -105,14 +105,14 @@ mod test {
 
     #[test]
     fn msgs_len() {
-        let mut b = Batch::default();
-        b.schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::ClearAdmin {
-            contract_addr: "".into(),
-        }));
-        b.schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::UpdateAdmin {
-            contract_addr: "".into(),
-            admin: "".into(),
-        }));
+        let b = Batch::default()
+            .schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::ClearAdmin {
+                contract_addr: "".into(),
+            }))
+            .schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::UpdateAdmin {
+                contract_addr: "".into(),
+                admin: "".into(),
+            }));
         assert_eq!(2, b.len());
         assert!(!b.is_empty());
 
@@ -134,8 +134,7 @@ mod test {
     #[test]
     fn resp_with_messages() {
         let ret: u16 = 435;
-        let mut b = Batch::default();
-        b.schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::ClearAdmin {
+        let b = Batch::default().schedule_execute_no_reply(CosmosMsg::Wasm(WasmMsg::ClearAdmin {
             contract_addr: "".to_string(),
         }));
         let emitter = Emitter::of_type(TY1).emit(KEY1, VALUE1).emit(KEY2, VALUE2);

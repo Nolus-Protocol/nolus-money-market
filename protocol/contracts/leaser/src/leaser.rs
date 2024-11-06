@@ -144,14 +144,13 @@ where
     }
     .and_then(|leases_resp| {
         protocols_registry(storage).and_then(|protocols_registry| {
-            let mut batch = Batch::default();
-            batch
+            Batch::default()
                 .schedule_execute_wasm_no_reply_no_funds(
                     protocols_registry,
                     &ExecuteMsg::DeregisterProtocol(migration_spec),
                 )
                 .map_err(ContractError::ProtocolDeregistration)
-                .map(|()| leases_resp.merge_with(batch))
+                .map(|msgs| leases_resp.merge_with(msgs))
         })
     })
 }
@@ -163,8 +162,8 @@ fn has_lease(storage: &dyn Storage) -> bool {
 fn update_remote_refs(
     storage: &dyn Storage,
     new_lease: Code,
-    batch: &mut Batch,
-) -> ContractResult<()> {
+    batch: Batch,
+) -> ContractResult<Batch> {
     let cfg = Config::load(storage)?;
     {
         let update_msg = LppExecuteMsg::<LpnCurrencies>::NewLeaseCode {
@@ -174,7 +173,7 @@ fn update_remote_refs(
             .schedule_execute_wasm_no_reply_no_funds(cfg.lpp, &update_msg)
             .map_err(Into::into)
     }
-    .and_then(|()| {
+    .and_then(|batch| {
         let update_msg = ReserveExecuteMsg::NewLeaseCode(new_lease);
         batch
             .schedule_execute_wasm_no_reply_no_funds(cfg.reserve, &update_msg)

@@ -51,13 +51,11 @@ pub fn register_account<C>(connection: C) -> Batch
 where
     C: Into<String>,
 {
-    let mut batch = Batch::default();
-    batch.schedule_execute_no_reply(NeutronMsg::register_interchain_account(
+    Batch::default().schedule_execute_no_reply(NeutronMsg::register_interchain_account(
         connection.into(),
         ICA_ACCOUNT_ID.into(),
         None,
-    ));
-    batch
+    ))
 }
 
 pub fn parse_register_response(response: &str) -> Result<HostAccount> {
@@ -79,9 +77,7 @@ where
     M: Into<String>,
     C: CurrencyDef,
 {
-    let mut batch = Batch::default();
-
-    batch.schedule_execute_no_reply(NeutronMsg::submit_tx(
+    Batch::default().schedule_execute_no_reply(NeutronMsg::submit_tx(
         connection.into(),
         ICA_ACCOUNT_ID.into(),
         trx.into_msgs(),
@@ -92,8 +88,7 @@ where
             ack_fee: vec![coin_legacy::to_cosmwasm_impl(ack_tip)],
             timeout_fee: vec![coin_legacy::to_cosmwasm_impl(timeout_tip)],
         },
-    ));
-    batch
+    ))
 }
 
 mod impl_ {

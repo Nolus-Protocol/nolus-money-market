@@ -20,7 +20,7 @@ where
     Lpns: Group,
     Self: Into<LppBatch<LppRef<Lpn, Lpns>>>,
 {
-    fn open_loan_req(&mut self, amount: Coin<Lpn>) -> Result<()>;
+    fn open_loan_req(self, amount: Coin<Lpn>) -> Result<Batch>;
     fn open_loan_resp(&self, resp: Reply) -> Result<LoanResponse<Lpn>>;
 
     fn quote(&self, amount: Coin<Lpn>) -> Result<QueryQuoteResponse>;
@@ -71,10 +71,11 @@ where
     Lpn::Group: MemberOf<Lpns>,
     Lpns: Group,
 {
-    fn open_loan_req(&mut self, amount: Coin<Lpn>) -> Result<()> {
+    fn open_loan_req(self, amount: Coin<Lpn>) -> Result<Batch> {
+        let id = self.id();
         self.batch
             .schedule_execute_wasm_reply_on_success_no_funds(
-                self.id().clone(),
+                id,
                 &ExecuteMsg::<Lpns>::OpenLoan {
                     amount: amount.into(),
                 },
@@ -124,7 +125,7 @@ mod test {
 
     use crate::{
         msg::ExecuteMsg,
-        stub::{lender::LppLender, LppBatch, LppRef},
+        stub::{lender::LppLender, LppRef},
     };
     #[test]
     fn open_loan_req() {
@@ -137,11 +138,10 @@ mod test {
         let borrow_amount = Coin::<Lpn>::new(10);
         let querier = MockQuerier::default();
         let wrapper = QuerierWrapper::new(&querier);
-        let mut lpp_stub = lpp.into_lender(wrapper);
-        lpp_stub
+        let batch = lpp
+            .into_lender(wrapper)
             .open_loan_req(borrow_amount)
             .expect("open new loan request failed");
-        let LppBatch { lpp_ref: _, batch } = lpp_stub.into();
         let resp: CwResponse = response::response_only_messages(batch);
         assert_eq!(1, resp.messages.len());
         let msg = &resp.messages[0];

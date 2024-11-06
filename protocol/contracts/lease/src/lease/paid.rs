@@ -35,19 +35,21 @@ where
     Lpn: CurrencyDef,
     Lpn::Group: MemberOf<LpnCurrencies>,
 {
-    pub(crate) fn close<B>(self, mut lease_account: B) -> ContractResult<Batch>
+    pub(crate) fn close<B>(self, lease_account: B) -> ContractResult<Batch>
     where
         B: BankAccount,
     {
         let surplus = lease_account.balance::<Lpn, LpnCurrencies>()?;
 
-        if !surplus.is_zero() {
-            lease_account.send(surplus, self.customer.clone());
-        }
+        let updated_account = if !surplus.is_zero() {
+            lease_account.send(surplus, self.customer.clone())
+        } else {
+            lease_account
+        };
 
-        lease_account.send(self.position.amount(), self.customer);
-
-        Ok(lease_account.into())
+        Ok(updated_account
+            .send(self.position.amount(), self.customer)
+            .into())
     }
 }
 

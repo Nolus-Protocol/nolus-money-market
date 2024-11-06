@@ -46,17 +46,30 @@ where
     type Error = Error;
 
     fn try_from(stub: Impl<Lpn>) -> Result<Self, Self::Error> {
-        let mut batch = Batch::default();
-        if let Some(losses) = stub.amount {
-            batch
-                .schedule_execute_wasm_no_reply_no_funds(
-                    stub.ref_.into(),
-                    &ExecuteMsg::CoverLiquidationLosses(losses.into()),
-                )
-                .map_err(Into::into)
-                .map(|()| batch)
-        } else {
-            Ok(batch)
-        }
+        stub.amount.map_or_else(
+            || Ok(Batch::default()),
+            |losses| {
+                Batch::default()
+                    .schedule_execute_wasm_no_reply_no_funds(
+                        stub.ref_.into(),
+                        &ExecuteMsg::CoverLiquidationLosses(losses.into()),
+                    )
+                    .map_err(Into::into)
+            },
+        )
     }
+
+    // fn try_from(stub: Impl<Lpn>) -> Result<Self, Self::Error> {
+    //     let batch = Batch::default();
+    //     if let Some(losses) = stub.amount {
+    //         batch
+    //             .schedule_execute_wasm_no_reply_no_funds(
+    //                 stub.ref_.into(),
+    //                 &ExecuteMsg::CoverLiquidationLosses(losses.into()),
+    //             )
+    //             .map_err(Into::into)
+    //     } else {
+    //         Ok(batch)
+    //     }
+    // }
 }

@@ -45,20 +45,21 @@ impl<'a> Lpp for Stub<'a> {
             return Ok(Default::default());
         }
 
-        let mut msgs = Batch::default();
-        msgs.schedule_execute_wasm_no_reply(
-            self.lpp.clone(),
-            &ExecuteMsg::DistributeRewards {},
-            Some(reward),
-        )
-        .map(|()| {
-            Emitter::of_type("tr-rewards")
-                .emit_tx_info(self.env)
-                .emit_to_string_value("to", self.lpp)
-                .emit_coin("rewards", reward)
-        })
-        .map(|events| MessageResponse::messages_with_events(msgs, events))
-        .map_err(Into::into)
+        Batch::default()
+            .schedule_execute_wasm_no_reply(
+                self.lpp.clone(),
+                &ExecuteMsg::DistributeRewards {},
+                Some(reward),
+            )
+            .map_err(Into::into)
+            .map(|msgs| {
+                let events = Emitter::of_type("tr-rewards")
+                    .emit_tx_info(self.env)
+                    .emit_to_string_value("to", self.lpp)
+                    .emit_coin("rewards", reward);
+
+                MessageResponse::messages_with_events(msgs, events)
+            })
     }
 }
 

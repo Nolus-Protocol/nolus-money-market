@@ -101,14 +101,13 @@ where
         // Limitations:
         // 1. Cannot, if ever we want, handle reply_on_success since a successful delivery would have moved to another state
         // 2. Do not support reply_* to the sub-messages
-        let mut resp = Batch::default();
-        resp.schedule_execute_wasm_reply_on_error_no_funds(
-            myself,
-            &ForwardToInnerMsg::msg(),
-            REPLY_ID,
-        )
-        .map(|()| resp)
-        .map_err(Into::into)
+        Batch::default()
+            .schedule_execute_wasm_reply_on_error_no_funds(
+                myself,
+                &ForwardToInnerMsg::msg(),
+                REPLY_ID,
+            )
+            .map_err(Into::into)
     }
 }
 

@@ -15,7 +15,7 @@ where
     // BaseC::Group: MemberOf<Self::BaseG>;
     type BaseG: Group;
 
-    fn add_alarm(&mut self, alarm: Alarm<AlarmCurrencies, Self::BaseC, Self::BaseG>) -> Result<()>
+    fn add_alarm(self, alarm: Alarm<AlarmCurrencies, Self::BaseC, Self::BaseG>) -> Result<Batch>
     where
         <Self::BaseC as CurrencyDef>::Group:
             MemberOf<Self::BaseG> + MemberOf<AlarmCurrencies::TopG>;
@@ -85,17 +85,11 @@ where
     type BaseC = OracleBase;
     type BaseG = OracleBaseG;
 
-    fn add_alarm(&mut self, alarm: Alarm<AlarmCurrencies, Self::BaseC, Self::BaseG>) -> Result<()> {
-        self.batch.schedule_execute_no_reply(
-            wasm_execute(
-                self.addr().clone(),
-                &ExecuteMsg::AddPriceAlarm { alarm },
-                vec![],
-            )
-            .map_err(Error::StubAddAlarm)?,
-        );
-
-        Ok(())
+    fn add_alarm(self, alarm: Alarm<AlarmCurrencies, Self::BaseC, Self::BaseG>) -> Result<Batch> {
+        let contract_addr = self.addr().clone();
+        wasm_execute(contract_addr, &ExecuteMsg::AddPriceAlarm { alarm }, vec![])
+            .map_err(Error::StubAddAlarm)
+            .map(|execute_msg| self.batch.schedule_execute_no_reply(execute_msg))
     }
 }
 

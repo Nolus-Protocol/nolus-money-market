@@ -119,14 +119,14 @@ fn do_cover_losses(
     this_contract: &Addr,
     querier: QuerierWrapper<'_>,
 ) -> Result<PlatformResponse> {
-    let mut bank = bank::account(this_contract, querier);
+    let bank = bank::account(this_contract, querier);
     bank.balance::<LpnCurrency, Lpns>()
         .map_err(Into::into)
         .and_then(|balance| {
             if balance < amount {
                 Err(Error::InsufficientBalance)
             } else {
-                bank.send(amount, lease.clone());
+                let bank = bank.send(amount, lease.clone());
                 let emitter = Emitter::of_type("reserve-cover-loss")
                     .emit("to", lease)
                     .emit_coin("payment", amount);

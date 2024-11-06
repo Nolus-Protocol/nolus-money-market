@@ -9,11 +9,8 @@ use crate::{msg::ExecuteMsg, ContractError};
 
 pub type Result<T> = StdResult<T, ContractError>;
 
-pub trait TimeAlarms
-where
-    Self: Into<Batch>,
-{
-    fn add_alarm(&mut self, time: Timestamp) -> Result<()>;
+pub trait TimeAlarms {
+    fn add_alarm(self, time: Timestamp) -> Result<Batch>;
 }
 
 pub trait WithTimeAlarms {
@@ -43,9 +40,7 @@ impl TimeAlarmsRef {
     }
 
     pub fn setup_alarm(&self, when: Timestamp) -> Result<Batch> {
-        let mut stub = self.as_stub();
-        stub.add_alarm(when)?;
-        Ok(stub.into())
+        self.as_stub().add_alarm(when)
     }
 
     /// It would be overengineering to hide the `TimeAlarms` implementation
@@ -81,14 +76,10 @@ impl<'a> TimeAlarmsStub<'a> {
 }
 
 impl<'a> TimeAlarms for TimeAlarmsStub<'a> {
-    fn add_alarm(&mut self, time: Timestamp) -> Result<()> {
-        self.batch.schedule_execute_no_reply(wasm_execute(
-            self.addr().clone(),
-            &ExecuteMsg::AddAlarm { time },
-            vec![],
-        )?);
-
-        Ok(())
+    fn add_alarm(self, time: Timestamp) -> Result<Batch> {
+        wasm_execute(self.addr(), &ExecuteMsg::AddAlarm { time }, vec![])
+            .map_err(Into::into)
+            .map(|msg| self.batch.schedule_execute_no_reply(msg))
     }
 }
 

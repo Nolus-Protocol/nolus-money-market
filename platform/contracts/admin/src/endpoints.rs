@@ -97,9 +97,7 @@ pub fn execute(
             }
             .store(deps.storage)?;
 
-            let mut batch: Batch = Batch::default();
-
-            batch.schedule_execute_reply_on_success(
+            let batch = Batch::default().schedule_execute_reply_on_success(
                 WasmMsg::Instantiate2 {
                     admin: Some(env.contract.address.into_string()),
                     code_id: code_id.u64(),

@@ -1,7 +1,7 @@
 use platform::batch::Batch;
 use sdk::cosmwasm_std::Addr;
 
-use crate::validate::Validate;
+use crate::{contracts::impl_mod::Batches, validate::Validate};
 
 use super::{
     super::{impl_mod::migrate_contract, AsRef, ForEachPair, MigrationSpec, TryForEach},
@@ -13,18 +13,11 @@ impl ProtocolContracts<Addr> {
         self,
         migration_msgs: ProtocolContracts<MigrationSpec>,
     ) -> Batch {
-        let mut migration_batch = Batch::default();
+        let migration_batch = Batch::default();
+        let post_migration_execute_batch = Batch::default();
+        let batches = Batches::default();
 
-        let mut post_migration_execute_batch = Batch::default();
-
-        () = self.for_each_pair(migration_msgs, (), |address, migration_spec, ()| {
-            () = migrate_contract(
-                &mut migration_batch,
-                &mut post_migration_execute_batch,
-                address,
-                migration_spec,
-            );
-        });
+        self.for_each_pair(migration_msgs, batches, migrate_contract);
 
         migration_batch.merge(post_migration_execute_batch)
     }

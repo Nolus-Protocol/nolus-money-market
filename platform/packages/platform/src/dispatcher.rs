@@ -34,10 +34,13 @@ where
 
     pub fn send_to(mut self, receiver: Addr, reply_id: Id) -> Result<Self, Error> {
         self.emitter = self.emitter.emit(EVENT_KEY, receiver.clone());
+        self.batch = self.batch.schedule_execute_wasm_reply_always_no_funds(
+            receiver,
+            &self.message,
+            reply_id,
+        )?;
 
-        self.batch
-            .schedule_execute_wasm_reply_always_no_funds(receiver, &self.message, reply_id)
-            .map(|()| self)
+        Ok(self)
     }
 
     pub fn nb_sent(&self) -> AlarmsCount {
