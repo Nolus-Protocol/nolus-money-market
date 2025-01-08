@@ -1,0 +1,13 @@
+[package]
+name = "json-value"
+version = "0.0.0"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+# General packages
+serde = { workspace = true }
+
+[lints]
+workspace = true
