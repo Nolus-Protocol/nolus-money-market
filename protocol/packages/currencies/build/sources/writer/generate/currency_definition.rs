@@ -2,10 +2,9 @@ use std::{borrow::Cow, iter};
 
 use anyhow::{anyhow, Context as _, Result};
 
-use crate::{
-    currencies_tree::{self, CurrenciesTree},
-    either::Either,
-};
+use either::Either;
+
+use crate::currencies_tree::{self, CurrenciesTree};
 
 use super::{super::super::generator, GeneratedSourceEntry};
 

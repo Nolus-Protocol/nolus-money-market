@@ -31,6 +31,7 @@ serde = { workspace = true, features = ["derive"] }
 currency = { workspace = true, features = ["testing"] }
 
 [build-dependencies]
+either = { workspace = true }
 topology = { workspace = true }
 
 anyhow = { workspace = true }

@@ -47,6 +47,7 @@ tree = { path = "../platform/packages/tree", default-features = false }
 versioning = { path = "../platform/packages/versioning", default-features = false }
 
 # Tools Packages
+either = { path = "../tools/either" }
 topology = { path = "../tools/topology" }
 
 # General

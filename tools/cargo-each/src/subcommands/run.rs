@@ -7,9 +7,9 @@ use std::{
 use anyhow::{anyhow, bail, Context, Result};
 use cargo_metadata::{Metadata, Package};
 
-use crate::{
-    combinations_iter, config::deserialize_config_if_any, either_iter::EitherIter, pipe::Pipe as _,
-};
+use either::Either;
+
+use crate::{combinations_iter, config::deserialize_config_if_any, pipe::Pipe as _};
 
 use super::{get_packages_iter, Mode, Tags};
 
@@ -93,9 +93,9 @@ where
             );
         }
 
-        EitherIter::Left(features_combination.into_iter())
+        Either::Left(features_combination.into_iter())
     } else {
-        EitherIter::Right(features_combinations)
+        Either::Right(features_combinations)
     };
 
     features_combinations.try_for_each(move |features_combination| {
