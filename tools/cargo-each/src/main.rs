@@ -11,7 +11,6 @@ use self::{pipe::Pipe as _, subcommands::Tags};
 mod check;
 mod combinations_iter;
 mod config;
-mod either_iter;
 mod iter_or_else_iter;
 mod pipe;
 mod subcommands;

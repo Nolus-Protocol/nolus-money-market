@@ -3,7 +3,7 @@ use std::{collections::BTreeSet, path::PathBuf};
 use anyhow::{anyhow, Result};
 use cargo_metadata::{Metadata, Package};
 
-use crate::either_iter::EitherIter;
+use either::Either;
 
 pub(crate) use self::{
     args::{Arguments, Parser, SubcommandArguments},
@@ -29,15 +29,15 @@ fn get_packages_iter(
     mode: Mode,
 ) -> Result<impl Iterator<Item = &Package>> {
     match mode {
-        Mode::Subdirectories => Ok(EitherIter::Left(filtered_workspace_members(
+        Mode::Subdirectories => Ok(Either::Left(filtered_workspace_members(
             metadata,
             current_dir,
         ))),
-        Mode::Workspace => Ok(EitherIter::Right(EitherIter::Left(
+        Mode::Workspace => Ok(Either::Right(Either::Left(
             metadata.workspace_packages().into_iter(),
         ))),
         Mode::Package(package) => find_package_by_name(metadata, &package)
-            .map(|package| EitherIter::Right(EitherIter::Right(Some(package).into_iter()))),
+            .map(|package| Either::Right(Either::Right(Some(package).into_iter()))),
     }
 }
 

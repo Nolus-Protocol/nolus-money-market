@@ -12,7 +12,8 @@ license = "Apache-2.0"
 unexpected_cfgs = { level = "forbid", check-cfg = ["cfg(test)"] }
 
 [workspace.dependencies]
-topology.path = "topology"
+either = { path = "either" }
+topology = { path = "topology" }
 
 anyhow = "1"
 cargo_metadata = "0.18.1"

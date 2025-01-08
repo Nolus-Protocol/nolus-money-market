@@ -3,10 +3,11 @@ use std::iter;
 use anyhow::{Context, Result};
 use cargo_metadata::Package;
 
+use either::Either;
+
 use crate::{
     check,
     config::{Combination, Config, FeatureGroup},
-    either_iter::EitherIter,
     iter_or_else_iter::IterOrElseIter,
     subcommands::Tags,
 };
@@ -23,13 +24,13 @@ pub(crate) fn package_combinations<'r>(
         check::configuration(package, config)
             .context("Configuration checks failed!")
             .map(move |()| {
-                Some(EitherIter::Left(configured_package_combinations(
+                Some(Either::Left(configured_package_combinations(
                     package, config, tags,
                 )))
             })
     } else {
         Ok(if tags.is_none() {
-            Some(EitherIter::Right(build_combinations(
+            Some(Either::Right(build_combinations(
                 package.features.keys().map(String::as_str),
             )))
         } else {
@@ -55,9 +56,9 @@ fn configured_package_combinations<'r>(
     let mut includes_empty = false;
 
     let iter = if let Some(tags) = tags {
-        EitherIter::Left(combinations.filter(move |combination| combination.tags.is_superset(tags)))
+        Either::Left(combinations.filter(move |combination| combination.tags.is_superset(tags)))
     } else {
-        EitherIter::Right(combinations)
+        Either::Right(combinations)
     }
     .flat_map(move |combination| {
         includes_empty = includes_empty | combination.always_on.is_empty()
@@ -80,12 +81,12 @@ fn package_combination_variants<'r>(
     let explicit_features = explicit_combination_features(config, combination);
 
     if combination.include_rest {
-        EitherIter::Left(cross_join(
+        Either::Left(cross_join(
             combination_left_over_features(package, config, combination),
             explicit_features,
         ))
     } else {
-        EitherIter::Right(explicit_features)
+        Either::Right(explicit_features)
     }
 }
 
@@ -240,13 +241,13 @@ where
             let cloned = left_set.clone();
 
             if right_set_element.as_ref().is_empty() {
-                EitherIter::Left(cloned)
+                Either::Left(cloned)
             } else {
                 let right_set_element = right_set_element.as_ref().to_string();
 
                 let back_iter = Some(right_set_element.clone()).into_iter();
 
-                EitherIter::Right(IterOrElseIter::new(
+                Either::Right(IterOrElseIter::new(
                     cloned.map(move |mut features_set| {
                         if features_set.is_empty() {
                             right_set_element.clone()
