@@ -7,13 +7,13 @@ use std::{
 
 use anyhow::{anyhow, bail, Context as _, Result};
 
+use either::Either;
 use topology::{CurrencyDefinitions, Topology};
 
-use self::{currencies_tree::CurrenciesTree, either::Either, protocol::Protocol};
+use self::{currencies_tree::CurrenciesTree, protocol::Protocol};
 
 mod convert_case;
 mod currencies_tree;
-mod either;
 mod protocol;
 mod sources;
 mod subtype_lifetime;
