@@ -82,6 +82,7 @@ dependencies = [
  "anyhow",
  "cargo_metadata",
  "clap",
+ "either",
  "serde",
 ]
 
@@ -190,6 +191,10 @@ dependencies = [
  "block-buffer",
  "crypto-common",
 ]
+
+[[package]]
+name = "either"
+version = "0.0.0"
 
 [[package]]
 name = "generic-array"
