@@ -4,12 +4,38 @@ use serde::{Deserialize, Serialize};
 
 use sdk::schemars::{self, JsonSchema};
 
-use crate::{fraction::Fraction, fractionable::Fractionable, zero::Zero};
+use crate::{
+    fraction::Fraction,
+    fractionable::Fractionable,
+    percent::{Percent, Units},
+    zero::Zero,
+};
 
 // TODO review whether it may gets simpler if extend Fraction
-pub trait Ratio<U> {
-    fn parts(&self) -> U;
-    fn total(&self) -> U;
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct Ratio<U> {
+    parts: U,
+    total: U,
+}
+
+impl<U> Ratio<U>
+where
+    U: Copy + PartialEq + PartialOrd<U>,
+{
+    pub fn new(parts: U, total: U) -> Self {
+        debug_assert!(parts < total);
+
+        Self { parts, total }
+    }
+
+    pub fn parts(&self) -> U {
+        self.parts
+    }
+
+    pub fn total(&self) -> U {
+        self.total
+    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
@@ -36,26 +62,30 @@ where
 
 impl<U, T> Fraction<U> for Rational<T>
 where
-    Self: Ratio<U>,
+    U: Copy + PartialOrd,
+    T: Copy + Into<U>,
 {
     #[track_caller]
     fn of<A>(&self, whole: A) -> A
     where
         A: Fractionable<U>,
     {
-        whole.safe_mul(self)
+        whole.safe_mul(&(*self).into())
     }
 }
 
-impl<U, T> Ratio<U> for Rational<T>
+impl<U, T> From<Rational<T>> for Ratio<U>
 where
-    T: Zero + Copy + PartialEq + Into<U>,
+    U: Copy + PartialOrd,
+    T: Into<U>,
 {
-    fn parts(&self) -> U {
-        self.nominator.into()
+    fn from(ratio: Rational<T>) -> Self {
+        Ratio::new(ratio.nominator.into(), ratio.denominator.into())
     }
+}
 
-    fn total(&self) -> U {
-        self.denominator.into()
+impl From<Rational<Percent>> for Ratio<Units> {
+    fn from(rational: Rational<Percent>) -> Self {
+        Ratio::new(rational.nominator.units(), rational.denominator.units())
     }
 }

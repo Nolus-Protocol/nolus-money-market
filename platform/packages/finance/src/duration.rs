@@ -98,13 +98,13 @@ impl Duration {
     where
         T: TimeSliceable,
     {
-        annual_amount.safe_mul(&Rational::new(self.nanos(), Self::YEAR.nanos()))
+        annual_amount.safe_mul(&Rational::new(self.nanos(), Self::YEAR.nanos()).into())
     }
 
     pub fn into_slice_per_ratio<U>(self, amount: U, annual_amount: U) -> Self
     where
         Self: Fractionable<U>,
-        U: Zero + Debug + PartialEq + Copy,
+        U: Zero + Debug + PartialEq + Copy + PartialOrd,
     {
         Rational::new(amount, annual_amount).of(self)
     }

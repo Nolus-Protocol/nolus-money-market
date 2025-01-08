@@ -41,14 +41,14 @@ mod test {
         use crate::fractionable::Fractionable;
         assert_eq!(
             Coin::<SuperGroupTestC1>::new(30),
-            Coin::<SuperGroupTestC1>::new(3).safe_mul(&Percent::from_percent(1000))
+            Coin::<SuperGroupTestC1>::new(3).safe_mul(&Percent::from_percent(1000).into())
         );
 
         assert_eq!(
             Coin::<SuperGroupTestC1>::new(1000),
             Fractionable::<u32>::safe_mul(
                 Coin::<SuperGroupTestC1>::new(2),
-                &Rational::new(1000u32, 2u32)
+                &Rational::new(1000u32, 2u32).into()
             )
         );
 
@@ -56,7 +56,7 @@ mod test {
             Coin::<SuperGroupTestC1>::new(2 * Amount::from(u32::MAX)),
             Fractionable::<u32>::safe_mul(
                 Coin::<SuperGroupTestC1>::new(2),
-                &Rational::new(u32::MAX, 1u32)
+                &Rational::new(u32::MAX, 1u32).into()
             )
         );
     }

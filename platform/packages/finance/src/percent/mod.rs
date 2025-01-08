@@ -45,7 +45,7 @@ impl Percent {
 
     pub fn from_ratio<FractionUnit>(nominator: FractionUnit, denominator: FractionUnit) -> Self
     where
-        FractionUnit: Copy + Debug + PartialEq + Zero,
+        FractionUnit: Copy + Debug + PartialEq + Zero + PartialOrd,
         Self: Fractionable<FractionUnit>,
     {
         Rational::new(nominator, denominator).of(Percent::HUNDRED)
@@ -84,29 +84,30 @@ impl Fraction<Units> for Percent {
     where
         A: Fractionable<Units>,
     {
-        whole.safe_mul(self)
+        whole.safe_mul(&(*self).into())
     }
 }
 
-impl Ratio<Units> for Percent {
-    fn parts(&self) -> Units {
-        self.units()
-    }
+// impl From<Percent> for Units {
+//     fn from(value: Percent) -> Self {
+//         value.units()
+//     }
+// }
 
-    fn total(&self) -> Units {
-        Percent::HUNDRED.units()
+impl From<Percent> for Ratio<Units> {
+    fn from(percent: Percent) -> Self {
+        Self::new(percent.units(), Percent::HUNDRED.units())
     }
 }
 
-impl Ratio<Units> for Rational<Percent> {
-    fn parts(&self) -> Units {
-        Ratio::<Percent>::parts(self).units()
-    }
+// impl Ratio<Units> for Rational<Percent> {
+//     fn parts(&self) -> Units {
+//         Ratio::<Percent>::parts(self).units()
+//     }
 
-    fn total(&self) -> Units {
-        Ratio::<Percent>::total(self).units()
-    }
-}
+//     fn total(&self) -> Units {
+//         Ratio::<Percent>::total(self).units()
+//
 
 impl Display for Percent {
     #[track_caller]
@@ -181,7 +182,7 @@ pub(super) mod test {
 
     use crate::{
         coin::Coin, fraction::Fraction, fractionable::Percentable, percent::Percent,
-        ratio::Rational,
+        ratio::{Ratio, Rational},
     };
 
     use super::Units;
@@ -309,7 +310,7 @@ pub(super) mod test {
     #[test]
     fn rational_of_percents() {
         let v = 14u32;
-        let r = Rational::new(Percent::HUNDRED, Percent::HUNDRED);
+        let r: Ratio::<u32> = Rational::new(Percent::HUNDRED, Percent::HUNDRED).into();
         assert_eq!(v, Fraction::<u32>::of(&r, v));
     }
 

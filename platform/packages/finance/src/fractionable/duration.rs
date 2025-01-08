@@ -14,10 +14,7 @@ where
 
 impl<C> Fractionable<Coin<C>> for Duration {
     #[track_caller]
-    fn safe_mul<F>(self, fraction: &F) -> Self
-    where
-        F: Ratio<Coin<C>>,
-    {
+    fn safe_mul(self, fraction: &Ratio<Coin<C>>) -> Self {
         let d128: u128 = self.into();
         // TODO re-assess the design of Ratio ... and whether it could be > 1
         d128.safe_mul(fraction)
@@ -38,7 +35,7 @@ mod tests {
         let res = d.safe_mul(&Rational::new(
             Coin::<SuperGroupTestC1>::new(10),
             Coin::<SuperGroupTestC1>::new(20),
-        ));
+        ).into());
         assert_eq!(Duration::from_secs(5), res);
     }
 
@@ -48,7 +45,7 @@ mod tests {
         let res = d.safe_mul(&Rational::new(
             Coin::<SuperGroupTestC1>::new(u128::MAX),
             Coin::<SuperGroupTestC1>::new(u128::MAX / 2),
-        ));
+        ).into());
         assert_eq!(Duration::from_secs(20), res);
     }
 }

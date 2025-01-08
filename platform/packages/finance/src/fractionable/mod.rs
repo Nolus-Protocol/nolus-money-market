@@ -15,9 +15,7 @@ mod usize;
 
 pub trait Fractionable<U> {
     #[track_caller]
-    fn safe_mul<F>(self, fraction: &F) -> Self
-    where
-        F: Ratio<U>;
+    fn safe_mul(self, fraction: &Ratio<U>) -> Self;
 }
 
 // TODO revisit its usability
@@ -38,13 +36,10 @@ where
     <D as TryInto<DIntermediate>>::Error: Debug,
     DIntermediate: Into<T>,
     D: Mul<D, Output = D> + Div<D, Output = D>,
-    U: Zero + PartialEq + Into<D>,
+    U: Zero + PartialEq + Into<D> + PartialOrd + Copy,
 {
     #[track_caller]
-    fn safe_mul<R>(self, ratio: &R) -> Self
-    where
-        R: Ratio<U>,
-    {
+    fn safe_mul(self, ratio: &Ratio<U>) -> Self {
         // TODO debug_assert_eq!(T::BITS * 2, D::BITS);
 
         if ratio.parts() == ratio.total() {

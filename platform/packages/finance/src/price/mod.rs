@@ -103,10 +103,7 @@ where
     /// Price(amount, amount_quote) * Ratio(nominator / denominator) = Price(amount * denominator, amount_quote * nominator)
     /// where the pairs (amount, nominator) and (amount_quote, denominator) are transformed into co-prime numbers.
     /// Please note that Price(amount, amount_quote) is like Ratio(amount_quote / amount).
-    pub(crate) fn lossy_mul<R>(self, rhs: &R) -> Self
-    where
-        R: Ratio<Amount>,
-    {
+    pub(crate) fn lossy_mul(self, rhs: &Ratio<Amount>) -> Self {
         let (amount_normalized, rhs_nominator_normalized) =
             self.amount.into_coprime_with(Coin::<C>::from(rhs.parts()));
         let (amount_quote_normalized, rhs_denominator_normalized) = self
@@ -318,7 +315,7 @@ where
         // Please note that Price(amount, amount_quote) is like Ratio(amount_quote / amount).
 
         Self::Output::new(self.amount, rhs.amount_quote)
-            .lossy_mul(&Rational::new(self.amount_quote, rhs.amount))
+            .lossy_mul(&Rational::new(self.amount_quote, rhs.amount).into())
     }
 }
 
@@ -644,7 +641,7 @@ mod test {
 
         let price3 = price::total_of(amount1).is(quote2);
         let ratio = Rational::new(quote1, amount2);
-        assert_eq!(exp, price3.lossy_mul(&ratio));
+        assert_eq!(exp, price3.lossy_mul(&ratio.into()));
     }
 
     fn lossy_mul_shifts_impl(q1: Amount, shifts: u8) {
