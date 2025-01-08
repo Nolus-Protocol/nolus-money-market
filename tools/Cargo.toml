@@ -12,9 +12,11 @@ license = "Apache-2.0"
 unexpected_cfgs = { level = "forbid", check-cfg = ["cfg(test)"] }
 
 [workspace.dependencies]
+# Own packages
 either = { path = "either" }
 topology = { path = "topology" }
 
+# General packages
 anyhow = "1"
 cargo_metadata = "0.18.1"
 clap = { version = "4.5", features = ["derive", "unicode"] }
