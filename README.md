@@ -33,7 +33,7 @@ Implementation of the core business logic as CosmWasm contracts.
 
 ### Build
 
-The build requires an environment variables named `RELEASE_VERSION` that is the name of the release as an arbitrary string.
+The build requires an environment variables named `SOFTWARE_RELEASE_ID` that is the name of the release as an arbitrary string.
 
 #### Workspaces
 
@@ -57,7 +57,7 @@ or builds the contracts of the workspace from within which it is ran:
 
 ```sh
 
-RELEASE_VERSION='dev-release' cargo each run -x -t build -t <protocol> -t <net> --exact -- cargo build --profile "production_nets_release" --lib --locked --target=wasm32-unknown-unknown
+SOFTWARE_RELEASE_ID='dev-release' cargo each run -x -t build -t <protocol> -t <net> --exact -- cargo build --profile "production_nets_release" --lib --locked --target=wasm32-unknown-unknown
 ```
 
 One way to avoid having to set those environment variables is to
@@ -68,16 +68,16 @@ An example one for VSCode/VSCodium, located at `.vscode/settings.json`, is shown
 ```json
 {
   "rust-analyzer.cargo.extraEnv": {
-    "RELEASE_VERSION": "local",
+    "SOFTWARE_RELEASE_ID": "local",
   },
   "terminal.integrated.env.linux": {
-    "RELEASE_VERSION": "local",
+    "SOFTWARE_RELEASE_ID": "local",
   },
   "terminal.integrated.env.osx": {
-    "RELEASE_VERSION": "local",
+    "SOFTWARE_RELEASE_ID": "local",
   },
   "terminal.integrated.env.windows": {
-    "RELEASE_VERSION": "local",
+    "SOFTWARE_RELEASE_ID": "local",
   },
 }
 ```
@@ -125,7 +125,7 @@ each set of contracts, depending on their workspace (indicated by
     docker run --rm -v "$(pwd)/platform/:/platform/:ro" \
     -v "$(pwd)/${WORKSPACE_DIR_NAME}/:/code/:ro" \
     -v "$(pwd)/artifacts/${ARTIFACTS_SUBDIR}/:/artifacts/:rw" \
-    --env "RELEASE_VERSION=`git describe`-`date -Iminute`" \
+    --env "SOFTWARE_RELEASE_ID=`git describe`-`date -Iminute`" \
     --env "features=contract$(if test "${WORKSPACE_DIR_NAME}" = 'protocol'; then echo ",net_${NET}"; fi)$(if test "${WORKSPACE_DIR_NAME}" = 'protocol'; then echo ",${PROTOCOL}"; fi)" \
     wasm-optimizer
   ```
@@ -138,7 +138,7 @@ be agnostic to the targeted network and protocol.
 
 **NOTE:** Builds are reproducable *as long as* all environment variables
 passed to the container are the exact same. If it is desired to build
-a verification copy of the contracts, one must set the `RELEASE_VERSION`
+a verification copy of the contracts, one must set the `SOFTWARE_RELEASE_ID`
 environment variable to the one used to build the original instead.
 
 ##### A non-Docker optimizer
@@ -187,7 +187,7 @@ Run the following in the `protocol` and `tests` workspaces.
 
 #### Explore the number and size of instantiations of each generic function
 ```sh
-RELEASE_VERSION=dev cargo llvm-lines -p <package> --features net_main,osmosis-osmosis-usdc_axelar  --profile production_nets_release --target "wasm32-unknown-unknown"
+SOFTWARE_RELEASE_ID=dev cargo llvm-lines -p <package> --features net_main,osmosis-osmosis-usdc_axelar  --profile production_nets_release --target "wasm32-unknown-unknown"
 ```
 #### Check the generated WASM code
 First, install the checker:

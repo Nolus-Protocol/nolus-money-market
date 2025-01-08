@@ -5,7 +5,7 @@ use sdk::{
     cosmwasm_std::{Addr, Uint64},
     schemars::{self, JsonSchema},
 };
-use versioning::Release;
+use versioning::Id;
 
 pub use crate::contracts::{
     Contracts, ContractsExecute, ContractsMigration, Dex, Granularity, HigherOrderGranularity,
@@ -78,7 +78,7 @@ pub enum SudoMsg {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct MigrateContracts {
-    pub release: Release,
+    pub release: Id,
     pub migration_spec: ContractsMigration,
 }
 

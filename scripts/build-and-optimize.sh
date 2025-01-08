@@ -55,13 +55,13 @@ RUSTFLAGS="${RUSTFLAGS:+"${RUSTFLAGS:?} "}-C link-arg=-s"
 readonly RUSTFLAGS
 export RUSTFLAGS
 
-if RELEASE_VERSION="$("cat" "/release-version.txt")"
+if SOFTWARE_RELEASE_ID="$("cat" "/release-version.txt")"
 then
-  readonly RELEASE_VERSION
+  readonly SOFTWARE_RELEASE_ID
 
-  : "${RELEASE_VERSION:?"Release version cannot be null!"}"
+  : "${SOFTWARE_RELEASE_ID:?"Release version cannot be null!"}"
 
-  export RELEASE_VERSION
+  export SOFTWARE_RELEASE_ID
 else
   "error" "Failed to read release version!"
 fi

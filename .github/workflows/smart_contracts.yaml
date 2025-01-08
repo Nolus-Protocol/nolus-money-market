@@ -38,7 +38,7 @@ defaults:
 
 env:
   CARGO_TERM_COLOR: "always"
-  RELEASE_VERSION: "ci"
+  SOFTWARE_RELEASE_ID: "ci"
   check-dependencies-versions: |-
     ${{ toJSON(github.ref_type == 'tag' || (github.event_name == 'workflow_dispatch' && inputs.check-dependencies-version)) }}
   upload-artifacts: |-

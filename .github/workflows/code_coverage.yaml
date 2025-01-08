@@ -12,7 +12,7 @@ defaults:
 
 env:
   CARGO_TERM_COLOR: "always"
-  RELEASE_VERSION: "ci"
+  SOFTWARE_RELEASE_ID: "ci"
 
 jobs:
   configuration:

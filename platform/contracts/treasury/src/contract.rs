@@ -45,7 +45,7 @@ pub fn instantiate(
 
 #[entry_point]
 pub fn migrate(deps: DepsMut<'_>, _env: Env, _msg: MigrateMsg) -> ContractResult<CwResponse> {
-    versioning::update_software(deps.storage, CONTRACT_VERSION, Into::into)
+    versioning::update_legacy_software(deps.storage, CONTRACT_VERSION, Into::into)
         .and_then(response::response)
 }
 

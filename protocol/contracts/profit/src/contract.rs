@@ -71,7 +71,7 @@ pub fn migrate(
     _env: Env,
     MigrateMsg {}: MigrateMsg,
 ) -> ContractResult<CwResponse> {
-    versioning::update_software(deps.storage, CONTRACT_VERSION, Into::into)
+    versioning::update_legacy_software(deps.storage, CONTRACT_VERSION, Into::into)
         .and_then(response::response)
 }
 

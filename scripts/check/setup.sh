@@ -20,10 +20,10 @@
 
 set -eu
 
-RELEASE_VERSION="dev"
-readonly RELEASE_VERSION
-: "${RELEASE_VERSION:?}"
-export RELEASE_VERSION
+SOFTWARE_RELEASE_ID="dev"
+readonly SOFTWARE_RELEASE_ID
+: "${SOFTWARE_RELEASE_ID:?}"
+export SOFTWARE_RELEASE_ID
 
 indentations="${indentations:-">"}"
 

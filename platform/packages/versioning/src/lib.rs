@@ -1,13 +1,16 @@
-use serde::{Deserialize, Serialize};
-
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-use sdk::{
-    cosmwasm_std::{StdError, StdResult, Storage},
-    cw_storage_plus::Item,
+use std::{
+    cmp::Ordering,
+    fmt::{Display, Formatter, Result as FmtResult},
 };
 
-pub use self::release::Release;
+use serde::{Deserialize, Serialize};
+
+use sdk::cosmwasm_std::{StdError, StdResult, Storage};
+#[cfg(feature = "schema")]
+use sdk::schemars::{self, JsonSchema};
+
+//TODO issue#466 hide `Id`
+pub use self::release::{Id, Release};
 
 mod release;
 
@@ -64,16 +67,65 @@ impl SemVer {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+impl Display for SemVer {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.write_fmt(format_args!("{}.{}.{}", self.major, self.minor, self.patch))
+    }
+}
+
+// #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
+/// A reference type representing a software package
+// TODO rename to SoftwarePackage
 pub struct Version {
     storage: VersionSegment,
+    /// the reference identification attribute
     software: SemVer,
 }
 
 impl Version {
     pub const fn new(storage: VersionSegment, software: SemVer) -> Self {
         Self { storage, software }
+    }
+
+    pub const fn same_storage(&self, other: &Self) -> bool {
+        self.check_storage(other.storage)
+    }
+
+    pub const fn next_storage(&self, other: &Self) -> bool {
+        other.check_storage(self.storage.wrapping_add(1))
+    }
+
+    const fn check_storage(&self, expected: VersionSegment) -> bool {
+        self.storage == expected
+    }
+}
+
+impl Display for Version {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.write_fmt(format_args!(
+            "version: {}, storage: {}",
+            self.software, self.storage
+        ))
+    }
+}
+
+impl Eq for Version {}
+
+impl PartialEq for Version {
+    fn eq(&self, other: &Self) -> bool {
+        let res = self.software == other.software;
+        if res {
+            debug_assert_eq!(self.storage, other.storage);
+        }
+        res
+    }
+}
+
+impl PartialOrd for Version {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.software.partial_cmp(&other.software)
     }
 }
 
@@ -87,13 +139,13 @@ macro_rules! package_version {
     }};
 }
 
-const VERSION_STORAGE_KEY: Item<Version> = Item::new("contract_version");
-
-pub fn initialize(storage: &mut dyn Storage, version: Version) -> StdResult<()> {
-    VERSION_STORAGE_KEY.save(storage, &version)
+pub fn initialize(_storage: &mut dyn Storage, _version: Version) -> StdResult<()> {
+    // no op
+    // TBD remove from the stack upward
+    Ok(())
 }
 
-pub fn update_software<ContractError, MapErrorFunctor>(
+pub fn update_legacy_software<ContractError, MapErrorFunctor>(
     storage: &mut dyn Storage,
     new: Version,
     map_error: MapErrorFunctor,
@@ -101,20 +153,20 @@ pub fn update_software<ContractError, MapErrorFunctor>(
 where
     MapErrorFunctor: FnOnce(StdError) -> ContractError,
 {
-    load_version(storage)
-        .and_then(|current| Release::from_env().allow_software_update(&current, &new))
-        .and_then(|()| save_version(storage, &new))
-        .map(|()| Release::from_env())
+    Release::pull_prev(storage)
+        .and_then(|prev_release| {
+            let this_release = Release::this(new);
+            prev_release.update_software(this_release)
+        })
         .map_err(map_error)
 }
 
 pub struct FullUpdateOutput<MigrateStorageOutput> {
-    pub release_label: Release,
+    pub to: Release,
     pub storage_migration_output: MigrateStorageOutput,
 }
 
-pub fn update_software_and_storage<
-    const FROM_STORAGE_VERSION: VersionSegment,
+pub fn update_legacy_software_and_storage<
     ContractError,
     MigrateStorageFunctor,
     StorageMigrationOutput,
@@ -130,26 +182,18 @@ where
         FnOnce(&mut dyn Storage) -> Result<StorageMigrationOutput, ContractError>,
     MapErrorFunctor: FnOnce(StdError) -> ContractError,
 {
-    load_version(storage)
-        .and_then(|current| {
-            Release::from_env()
-                .allow_software_and_storage_update::<FROM_STORAGE_VERSION>(&current, &new)
+    Release::pull_prev(storage)
+        .and_then(|prev_release| {
+            let this_release = Release::this(new);
+            prev_release.update_software_and_storage(this_release)
         })
-        .and_then(|()| save_version(storage, &new))
         .map_err(map_error)
-        .and_then(|()| migrate_storage(storage))
-        .map(|storage_migration_output| FullUpdateOutput {
-            release_label: Release::from_env(),
-            storage_migration_output,
+        .and_then(|new_release| {
+            migrate_storage(storage).map(|storage_migration_output| FullUpdateOutput {
+                to: new_release,
+                storage_migration_output,
+            })
         })
-}
-
-fn load_version(storage: &mut dyn Storage) -> Result<Version, StdError> {
-    VERSION_STORAGE_KEY.load(storage)
-}
-
-fn save_version(storage: &mut dyn Storage, new: &Version) -> Result<(), StdError> {
-    VERSION_STORAGE_KEY.save(storage, new)
 }
 
 #[cfg(test)]
