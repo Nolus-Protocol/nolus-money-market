@@ -11,8 +11,9 @@ use sdk::{
 };
 
 use crate::{
+    coin::Coin,
     fraction::Fraction,
-    fractionable::{Fractionable, TimeSliceable},
+    fractionable::{CheckedMultiply, Fractionable, TimeSliceable},
     ratio::Rational,
     zero::Zero,
 };
@@ -107,6 +108,31 @@ impl Duration {
         U: Zero + Debug + PartialEq + Copy,
     {
         Rational::new(amount, annual_amount).of(self)
+    }
+
+    /// Implementation note: This method uses the checked_mul method to safely perform the multiplication.
+    /// Returns None if the result exceeds the limits of the type.
+    pub fn into_slice_per_ratio_checked<U>(self, amount: U, annual_amount: U) -> Option<Self>
+    where
+        Self: Fractionable<U> + CheckedMultiply<U>,
+        U: Zero + Debug + PartialEq + Copy,
+    {
+        self.checked_mul(amount, annual_amount)
+    }
+}
+
+impl<C> CheckedMultiply<Coin<C>> for Duration {
+    #[track_caller]
+    fn checked_mul(self, parts: Coin<C>, total: Coin<C>) -> Option<Self>
+    where
+        Coin<C>: Zero + Debug + PartialEq<Coin<C>>,
+        Self: Sized,
+    {
+        let d128: u128 = self.into();
+
+        CheckedMultiply::<Coin<C>>::checked_mul(d128, parts, total)
+            .and_then(|res| res.try_into().ok())
+            .map(Self::from_nanos)
     }
 }
 

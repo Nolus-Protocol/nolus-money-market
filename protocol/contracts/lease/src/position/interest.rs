@@ -17,7 +17,7 @@ pub trait Due {
     /// When overdue interest amount goes above a configured minimum then the interest becomes collectable.
     fn overdue_collection(&self, min_amount: LpnCoin) -> OverdueCollection;
 }
-
+#[derive(PartialEq, Debug)]
 pub enum OverdueCollection {
     /// No collectable overdue interest yet
     ///
