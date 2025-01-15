@@ -11,13 +11,20 @@ use sdk::{
 };
 
 use crate::{
-    fraction::Fraction,
     fractionable::{Fractionable, TimeSliceable},
-    ratio::Rational,
+    ratio::{CheckedMul, Rational},
     zero::Zero,
 };
 
 pub type Units = u64;
+
+// impl CheckedMul for u64 {
+//     type Output = Self;
+
+//     fn checked_mul(self, rhs: Self) -> Option<Self::Output> {
+//         self.checked_mul(rhs)
+//     }
+// }
 
 pub type Seconds = u32;
 
@@ -94,19 +101,19 @@ impl Duration {
     }
 
     #[track_caller]
-    pub fn annualized_slice_of<T>(&self, annual_amount: T) -> T
+    pub fn annualized_slice_of<T>(&self, annual_amount: T) -> Option<T>
     where
-        T: TimeSliceable,
+        T: TimeSliceable + Copy,
     {
-        annual_amount.safe_mul(&Rational::new(self.nanos(), Self::YEAR.nanos()).into())
+        Rational::new(self.nanos(), Self::YEAR.nanos()).checked_mul(annual_amount)
     }
 
-    pub fn into_slice_per_ratio<U>(self, amount: U, annual_amount: U) -> Self
+    pub fn into_slice_per_ratio<U>(self, amount: U, annual_amount: U) -> Option<Self>
     where
         Self: Fractionable<U>,
         U: Zero + Debug + PartialEq + Copy + PartialOrd,
     {
-        Rational::new(amount, annual_amount).of(self)
+        Rational::new(amount, annual_amount).checked_mul(self)
     }
 }
 

@@ -55,7 +55,6 @@ mod test {
     use crate::coin::{Amount, Coin};
 
     mod percent {
-        use crate::fraction::Fraction;
         use crate::fractionable::price::test::{c, q};
         use crate::{percent::Percent, price};
 
@@ -78,7 +77,6 @@ mod test {
 
         use crate::{
             coin::{Amount, Coin},
-            fraction::Fraction,
             fractionable::price::test::{c, q},
             price,
             ratio::Rational,
@@ -129,7 +127,8 @@ mod test {
             let price = price::total_of(amount1).is(quote1);
             let ratio = Rational::new(nominator, denominator);
             assert_eq!(
-                Fraction::<usize>::of(&ratio, price),
+                ratio.checked_mul(price).unwrap(),
+                // Ratio::<usize>::of(&ratio, price),
                 price::total_of(amount_exp).is(quote_exp)
             );
         }

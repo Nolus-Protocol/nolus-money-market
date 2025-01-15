@@ -10,7 +10,6 @@ use sdk::schemars::{self, JsonSchema};
 use crate::{
     coin::{Amount, Coin},
     error::{Error, Result},
-    fraction::Fraction,
     fractionable::HigherRank,
     ratio::{Ratio, Rational},
 };
@@ -315,7 +314,7 @@ where
         // Please note that Price(amount, amount_quote) is like Ratio(amount_quote / amount).
 
         Self::Output::new(self.amount, rhs.amount_quote)
-            .lossy_mul(&Rational::new(self.amount_quote, rhs.amount).into())
+            .lossy_mul(&Ratio::new(self.amount_quote.into(), rhs.amount.into()))
     }
 }
 
@@ -324,7 +323,7 @@ where
 /// For example, total(10 EUR, 1.01 EURUSD) = 10.1 USD
 pub fn total<C, QuoteC>(of: Coin<C>, price: Price<C, QuoteC>) -> Coin<QuoteC> {
     let ratio_impl = Rational::new(of, price.amount);
-    Fraction::<Coin<C>>::of(&ratio_impl, price.amount_quote)
+    Ratio::<Coin<C>>::of(&ratio_impl, price.amount_quote)
 }
 
 #[cfg(test)]
@@ -641,7 +640,7 @@ mod test {
 
         let price3 = price::total_of(amount1).is(quote2);
         let ratio = Rational::new(quote1, amount2);
-        assert_eq!(exp, price3.lossy_mul(&ratio.into()));
+        assert_eq!(exp, price3.lossy_mul(&ratio));
     }
 
     fn lossy_mul_shifts_impl(q1: Amount, shifts: u8) {

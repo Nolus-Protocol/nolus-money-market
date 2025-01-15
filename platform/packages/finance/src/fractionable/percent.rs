@@ -85,15 +85,15 @@ mod test {
             coin::Coin,
             fractionable::Fractionable,
             percent::{Percent, Units},
-            ratio::Rational,
+            ratio::Ratio,
         };
 
         #[test]
         fn safe_mul() {
-            let ratio_one = Rational::new(
+            let ratio_one = Ratio::new(
                 Coin::<SuperGroupTestC1>::new(u128::MAX),
                 Coin::<SuperGroupTestC1>::new(u128::MAX),
-            ).into();
+            );
             assert_eq!(
                 Percent::from_permille(Units::MAX),
                 Fractionable::<Coin<_>>::safe_mul(Percent::from_permille(Units::MAX), &ratio_one)

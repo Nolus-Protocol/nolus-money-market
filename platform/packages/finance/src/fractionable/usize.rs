@@ -14,7 +14,7 @@ impl Fractionable<PercentUnits> for usize {
 
 #[cfg(test)]
 mod test {
-    use crate::{fraction::Fraction, percent::Percent};
+    use crate::percent::Percent;
 
     #[test]
     fn ok() {

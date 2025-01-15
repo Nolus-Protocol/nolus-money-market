@@ -30,11 +30,7 @@ impl<C> From<Uint128> for Coin<C> {
 mod test {
     use currency::test::SuperGroupTestC1;
 
-    use crate::{
-        coin::{Amount, Coin},
-        percent::Percent,
-        ratio::Rational,
-    };
+    use crate::{coin::Coin, percent::Percent, ratio::Ratio};
 
     #[test]
     fn safe_mul() {
@@ -45,18 +41,18 @@ mod test {
         );
 
         assert_eq!(
-            Coin::<SuperGroupTestC1>::new(1000),
+            Coin::<SuperGroupTestC1>::new(4),
             Fractionable::<u32>::safe_mul(
-                Coin::<SuperGroupTestC1>::new(2),
-                &Rational::new(1000u32, 2u32).into()
+                Coin::<SuperGroupTestC1>::new(6),
+                &Ratio::new(2u32, 3u32)
             )
         );
 
         assert_eq!(
-            Coin::<SuperGroupTestC1>::new(2 * Amount::from(u32::MAX)),
+            Coin::<SuperGroupTestC1>::new(2u32.into()),
             Fractionable::<u32>::safe_mul(
-                Coin::<SuperGroupTestC1>::new(2),
-                &Rational::new(u32::MAX, 1u32).into()
+                Coin::<SuperGroupTestC1>::new(4),
+                &Ratio::new(u32::MAX / 2, u32::MAX)
             )
         );
     }
