@@ -33,7 +33,6 @@ mod mock_lease {
             to_json_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, StdError, StdResult,
         },
         cw_storage_plus::Item,
-        schemars::{self, JsonSchema},
         testing::{self, CwContract, CwContractWrapper},
     };
     use timealarms::stub::TimeAlarmsRef;
@@ -43,13 +42,13 @@ mod mock_lease {
     const GATE: Item<bool> = Item::new("alarm gate");
     const TIMEALARMS_ADDR: Item<Addr> = Item::new("ta_addr");
 
-    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     #[serde(rename_all = "snake_case")]
     pub struct MockInstantiateMsg {
         time_alarms_contract: Addr,
     }
 
-    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     #[serde(rename_all = "snake_case")]
     pub enum MockExecuteMsg {
         // mimic the scheme

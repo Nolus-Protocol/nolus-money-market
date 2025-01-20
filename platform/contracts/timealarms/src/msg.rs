@@ -1,13 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use sdk::{
-    cosmwasm_std::Timestamp,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Timestamp;
 
 pub type AlarmsCount = platform::dispatcher::AlarmsCount;
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct InstantiateMsg {}
@@ -16,7 +13,7 @@ pub struct InstantiateMsg {}
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct MigrateMsg {}
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg {
@@ -29,7 +26,7 @@ pub enum ExecuteMsg {
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum SudoMsg {}
@@ -44,14 +41,14 @@ pub enum QueryMsg {
     PlatformPackageRelease {},
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteAlarmMsg {
     TimeAlarm {},
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize)]
 #[cfg_attr(feature = "testing", derive(PartialEq, Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 /// number of sent alarms

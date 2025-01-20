@@ -12,12 +12,11 @@ use finance::{
 use sdk::{
     cosmwasm_std::{StdResult, Storage, Timestamp},
     cw_storage_plus::Item,
-    schemars::{self, JsonSchema},
 };
 
 use crate::contract::ContractError;
 
-#[derive(Serialize, Deserialize, Debug, JsonSchema)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(bound(serialize = "", deserialize = ""))]
 pub struct Total<Lpn> {
     total_principal_due: Coin<Lpn>,

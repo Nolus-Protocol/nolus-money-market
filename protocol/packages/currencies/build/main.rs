@@ -56,7 +56,7 @@ fn main() -> Result<()> {
         generate_currencies(build_report, output_directory, topology, protocol)
     } else {
         Err(anyhow!(
-            "Topology and protocol definitions don't exist while `tesing` \
+            "Topology and protocol definitions don't exist while `testing` \
             feature is not selected!"
         ))
     }

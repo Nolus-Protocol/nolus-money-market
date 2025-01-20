@@ -1,9 +1,8 @@
-use sdk::schemars::{self, JsonSchema};
 use serde::Serialize;
 
 use currency::{CurrencyDTO, Group};
 
-#[derive(Serialize, JsonSchema)]
+#[derive(Serialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case", bound(serialize = ""))]
 pub enum BaseCurrencyQueryMsg<G>
 where

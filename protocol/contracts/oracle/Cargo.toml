@@ -46,8 +46,8 @@ marketprice = { workspace = true, optional = true }
 oracle-platform = { workspace = true, optional = true }
 platform = { workspace = true }
 sdk = { workspace = true }
-tree = { workspace = true, features = ["schema"] }
-versioning = { workspace = true, optional = true, features = ["protocol_contract", "schema"] }
+tree = { workspace = true}
+versioning = { workspace = true, optional = true, features = ["protocol_contract"] }
 
 # Required as a dependency by `entry_point` attribute macro
 cosmwasm-std = { workspace = true, optional = true }
@@ -60,7 +60,6 @@ currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
 platform = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
 oracle = { workspace = true, features = ["contract"] }
 marketprice = { workspace = true, features = ["testing"] }
-tree = { workspace = true, features = ["schema", "testing"] }
+tree = { workspace = true, features = ["testing"] }

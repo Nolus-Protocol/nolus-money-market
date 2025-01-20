@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use currency::{AnyVisitor, Matcher, MaybeAnyVisitResult, MemberOf};
-use sdk::schemars::{self, JsonSchema};
 
 use super::Group as PaymentGroup;
 
@@ -19,7 +18,7 @@ mod impl_mod {
 mod impl_mod;
 
 #[derive(
-    Clone, Copy, Debug, Ord, PartialEq, PartialOrd, Eq, Serialize, Deserialize, JsonSchema,
+    Clone, Copy, Debug, Ord, PartialEq, PartialOrd, Eq, Serialize, Deserialize,
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum Group {}

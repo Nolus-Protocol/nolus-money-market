@@ -5,10 +5,7 @@ use finance::{
     duration::{Duration, Seconds},
     percent::Percent,
 };
-use sdk::{
-    cosmwasm_std::Timestamp,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Timestamp;
 
 use crate::finance::LpnCoinDTO;
 
@@ -16,7 +13,6 @@ use super::{DownpaymentCoin, LeaseAssetCurrencies, LeaseCoin};
 
 pub use opened::ClosePolicy;
 
-#[derive(Deserialize, JsonSchema)]
 #[cfg_attr(
     any(test, feature = "testing"),
     derive(Clone, Debug, PartialEq, Serialize)

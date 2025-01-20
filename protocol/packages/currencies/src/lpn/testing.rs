@@ -2,7 +2,6 @@ pub(super) mod definitions {
     use serde::{Deserialize, Serialize};
 
     use currency::{CurrencyDTO, CurrencyDef, Definition, InPoolWith};
-    use sdk::schemars::{self, JsonSchema};
 
     use crate::{
         lease::{LeaseC2, LeaseC7},
@@ -12,7 +11,7 @@ pub(super) mod definitions {
     use super::super::Group as LpnGroup;
 
     #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize,
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct Lpn(CurrencyDTO<LpnGroup>);

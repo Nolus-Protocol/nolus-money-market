@@ -8,12 +8,11 @@ use platform::contract::Code;
 use sdk::{
     cosmwasm_std::{Addr, Storage},
     cw_storage_plus::Item,
-    schemars::{self, JsonSchema},
 };
 
 use crate::{msg::InstantiateMsg, result::ContractResult};
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 pub struct Config {
     pub lease_code: Code,

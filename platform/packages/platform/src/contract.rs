@@ -1,16 +1,13 @@
 use std::mem;
 
-use sdk::{
-    cosmwasm_std::{Addr, CodeInfoResponse, ContractInfoResponse, QuerierWrapper, WasmQuery},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, CodeInfoResponse, ContractInfoResponse, QuerierWrapper, WasmQuery};
 use serde::{Deserialize, Serialize};
 
 use crate::{error::Error, result::Result};
 
 pub type CodeId = u64;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case", transparent)]
 /// A valid Cosmwasm code that may be stored and transferred
 /// Not indended to be used in external APIs since there is no way to integrate validation on deserialization!

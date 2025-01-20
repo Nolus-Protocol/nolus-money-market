@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use crate::{
     AnyVisitor, CurrencyDTO, CurrencyDef, Definition, Group, Matcher, MaybeAnyVisitResult,
     MaybePairsVisitorResult, MemberOf, PairsGroup, PairsVisitor,
 };
 
 #[derive(
-    Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize, JsonSchema,
+    Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize,
 )]
 pub struct Stable(CurrencyDTO<PlatformGroup>);
 
@@ -42,7 +40,7 @@ impl PairsGroup for Stable {
 }
 
 #[derive(
-    Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize, JsonSchema,
+    Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize,
 )]
 /// A 'platform'-only 'dex-independent' representation of Nls.
 ///

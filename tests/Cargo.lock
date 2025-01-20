@@ -1779,7 +1779,6 @@ dependencies = [
  "anyhow",
  "base64 0.22.1",
  "cosmos-sdk-proto 0.26.1",
- "cosmwasm-schema 2.2.0",
  "cosmwasm-std 2.1.5",
  "cw-multi-test",
  "cw-storage-plus 2.0.0",
@@ -2197,7 +2196,6 @@ dependencies = [
 name = "tree"
 version = "0.1.0"
 dependencies = [
- "sdk",
  "serde",
 ]
 

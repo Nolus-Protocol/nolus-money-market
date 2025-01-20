@@ -3,10 +3,7 @@ use serde::{Deserialize, Serialize};
 use currencies::{LeaseGroup, PaymentGroup};
 use finance::coin::CoinDTO;
 use position::ClosePolicyChange;
-use sdk::{
-    cosmwasm_std::Addr,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Addr;
 
 use self::position::PositionClose;
 
@@ -29,7 +26,7 @@ pub type LpnCoinDTO = crate::finance::LpnCoinDTO;
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct MigrateMsg {}
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg {

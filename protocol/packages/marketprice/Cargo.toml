@@ -18,7 +18,7 @@ testing = []
 [dependencies]
 currency = { workspace = true }
 finance = { workspace = true }
-sdk = { workspace = true, features = ["storage", "schema"] }
+sdk = { workspace = true, features = ["storage"] }
 
 thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

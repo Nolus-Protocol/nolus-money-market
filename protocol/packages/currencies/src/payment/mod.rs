@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use currency::{AnyVisitor, Matcher, MaybeAnyVisitResult, MemberOf};
-use sdk::schemars::{self, JsonSchema};
 
 use crate::{lease::Group as LeaseGroup, lpn::Group as LpnGroup, native::Group as NativeGroup};
 
@@ -17,7 +16,7 @@ pub(crate) mod only;
 mod testing;
 
 #[derive(
-    Clone, Copy, Debug, Ord, PartialEq, PartialOrd, Eq, Serialize, Deserialize, JsonSchema,
+    Clone, Copy, Debug, Ord, PartialEq, PartialOrd, Eq, Serialize, Deserialize,
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum Group {}
