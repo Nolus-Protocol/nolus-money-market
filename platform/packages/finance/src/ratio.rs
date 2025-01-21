@@ -3,6 +3,7 @@ use std::{
     ops::{Div, Rem},
 };
 
+use gcd::Gcd;
 use serde::{Deserialize, Serialize};
 
 use sdk::schemars::{self, JsonSchema};
@@ -64,6 +65,20 @@ where
     pub fn denominator(&self) -> U {
         self.denominator
     }
+
+    fn into_coprime(a: U, b: U) -> (U, U)
+    where
+        U: Gcd + Div<Output = U>,
+    {
+        debug_assert_ne!(a, Zero::ZERO, "LHS-value is zero!");
+        debug_assert_ne!(b, Zero::ZERO, "RHS-value is zero!");
+
+        let gcd = a.gcd(b);
+
+        debug_assert_ne!(gcd, Zero::ZERO);
+
+        (a / gcd, b / gcd)
+    }
 }
 
 pub trait CheckedMul<Rhs = Self> {
@@ -78,15 +93,20 @@ pub trait CheckedAdd<Rhs = Self> {
     fn checked_add(self, rhs: Rhs) -> Option<Self::Output>;
 }
 
+pub trait CheckedDiv<Rhs = Self> {
+    type Output;
+
+    fn checked_div(self, rhs: Rhs) -> Option<Self::Output>;
+}
+
 impl<U> Rational<U>
 where
     U: Zero + Debug + PartialEq<U> + Copy + PartialOrd + Div<Output = U> + Rem<Output = U>,
 {
-    // Multiplication of Rational > 1.
     pub fn checked_mul<F>(self, rhs: F) -> Option<F>
     where
         U: CheckedMul<F, Output = F>,
-        F: Fractionable<U> + CheckedAdd<F, Output = F> + Copy,
+        F: Fractionable<U> + CheckedAdd<Output = F> + Copy,
     {
         // Rational(a,b).checked_mul(c) = (a / b).checked_mul(c) + c.safe_mul(Rational(a % b, b))
         (self.nominator / self.denominator)
@@ -103,25 +123,43 @@ where
 
 impl<U> CheckedAdd for Rational<U>
 where
-    U: Zero + Debug + PartialEq<U> + CheckedMul<Output = U> + CheckedAdd<Output = U> + Copy,
+    U: Zero
+        + Debug
+        + PartialEq<U>
+        + CheckedMul<Output = U>
+        + CheckedAdd<Output = U>
+        + CheckedDiv<Output = U>
+        + Copy
+        + Gcd
+        + Div<Output = U>
+        + Rem<Output = U>,
 {
     type Output = Self;
 
     fn checked_add(self, rhs: Self) -> Option<Self::Output> {
-        self.denominator
-            .checked_mul(rhs.denominator)
-            .and_then(|common_denominator| {
-                self.nominator
-                    .checked_mul(rhs.denominator)
-                    .and_then(|scaled_left_nom| {
-                        rhs.nominator
-                            .checked_mul(self.denominator)
-                            .and_then(|scaled_right_nom| {
-                                scaled_left_nom
-                                    .checked_add(scaled_right_nom)
-                                    .map(|nominator| Rational::new(nominator, common_denominator))
-                            })
-                    })
-            })
+        // let a1 = a / gcd(a, c), and c1 = c / gcd(a, c), then
+        // b / a + d / c = (b * c1 + d * a1) / (a1 * c1 * gcd(a, c))
+        let (a1, c1) = Rational::into_coprime(self.denominator, rhs.denominator);
+        debug_assert_eq!(self.denominator % a1, Zero::ZERO);
+        debug_assert_eq!(rhs.denominator % c1, Zero::ZERO);
+        let gcd = match self.nominator.checked_div(a1) {
+            None => unreachable!("invariant on amount != 0 should have passed!"),
+            Some(gcd) => gcd,
+        };
+        debug_assert_eq!(Some(gcd), rhs.nominator.checked_div(c1));
+
+        let may_b_c1 = self.nominator.checked_mul(c1);
+        let may_d_a1 = rhs.nominator.checked_mul(a1);
+
+        let may_nominator = may_b_c1
+            .zip(may_d_a1)
+            .and_then(|(b_c1, d_a1)| b_c1.checked_add(d_a1));
+        let may_denominator = a1
+            .checked_mul(c1.into())
+            .and_then(|a1_c1| a1_c1.checked_mul(gcd));
+
+        may_nominator
+            .zip(may_denominator)
+            .map(|(nominator, denominator)| Self::new(nominator, denominator))
     }
 }
