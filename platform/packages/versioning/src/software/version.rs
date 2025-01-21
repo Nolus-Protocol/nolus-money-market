@@ -2,13 +2,9 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-
 pub type VersionSegment = u16;
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 pub struct SemVer {
     major: VersionSegment,
     minor: VersionSegment,
