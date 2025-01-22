@@ -19,9 +19,7 @@ pub mod bound;
 
 pub type Units = u32;
 
-#[derive(
-    Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize,
-)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(transparent)]
 pub struct Percent(Units); //value in permille

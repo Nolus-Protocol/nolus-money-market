@@ -9,9 +9,7 @@ use sdk::cosmwasm_std::{StdError, StdResult};
 
 mod unchecked;
 
-#[derive(
-    Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Default, Serialize, Deserialize,
-)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Default, Serialize, Deserialize)]
 #[repr(transparent)]
 #[serde(transparent)]
 pub struct TotalValueLocked(u32);
