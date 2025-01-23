@@ -7,7 +7,7 @@ name = "access-control"
 version = "0.1.0"
 dependencies = [
  "sdk",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -20,7 +20,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "versioning",
 ]
 
@@ -576,10 +576,9 @@ dependencies = [
  "anyhow",
  "currency",
  "either",
- "sdk",
  "serde",
  "serde_json",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "topology",
 ]
 
@@ -589,7 +588,7 @@ version = "0.6.1"
 dependencies = [
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -825,7 +824,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "timealarms",
 ]
 
@@ -970,7 +969,7 @@ dependencies = [
  "gcd",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -1171,7 +1170,7 @@ dependencies = [
  "sdk",
  "serde",
  "swap",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "timealarms",
  "versioning",
 ]
@@ -1193,7 +1192,7 @@ dependencies = [
  "reserve",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "versioning",
 ]
 
@@ -1218,7 +1217,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "versioning",
 ]
 
@@ -1231,7 +1230,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -1242,7 +1241,7 @@ dependencies = [
  "finance",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -1344,7 +1343,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "tree",
  "versioning",
 ]
@@ -1357,7 +1356,7 @@ dependencies = [
  "finance",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -1425,7 +1424,7 @@ dependencies = [
  "finance",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -1477,7 +1476,7 @@ dependencies = [
  "sdk",
  "serde",
  "swap",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "timealarms",
  "versioning",
 ]
@@ -1682,7 +1681,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "versioning",
 ]
 
@@ -1754,7 +1753,7 @@ dependencies = [
  "ibc-proto",
  "neutron-sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]
@@ -2118,7 +2117,7 @@ dependencies = [
  "platform",
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
  "versioning",
 ]
 
@@ -2181,7 +2180,7 @@ version = "0.2.1"
 dependencies = [
  "sdk",
  "serde",
- "thiserror 2.0.11",
+ "thiserror 2.0.8",
 ]
 
 [[package]]

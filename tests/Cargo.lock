@@ -577,7 +577,6 @@ dependencies = [
  "anyhow",
  "currency",
  "either",
- "sdk",
  "serde",
  "serde_json",
  "thiserror 2.0.8",
