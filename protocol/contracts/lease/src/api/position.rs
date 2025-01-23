@@ -1,7 +1,6 @@
 use finance::percent::Percent;
 use serde::{Deserialize, Serialize};
 
-
 use super::LeaseCoin;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
