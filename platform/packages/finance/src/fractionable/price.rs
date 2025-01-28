@@ -9,11 +9,8 @@ where
     C: 'static,
     QuoteC: 'static,
 {
-    fn safe_mul<F>(self, fraction: &F) -> Self
-    where
-        F: Ratio<PercentUnits>,
-    {
-        self.lossy_mul(&RatioUpcast(PhantomData, fraction))
+    fn safe_mul(self, fraction: &Ratio<PercentUnits>) -> Self {
+        self.lossy_mul(&RatioUpcast(PhantomData, fraction).into())
     }
 }
 
@@ -22,45 +19,32 @@ where
     C: 'static,
     QuoteC: 'static,
 {
-    fn safe_mul<F>(self, fraction: &F) -> Self
-    where
-        F: Ratio<usize>,
-    {
-        self.lossy_mul(&RatioTryUpcast(fraction))
+    fn safe_mul(self, fraction: &Ratio<usize>) -> Self {
+        self.lossy_mul(&RatioTryUpcast(fraction).into())
     }
 }
 
-struct RatioUpcast<'a, U, R>(PhantomData<U>, &'a R)
+struct RatioUpcast<'a, U>(PhantomData<U>, &'a Ratio<U>);
+
+impl<'a, U> From<RatioUpcast<'a, U>> for Ratio<Amount>
 where
-    R: Ratio<U>;
-impl<U, R> Ratio<Amount> for RatioUpcast<'_, U, R>
-where
-    U: Into<Amount>,
-    R: Ratio<U>,
+    U: PartialEq + PartialOrd + Copy + Into<Amount>,
 {
-    fn parts(&self) -> Amount {
-        self.1.parts().into()
-    }
-    fn total(&self) -> Amount {
-        self.1.total().into()
+    fn from(upcast: RatioUpcast<'a, U>) -> Self {
+        Self::new(upcast.1.parts().into(), upcast.1.total().into())
     }
 }
 
-struct RatioTryUpcast<'a, R>(&'a R)
-where
-    R: Ratio<usize>;
+struct RatioTryUpcast<'a>(&'a Ratio<usize>);
 
 const EXPECT_MSG: &str = "usize should convert into u128";
 
-impl<R> Ratio<Amount> for RatioTryUpcast<'_, R>
-where
-    R: Ratio<usize>,
-{
-    fn parts(&self) -> Amount {
-        self.0.parts().try_into().expect(EXPECT_MSG)
-    }
-    fn total(&self) -> Amount {
-        self.0.total().try_into().expect(EXPECT_MSG)
+impl From<RatioTryUpcast<'_>> for Ratio<Amount> {
+    fn from(upcast: RatioTryUpcast<'_>) -> Self {
+        Self::new(
+            upcast.0.parts().try_into().expect(EXPECT_MSG),
+            upcast.0.total().try_into().expect(EXPECT_MSG),
+        )
     }
 }
 
@@ -71,7 +55,6 @@ mod test {
     use crate::coin::{Amount, Coin};
 
     mod percent {
-        use crate::fraction::Fraction;
         use crate::fractionable::price::test::{c, q};
         use crate::{percent::Percent, price};
 
@@ -94,7 +77,6 @@ mod test {
 
         use crate::{
             coin::{Amount, Coin},
-            fraction::Fraction,
             fractionable::price::test::{c, q},
             price,
             ratio::Rational,
@@ -145,7 +127,8 @@ mod test {
             let price = price::total_of(amount1).is(quote1);
             let ratio = Rational::new(nominator, denominator);
             assert_eq!(
-                Fraction::<usize>::of(&ratio, price),
+                ratio.checked_mul(price).unwrap(),
+                // Ratio::<usize>::of(&ratio, price),
                 price::total_of(amount_exp).is(quote_exp)
             );
         }

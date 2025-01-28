@@ -14,7 +14,7 @@ use ::serde::{Deserialize, Serialize};
 use currency::{Currency, CurrencyDef, Group, MemberOf};
 use sdk::schemars::{self, JsonSchema};
 
-use crate::zero::Zero;
+use crate::{ratio::{CheckedAdd, CheckedDiv, CheckedMul, Rational}, zero::Zero};
 
 pub use self::dto::{from_amount_ticker, CoinDTO, IntoDTO};
 
@@ -53,11 +53,7 @@ impl<C> Coin<C> {
 
     #[track_caller]
     pub fn checked_add(self, rhs: Self) -> Option<Self> {
-        let may_amount = self.amount.checked_add(rhs.amount);
-        may_amount.map(|amount| Self {
-            amount,
-            ticker: self.ticker,
-        })
+        self.checked_operation(self.amount.checked_add(rhs.amount))
     }
 
     #[track_caller]
@@ -67,29 +63,21 @@ impl<C> Coin<C> {
 
     #[track_caller]
     pub fn checked_sub(self, rhs: Self) -> Option<Self> {
-        let may_amount = self.amount.checked_sub(rhs.amount);
-        may_amount.map(|amount| Self {
-            amount,
-            ticker: self.ticker,
-        })
+        self.checked_operation(self.amount.checked_sub(rhs.amount))
     }
 
     #[track_caller]
     pub fn checked_mul(self, rhs: Amount) -> Option<Self> {
-        let may_amount = self.amount.checked_mul(rhs);
-        may_amount.map(|amount| Self {
-            amount,
-            ticker: self.ticker,
-        })
+        self.checked_operation(self.amount.checked_mul(rhs))
     }
 
     #[track_caller]
     pub fn checked_div(self, rhs: Amount) -> Option<Self> {
-        let may_amount = self.amount.checked_div(rhs);
-        may_amount.map(|amount| Self {
-            amount,
-            ticker: self.ticker,
-        })
+        self.checked_operation(self.amount.checked_div(rhs))
+    }
+
+    pub(crate) fn to_rational<OtherC>(self, denominator: Coin<OtherC>) -> Rational<Amount> {
+        Rational::new(self.amount, denominator.amount)
     }
 
     #[track_caller]
@@ -117,6 +105,14 @@ impl<C> Coin<C> {
             Self::new(self.amount / gcd),
             Coin::<OtherC>::new(other.amount / gcd),
         )
+    }
+
+    #[track_caller]
+    fn checked_operation(self, res: Option<Amount>) -> Option<Self> {
+        res.map(|amount| Self {
+            amount,
+            ticker: self.ticker,
+        })
     }
 }
 
@@ -222,6 +218,30 @@ impl<C> From<Amount> for Coin<C> {
 impl<C> From<Coin<C>> for Amount {
     fn from(coin: Coin<C>) -> Self {
         coin.amount
+    }
+}
+
+impl CheckedAdd for Amount {
+    type Output = Self;
+
+    fn checked_add(self, rhs: Self) -> Option<Self::Output> {
+        self.checked_add(rhs)
+    }
+}
+
+impl CheckedDiv for Amount {
+    type Output = Self;
+
+    fn checked_div(self, rhs: Self) -> Option<Self::Output> {
+        self.checked_div(rhs)
+    }
+}
+
+impl CheckedMul for Amount {
+    type Output = Self;
+
+    fn checked_mul(self, rhs: Self) -> Option<Self::Output> {
+        self.checked_mul(rhs)
     }
 }
 

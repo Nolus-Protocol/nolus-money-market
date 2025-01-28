@@ -10,9 +10,8 @@ use sdk::schemars::{self, JsonSchema};
 use crate::{
     coin::{Amount, Coin},
     error::{Error, Result},
-    fraction::Fraction,
     fractionable::HigherRank,
-    ratio::{Ratio, Rational},
+    ratio::{CheckedAdd, Ratio, Rational},
 };
 
 pub mod base;
@@ -103,10 +102,7 @@ where
     /// Price(amount, amount_quote) * Ratio(nominator / denominator) = Price(amount * denominator, amount_quote * nominator)
     /// where the pairs (amount, nominator) and (amount_quote, denominator) are transformed into co-prime numbers.
     /// Please note that Price(amount, amount_quote) is like Ratio(amount_quote / amount).
-    pub(crate) fn lossy_mul<R>(self, rhs: &R) -> Self
-    where
-        R: Ratio<Amount>,
-    {
+    pub(crate) fn lossy_mul(self, rhs: &Ratio<Amount>) -> Self {
         let (amount_normalized, rhs_nominator_normalized) =
             self.amount.into_coprime_with(Coin::<C>::from(rhs.parts()));
         let (amount_quote_normalized, rhs_denominator_normalized) = self
@@ -152,31 +148,24 @@ where
     fn check(invariant: bool, msg: &str) -> Result<()> {
         Error::broken_invariant_if::<Self>(!invariant, msg)
     }
+    
+    fn to_rational(self) -> Rational<Amount> {
+        self.amount_quote.to_rational(self.amount)
+    }
 
     fn checked_add(self, rhs: Self) -> Option<Self> {
-        // let a1 = a / gcd(a, c), and c1 = c / gcd(a, c), then
-        // b / a + d / c = (b * c1 + d * a1) / (a1 * c1 * gcd(a, c))
         // taking into account that Price is like amount_quote/amount
-        let (a1, c1) = self.amount.into_coprime_with(rhs.amount);
-        debug_assert_eq!(0, Amount::from(self.amount) % Amount::from(a1));
-        debug_assert_eq!(0, Amount::from(rhs.amount) % Amount::from(c1));
-        let gcd: Amount = match self.amount.checked_div(a1.into()) {
-            None => unreachable!("invariant on amount != 0 should have passed!"),
-            Some(gcd) => gcd.into(),
-        };
-        debug_assert_eq!(Some(gcd.into()), rhs.amount.checked_div(c1.into()));
+        let lhs_rational = self.to_rational();
+        let rhs_rational = rhs.to_rational();
 
-        let may_b_c1 = self.amount_quote.checked_mul(c1.into());
-        let may_d_a1 = rhs.amount_quote.checked_mul(a1.into());
-        let may_amount_quote = may_b_c1
-            .zip(may_d_a1)
-            .and_then(|(b_c1, d_a1)| b_c1.checked_add(d_a1));
-        let may_amount = a1
-            .checked_mul(c1.into())
-            .and_then(|a1_c1| a1_c1.checked_mul(gcd));
-        may_amount_quote
-            .zip(may_amount)
-            .map(|(amount_quote, amount)| Self::new(amount, amount_quote))
+        lhs_rational
+            .checked_add(rhs_rational)
+            .map(|result_rational| {
+                Self::new(
+                    result_rational.denominator().into(),
+                    result_rational.nominator().into(),
+                )
+            })
     }
 
     /// Add two prices rounding each of them to 1.10-18, simmilarly to
@@ -318,7 +307,7 @@ where
         // Please note that Price(amount, amount_quote) is like Ratio(amount_quote / amount).
 
         Self::Output::new(self.amount, rhs.amount_quote)
-            .lossy_mul(&Rational::new(self.amount_quote, rhs.amount))
+            .lossy_mul(&Ratio::new(self.amount_quote.into(), rhs.amount.into()))
     }
 }
 
@@ -327,7 +316,7 @@ where
 /// For example, total(10 EUR, 1.01 EURUSD) = 10.1 USD
 pub fn total<C, QuoteC>(of: Coin<C>, price: Price<C, QuoteC>) -> Coin<QuoteC> {
     let ratio_impl = Rational::new(of, price.amount);
-    Fraction::<Coin<C>>::of(&ratio_impl, price.amount_quote)
+    Ratio::<Coin<C>>::of(&ratio_impl, price.amount_quote)
 }
 
 #[cfg(test)]

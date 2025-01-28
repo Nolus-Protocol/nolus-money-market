@@ -1,7 +1,6 @@
 pub mod coin;
 pub mod duration;
 pub mod error;
-pub mod fraction;
 pub mod fractionable;
 pub mod interest;
 pub mod liability;

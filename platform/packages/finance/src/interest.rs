@@ -2,16 +2,15 @@ use std::{cmp, fmt::Debug, ops::Sub};
 
 use crate::{
     duration::Duration,
-    fraction::Fraction,
     fractionable::{Fractionable, TimeSliceable},
+    percent::Percent,
     zero::Zero,
 };
 
 /// Computes how much interest is accrued
-pub fn interest<U, F, P>(rate: F, principal: P, period: Duration) -> P
+pub fn interest<U, P>(rate: Percent, principal: P, period: Duration) -> Option<P>
 where
-    F: Fraction<U>,
-    P: Fractionable<U> + TimeSliceable,
+    P: Fractionable<U> + TimeSliceable + Copy,
 {
     let interest_per_year = rate.of(principal);
     period.annualized_slice_of(interest_per_year)
@@ -20,33 +19,32 @@ where
 /// Computes how much time this payment covers, return.0, and the change, return.1
 ///
 /// The actual payment is equal to the payment minus the returned change.
-pub fn pay<U, F, P>(rate: F, principal: P, payment: P, period: Duration) -> (Duration, P)
+pub fn pay<U, P>(rate: Percent, principal: P, payment: P, period: Duration) -> Option<(Duration, P)>
 where
-    F: Fraction<U>,
     P: Copy + Debug + Fractionable<U> + Ord + Sub<Output = P> + TimeSliceable + Zero,
     Duration: Fractionable<P>,
 {
-    let interest_due_per_period: P = interest(rate, principal, period);
+    interest(rate, principal, period).and_then(|interest_due_per_period| {
+        if interest_due_per_period == P::ZERO {
+            Some((Duration::from_nanos(0), payment))
+        } else {
+            let repayment: P = cmp::min(interest_due_per_period, payment);
 
-    if interest_due_per_period == P::ZERO {
-        (Duration::from_nanos(0), payment)
-    } else {
-        let repayment: P = cmp::min(interest_due_per_period, payment);
-
-        let period_paid_for = period.into_slice_per_ratio(repayment, interest_due_per_period);
-        let change = payment - repayment;
-        (period_paid_for, change)
-    }
+            period
+                .into_slice_per_ratio(repayment, interest_due_per_period)
+                .map(|period_paid_for| {
+                    let change = payment - repayment;
+                    (period_paid_for, change)
+                })
+        }
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use currency::test::SubGroupTestC10;
 
-    use crate::{
-        coin::Coin, duration::Duration, fraction::Fraction, percent::Percent, ratio::Rational,
-        zero::Zero,
-    };
+    use crate::{coin::Coin, duration::Duration, percent::Percent, ratio::Rational, zero::Zero};
 
     type MyCoin = Coin<SubGroupTestC10>;
     const PERIOD_LENGTH: Duration = Duration::YEAR;
@@ -144,8 +142,8 @@ mod tests {
         let part = MyCoin::new(125);
         let r = Rational::new(part, whole);
 
-        let res = super::interest::<MyCoin, _, _>(r, whole, PERIOD_LENGTH);
-        assert_eq!(part, res);
+        let res = super::interest::<MyCoin, _>(r, whole, PERIOD_LENGTH);
+        assert_eq!(part, res.unwrap());
     }
 
     #[test]
@@ -153,8 +151,8 @@ mod tests {
         let principal = MyCoin::new(1001);
         let r = Rational::new(MyCoin::ZERO, principal);
 
-        let res = super::interest::<MyCoin, _, _>(r, principal, PERIOD_LENGTH);
-        assert_eq!(MyCoin::ZERO, res);
+        let res = super::interest::<MyCoin, _>(r, principal, PERIOD_LENGTH);
+        assert_eq!(MyCoin::ZERO, res.unwrap());
     }
 
     fn pay_impl(
