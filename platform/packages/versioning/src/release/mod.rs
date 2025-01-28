@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use crate::{Error, ProtocolRelease, SoftwarePackageRelease};
 
 pub use self::id::Id;
@@ -34,7 +32,7 @@ pub struct ProtocolPackageRelease {
     protocol: ProtocolRelease,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct ProtocolPackageReleaseId {
     software: Id,
