@@ -56,7 +56,7 @@ thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
-currencies = { workspace = true, features = ["testing"] }
+currencies = { workspace = true }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
 platform = { workspace = true, features = ["testing"] }
