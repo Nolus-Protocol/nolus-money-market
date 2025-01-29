@@ -101,6 +101,7 @@ pub(crate) fn dummy_feed_prices_msg(
     }
 }
 
+#[cfg(test)]
 pub(crate) fn setup_test(
     msg: InstantiateMsg<PriceCurrencies>,
 ) -> (OwnedDeps<MemoryStorage, MockApi, MockQuerier>, MessageInfo) {
