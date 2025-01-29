@@ -39,7 +39,7 @@ testing = [
 ]
 
 [dependencies]
-currencies = { workspace = true, optional = true }
+currencies = { workspace = true, optional = true, features = ["testing"] }
 currency = { workspace = true }
 finance = { workspace = true }
 marketprice = { workspace = true, optional = true }
