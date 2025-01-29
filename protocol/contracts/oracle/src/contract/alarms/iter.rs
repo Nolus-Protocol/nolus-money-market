@@ -93,22 +93,30 @@ where
 
     #[expect(tail_expr_drop_order)] // TODO remove once stop linting with the 'rust-2024-compatibility' group
     fn next(&mut self) -> Option<Self::Item> {
-        self.alarm_iter.as_ref()?;
+        let mut result = None;
 
-        let mut result = self.next_alarm();
-        while result.is_none() && self.alarm_iter.is_some() {
-            result = {
-                // TODO remove once stop linting with the 'rust-2024-compatibility' group
-                #[expect(if_let_rescope)]
-                if let Err(error) = self.move_to_next_alarms() {
-                    Some(Err(error))
-                } else if self.alarm_iter.is_none() {
+        while let Some(ref mut alarms_iter) = self.alarm_iter {
+            result = alarms_iter.next();
+
+            if result.is_some() {
+                break;
+            }
+
+            #[cfg(debug_assertions)]
+            {
+                self.alarm_iter = None;
+            }
+
+            self.alarm_iter = match self.next_alarms() {
+                Ok(iter) => iter,
+                Err(error) => {
+                    result = Some(Err(error));
+
                     None
-                } else {
-                    self.next_alarm()
                 }
             };
         }
+
         result
     }
 }
