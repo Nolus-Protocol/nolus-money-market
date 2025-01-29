@@ -112,6 +112,11 @@ where
             };
         }
 
+        debug_assert!(matches!(
+            (&result, &self.alarm_iter),
+            (Some(Ok(_)), Some(_)) | (Some(Err(_)), None) | (None, None)
+        ));
+
         result
     }
 }
