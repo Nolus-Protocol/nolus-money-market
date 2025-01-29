@@ -47,14 +47,9 @@ where
         Ok(iter)
     }
 
-    fn move_to_next_alarms(&mut self) -> ContractResult<()> {
-        debug_assert!(self.next_alarm().is_none());
-
-        self.alarm_iter = self.next_alarms()?;
-        Ok(())
-    }
-
     fn next_alarms(&mut self) -> ContractResult<Option<AlarmIter<'alarms, PriceG>>> {
+        debug_assert!(self.alarm_iter.is_none());
+
         self.price_iter
             .next()
             .map(|price_result| {
@@ -69,13 +64,6 @@ where
                 })
             })
             .transpose()
-    }
-
-    fn next_alarm(&mut self) -> Option<ContractResult<Addr>> {
-        match self.alarm_iter.as_mut() {
-            None => unimplemented!("calling 'next_alarm' on Some price alarms"),
-            Some(iter) => iter.next(),
-        }
     }
 }
 
