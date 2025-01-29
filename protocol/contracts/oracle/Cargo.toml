@@ -29,7 +29,7 @@ contract = [
 ]
 stub_alarms = ["dep:currencies"]
 stub_price = ["dep:oracle-platform"]
-stub_swap = ["dep:oracle-platform"]
+stub_swap = ["dep:currencies", "dep:oracle-platform"]
 testing = [
     "stub_alarms",
     "stub_price",
