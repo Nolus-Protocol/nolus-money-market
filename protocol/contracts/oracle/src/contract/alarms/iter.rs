@@ -61,9 +61,9 @@ where
         debug_assert!(self.alarm_iter.is_none());
 
         self.price_iter.next().map(|price_result| {
-            price_result.and_then(|ref price| {
+            price_result.and_then(|price| {
                 price::base::with_price::execute(
-                    price,
+                    &price,
                     Cmd {
                         alarms: self.alarms,
                         _base_c: PhantomData,
