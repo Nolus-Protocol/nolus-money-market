@@ -141,6 +141,7 @@ where
     type PriceG = PriceG;
 
     type Output = AlarmIter<'alarms, PriceG>;
+
     type Error = ContractError;
 
     fn exec<C>(self, price: Price<C, BaseC>) -> Result<Self::Output, Self::Error>
