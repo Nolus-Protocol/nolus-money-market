@@ -11,7 +11,7 @@ pub mod result;
 #[cfg(feature = "contract")]
 pub mod state;
 pub mod stub;
-#[cfg(all(feature = "stub_swap", "testing", test))]
+#[cfg(feature = "stub_swap")]
 pub mod test_tree;
 #[cfg(all(feature = "contract", test))]
 mod tests;
