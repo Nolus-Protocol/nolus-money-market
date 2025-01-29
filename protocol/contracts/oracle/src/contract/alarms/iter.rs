@@ -57,13 +57,13 @@ where
     fn next_alarms(&mut self) -> ContractResult<Option<AlarmIter<'alarms, PriceG>>> {
         self.price_iter
             .next()
-            .map(|price_result: PriceResult<PriceG, BaseC, BaseG>| {
+            .map(|price_result| {
                 price_result.and_then(|ref price| {
                     price::base::with_price::execute(
                         price,
                         Cmd {
                             alarms: self.alarms,
-                            _base_c: PhantomData::<BaseC>,
+                            _base_c: PhantomData,
                         },
                     )
                 })
@@ -143,8 +143,6 @@ where
         Ok(self
             .alarms
             .alarms(price)
-            .map::<ContractResult<Addr>, AlarmIterMapFn>(|result: Result<Addr, AlarmError>| {
-                result.map_err(Into::into)
-            }))
+            .map(|result| result.map_err(Into::into)))
     }
 }
