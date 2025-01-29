@@ -42,7 +42,7 @@ testing = [
 currencies = { workspace = true, optional = true, features = ["testing"] }
 currency = { workspace = true }
 finance = { workspace = true }
-marketprice = { workspace = true, optional = true }
+marketprice = { workspace = true, optional = true, features = ["testing"]  }
 oracle-platform = { workspace = true, optional = true }
 platform = { workspace = true }
 sdk = { workspace = true }
@@ -60,5 +60,5 @@ currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
 platform = { workspace = true, features = ["testing"] }
-marketprice = { workspace = true }
+marketprice = { workspace = true, features = ["testing"] }
 tree = { workspace = true, features = ["testing"] }
