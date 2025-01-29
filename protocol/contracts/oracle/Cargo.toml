@@ -60,5 +60,5 @@ currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
 platform = { workspace = true, features = ["testing"] }
-marketprice = { workspace = true, features = ["testing"] }
+marketprice = { workspace = true }
 tree = { workspace = true, features = ["testing"] }
