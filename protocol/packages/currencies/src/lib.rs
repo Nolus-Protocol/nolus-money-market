@@ -11,6 +11,7 @@ mod lpn;
 mod native;
 mod payment;
 mod stable;
+#[cfg(feature = "testing")] 
 pub mod testing {
     pub use crate::{
         lease::{LeaseC1, LeaseC2, LeaseC3, LeaseC4, LeaseC5, LeaseC6, LeaseC7},

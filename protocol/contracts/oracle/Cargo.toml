@@ -38,14 +38,14 @@ testing = [
 ]
 
 [dependencies]
-currencies = { workspace = true, optional = true}
+currencies = { workspace = true, optional = true }
 currency = { workspace = true }
 finance = { workspace = true }
-marketprice = { workspace = true, optional = true}
+marketprice = { workspace = true, optional = true }
 oracle-platform = { workspace = true, optional = true }
 platform = { workspace = true }
 sdk = { workspace = true }
-tree = { workspace = true}
+tree = { workspace = true }
 versioning = { workspace = true, optional = true, features = ["protocol_contract"] }
 
 # Required as a dependency by `entry_point` attribute macro
