@@ -35,6 +35,7 @@ testing = [
     "stub_price",
     "stub_swap",
     "currencies/testing",
+    "marketprice/testing",
 ]
 
 [dependencies]
