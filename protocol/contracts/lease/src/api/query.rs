@@ -13,6 +13,7 @@ use super::{DownpaymentCoin, LeaseAssetCurrencies, LeaseCoin};
 
 pub use opened::ClosePolicy;
 
+#[derive(Deserialize)]
 #[cfg_attr(
     any(test, feature = "testing"),
     derive(Clone, Debug, PartialEq, Serialize)
