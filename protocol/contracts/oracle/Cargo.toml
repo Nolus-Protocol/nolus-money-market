@@ -38,10 +38,10 @@ testing = [
 ]
 
 [dependencies]
-currencies = { workspace = true, optional = true, features = ["testing"] }
+currencies = { workspace = true, optional = true}
 currency = { workspace = true }
 finance = { workspace = true }
-marketprice = { workspace = true, optional = true, features = ["testing"]  }
+marketprice = { workspace = true, optional = true}
 oracle-platform = { workspace = true, optional = true }
 platform = { workspace = true }
 sdk = { workspace = true }
