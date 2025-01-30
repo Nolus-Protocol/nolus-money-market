@@ -43,39 +43,34 @@ where
             price_iter,
             alarm_iter: None,
         };
-        iter.alarm_iter = iter.next_alarms()?;
-        Ok(iter)
-    }
 
-    fn move_to_next_alarms(&mut self) -> ContractResult<()> {
-        debug_assert!(self.next_alarm().is_none());
+        #[expect(if_let_rescope)]
+        // TODO remove once stop linting with the 'rust-2024-compatibility' group
+        if let Some(alarms_iter) = iter.next_alarms() {
+            alarms_iter.map(|alarms_iter| {
+                iter.alarm_iter = Some(alarms_iter);
 
-        self.alarm_iter = self.next_alarms()?;
-        Ok(())
-    }
-
-    fn next_alarms(&mut self) -> ContractResult<Option<AlarmIter<'alarms, PriceG>>> {
-        self.price_iter
-            .next()
-            .map(|price_result: PriceResult<PriceG, BaseC, BaseG>| {
-                price_result.and_then(|ref price| {
-                    price::base::with_price::execute(
-                        price,
-                        Cmd {
-                            alarms: self.alarms,
-                            _base_c: PhantomData::<BaseC>,
-                        },
-                    )
-                })
+                iter
             })
-            .transpose()
+        } else {
+            Ok(iter)
+        }
     }
 
-    fn next_alarm(&mut self) -> Option<ContractResult<Addr>> {
-        match self.alarm_iter.as_mut() {
-            None => unimplemented!("calling 'next_alarm' on Some price alarms"),
-            Some(iter) => iter.next(),
-        }
+    fn next_alarms(&mut self) -> Option<ContractResult<AlarmIter<'alarms, PriceG>>> {
+        debug_assert!(self.alarm_iter.is_none());
+
+        self.price_iter.next().map(|price_result| {
+            price_result.and_then(|price| {
+                price::base::with_price::execute(
+                    &price,
+                    Cmd {
+                        alarms: self.alarms,
+                        _base_c: PhantomData,
+                    },
+                )
+            })
+        })
     }
 }
 
@@ -91,24 +86,37 @@ where
 {
     type Item = ContractResult<Addr>;
 
-    #[expect(tail_expr_drop_order)] // TODO remove once stop linting with the 'rust-2024-compatibility' group
     fn next(&mut self) -> Option<Self::Item> {
-        self.alarm_iter.as_ref()?;
+        let mut result = None;
 
-        let mut result = self.next_alarm();
-        while result.is_none() && self.alarm_iter.is_some() {
-            result = {
-                // TODO remove once stop linting with the 'rust-2024-compatibility' group
-                #[expect(if_let_rescope)]
-                if let Err(error) = self.move_to_next_alarms() {
-                    Some(Err(error))
-                } else if self.alarm_iter.is_none() {
+        while let Some(ref mut alarms_iter) = self.alarm_iter {
+            result = alarms_iter.next();
+
+            if result.is_some() {
+                break;
+            }
+
+            #[cfg(debug_assertions)]
+            {
+                self.alarm_iter = None;
+            }
+
+            self.alarm_iter = match self.next_alarms() {
+                Some(Ok(iter)) => Some(iter),
+                Some(Err(error)) => {
+                    result = Some(Err(error));
+
                     None
-                } else {
-                    self.next_alarm()
                 }
+                None => None,
             };
         }
+
+        debug_assert!(matches!(
+            (&result, &self.alarm_iter),
+            (Some(Ok(_)), Some(_)) | (Some(Err(_)), None) | (None, None)
+        ));
+
         result
     }
 }
@@ -133,6 +141,7 @@ where
     type PriceG = PriceG;
 
     type Output = AlarmIter<'alarms, PriceG>;
+
     type Error = ContractError;
 
     fn exec<C>(self, price: Price<C, BaseC>) -> Result<Self::Output, Self::Error>
@@ -143,8 +152,6 @@ where
         Ok(self
             .alarms
             .alarms(price)
-            .map::<ContractResult<Addr>, AlarmIterMapFn>(|result: Result<Addr, AlarmError>| {
-                result.map_err(Into::into)
-            }))
+            .map(|result| result.map_err(Into::into)))
     }
 }
