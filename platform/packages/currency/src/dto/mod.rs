@@ -145,7 +145,7 @@ where
         }
 
         // V: AnyVisitor<<Self::Group as Group>::TopG>,
-        S::visit_any(symbol, TypeToCurrency(PhantomData::<S::Group>))
+        S::visit_any(symbol, TypeToCurrency(PhantomData::<S::Group>)).unwrap_or_else(Err)
     }
 
     fn unexpected<R>(self) -> R
