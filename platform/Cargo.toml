@@ -42,7 +42,6 @@ serde = { version = "1", default-features = false }
 thiserror = { version = "2", default-features = false }
 
 # CosmWasm
-# TBD version = "<major>" only once address PR#469
 cosmwasm-std = { version = "2", default-features = false, features = [
     "abort",
     "cosmwasm_1_2",
