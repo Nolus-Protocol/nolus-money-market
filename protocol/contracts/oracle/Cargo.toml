@@ -34,14 +34,13 @@ testing = [
     "stub_price",
     "stub_swap",
     "currencies/testing",
-    "marketprice",
+    "marketprice/testing",
 ]
 
 [dependencies]
 currencies = { workspace = true, optional = true }
 currency = { workspace = true }
 finance = { workspace = true }
-marketprice = { workspace = true, optional = true }
 oracle-platform = { workspace = true, optional = true }
 platform = { workspace = true }
 sdk = { workspace = true }
