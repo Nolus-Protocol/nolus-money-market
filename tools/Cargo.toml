@@ -13,6 +13,7 @@ unexpected_cfgs = { level = "forbid", check-cfg = ["cfg(test)"] }
 
 [workspace.dependencies]
 # Own packages
+json-value = { path = "json-value" }
 topology = { path = "topology" }
 
 # General packages
@@ -24,6 +25,9 @@ thiserror = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10.8"
+
+# Testing packages
+serde_test = "1"
 
 [profile.dev.build-override]
 opt-level = 3
