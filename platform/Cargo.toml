@@ -28,7 +28,6 @@ finance = { path = "packages/finance", default-features = false }
 lpp-platform = { path = "packages/lpp", default-features = false }
 oracle-platform = { path = "packages/oracle", default-features = false }
 platform = { path = "packages/platform", default-features = false }
-schema = { path = "packages/schema", default-features = false }
 sdk = { path = "packages/sdk", default-features = false }
 time-oracle = { path = "packages/time-oracle", default-features = false }
 tree = { path = "packages/tree", default-features = false }
@@ -49,7 +48,6 @@ cosmwasm-std = { version = "~2.1", default-features = false, features = [
     "iterator",
     "std",
 ] }
-cosmwasm-schema = "2"
 cw-storage-plus = "2"
 cw-multi-test = { version = "2", default-features = false, features = [
     "cosmwasm_1_2",

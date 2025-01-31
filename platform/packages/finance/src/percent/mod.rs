@@ -5,10 +5,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use sdk::{
-    cosmwasm_std::{OverflowError, OverflowOperation},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{OverflowError, OverflowOperation};
 
 use crate::{
     error::Result as FinanceResult,
@@ -22,9 +19,7 @@ pub mod bound;
 
 pub type Units = u32;
 
-#[derive(
-    Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(transparent)]
 pub struct Percent(Units); //value in permille

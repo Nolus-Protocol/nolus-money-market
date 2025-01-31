@@ -1,8 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-
 pub use protocol_::Protocol;
 
 use crate::{release::Id, Error};
@@ -12,7 +9,6 @@ mod current;
 mod protocol_;
 
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(test, derive(Debug))]
 pub struct Release {
     id: Id,

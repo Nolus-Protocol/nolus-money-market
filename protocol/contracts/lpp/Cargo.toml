@@ -50,4 +50,3 @@ access-control = { workspace = true }
 currencies = { workspace = true, features = ["testing"] }
 finance = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
-schema = { workspace = true }

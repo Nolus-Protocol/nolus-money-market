@@ -5,15 +5,12 @@ pub(super) mod definitions {
         CurrencyDTO, CurrencyDef, Definition, InPoolWith, Matcher, MaybePairsVisitorResult,
         PairsGroup, PairsVisitor,
     };
-    use sdk::schemars::{self, JsonSchema};
 
     use crate::{lease::LeaseC5, lpn::Lpn, payment::Group as PaymentGroup};
 
     use super::super::Group as NativeGroup;
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct Nls(CurrencyDTO<NativeGroup>);
 

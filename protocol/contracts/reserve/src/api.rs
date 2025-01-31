@@ -4,15 +4,12 @@ pub(crate) use currencies::Lpns as LpnCurrencies;
 use currency::CurrencyDTO;
 use finance::coin::CoinDTO;
 use platform::contract::{Code, CodeId};
-use sdk::{
-    cosmwasm_std::Uint64,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Uint64;
 
 pub type LpnCurrencyDTO = CurrencyDTO<LpnCurrencies>;
 pub type LpnCoin = CoinDTO<LpnCurrencies>;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct InstantiateMsg {
     /// Unchecked address of the user that can change the lease code Id
@@ -21,11 +18,11 @@ pub struct InstantiateMsg {
     pub lease_code: Uint64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct MigrateMsg {}
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg {
     // This is an internal system API and we use [Code]
@@ -34,11 +31,11 @@ pub enum ExecuteMsg {
     CoverLiquidationLosses(LpnCoin),
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum SudoMsg {}
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum QueryMsg {
@@ -50,7 +47,7 @@ pub enum QueryMsg {
     ProtocolPackageRelease {},
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "testing", derive(Debug))]
 pub struct ConfigResponse {
     lease_code_id: Uint64,

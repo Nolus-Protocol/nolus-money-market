@@ -8,7 +8,6 @@ use std::{
 #[cfg(any(test, feature = "testing"))]
 use currency::CurrencyDef;
 use currency::{Currency, CurrencyDTO, Group, InPoolWith, MemberOf};
-use sdk::schemars::{self, JsonSchema};
 
 use crate::{
     coin::CoinDTO,
@@ -19,7 +18,7 @@ use crate::{
 mod unchecked;
 pub mod with_price;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     try_from = "unchecked::PriceDTO<G>",
     bound(serialize = "", deserialize = "G: Group<TopG = G>")

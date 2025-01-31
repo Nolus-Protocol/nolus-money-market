@@ -12,7 +12,6 @@ use std::{
 use ::serde::{Deserialize, Serialize};
 
 use currency::{Currency, CurrencyDef, Group, MemberOf};
-use sdk::schemars::{self, JsonSchema};
 
 use crate::zero::Zero;
 
@@ -27,10 +26,9 @@ pub type Amount = u128;
 pub type NonZeroAmount = NonZeroU128;
 
 // Only marketprice::feed::Observation<C, QuoteC> relies on Coin's (de-)serialization
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize)]
 pub struct Coin<C> {
     #[serde(with = "amount_serde")]
-    #[schemars(with = "String")]
     amount: Amount,
     // TODO rename to currency
     #[serde(skip)]

@@ -3,10 +3,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use ::platform::contract::CodeId;
-use sdk::{
-    cosmwasm_std::{Addr, Uint64},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, Uint64};
 
 #[cfg(feature = "contract")]
 pub(crate) use self::impl_mod::{execute, migrate};
@@ -31,7 +28,7 @@ mod impl_mod;
 mod platform;
 mod protocol;
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(
     rename_all = "snake_case",
     deny_unknown_fields,
@@ -42,11 +39,6 @@ mod protocol;
             Protocol::Of<Unit>: Deserialize<'de>",
     )
 )]
-#[schemars(bound = "Platform: JsonSchema, \
-    Platform::Of<Unit>: JsonSchema, \
-    Protocol: JsonSchema, \
-    Protocol::Of<Unit>: JsonSchema, \
-    Unit: JsonSchema")]
 pub struct ContractsTemplate<Platform, Protocol, Unit>
 where
     Platform: HigherOrderType,
@@ -70,7 +62,7 @@ pub type ContractsExecute = ContractsTemplate<
     String,
 >;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct MigrationSpec
 where

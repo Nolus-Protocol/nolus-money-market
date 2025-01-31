@@ -4,7 +4,6 @@ use currency::{
     AnyVisitor, Matcher, MaybeAnyVisitResult, MaybePairsVisitorResult, MemberOf, PairsGroup,
     PairsVisitor,
 };
-use sdk::schemars::{self, JsonSchema};
 
 use crate::payment::Group as PaymentGroup;
 
@@ -19,9 +18,7 @@ mod impl_mod {
 #[path = "testing.rs"]
 mod impl_mod;
 
-#[derive(
-    Clone, Copy, Debug, Ord, PartialEq, PartialOrd, Eq, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Clone, Copy, Debug, Ord, PartialEq, PartialOrd, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum Group {}
 

@@ -3,15 +3,11 @@ use std::mem;
 use serde::{Deserialize, Serialize};
 
 use platform::contract::Code;
-use sdk::{
-    cosmwasm_std::Storage,
-    cw_storage_plus::Item,
-    schemars::{self, JsonSchema},
-};
+use sdk::{cosmwasm_std::Storage, cw_storage_plus::Item};
 
 use crate::error::Result;
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct Config {
     lease_code: Code,
 }

@@ -5,16 +5,11 @@ use finance::{
     coin::{Amount, Coin},
     percent::Percent,
 };
-use sdk::{
-    cosmwasm_std::{StdError, StdResult},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{StdError, StdResult};
 
 mod unchecked;
 
-#[derive(
-    Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Default, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Default, Serialize, Deserialize)]
 #[repr(transparent)]
 #[serde(transparent)]
 pub struct TotalValueLocked(u32);
@@ -37,7 +32,7 @@ impl TotalValueLocked {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct Bar {
     pub tvl: TotalValueLocked,
@@ -47,7 +42,7 @@ pub struct Bar {
 // A list of (minTVL_thousands: u32, APR%o) which defines the APR as per the TVL.
 // The list represents intervals of TVL amounts starting from the given min TVL.
 // A valid configuration shall include a pair with minTVL_thousands == 0.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "unchecked::RewardScale", into = "unchecked::RewardScale")]
 pub struct RewardScale {
     bars: Vec<Bar>,

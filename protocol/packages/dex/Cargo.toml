@@ -23,7 +23,7 @@ finance = { workspace = true }
 oracle = { workspace = true, features = ["stub_swap"] }
 timealarms = { workspace = true, optional = true, features = ["stub"] }
 platform = { workspace = true }
-sdk = { workspace = true, features = ["schema"] }
+sdk = { workspace = true}
 
 serde = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
