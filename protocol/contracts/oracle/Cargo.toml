@@ -34,7 +34,6 @@ testing = [
     "stub_price",
     "stub_swap",
     "currencies/testing",
-    "marketprice/testing",
 ]
 
 [dependencies]
@@ -58,5 +57,6 @@ serde = { workspace = true, features = ["derive"] }
 currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
+marketprice = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
 tree = { workspace = true, features = ["testing"] }
