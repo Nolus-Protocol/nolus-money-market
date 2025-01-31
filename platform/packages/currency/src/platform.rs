@@ -90,6 +90,13 @@ impl Group for PlatformGroup {
     const DESCR: &'static str = "platform currencies";
     type TopG = Self;
 
+    fn currencies() -> impl Iterator<Item = CurrencyDTO<Self>> {
+        [Nls::definition().dto(), Stable::definition().dto()]
+            .into_iter()
+            .map(ToOwned::to_owned)
+            .map(CurrencyDTO::into_super_group)
+    }
+
     fn maybe_visit<M, V>(matcher: &M, visitor: V) -> MaybeAnyVisitResult<Self, V>
     where
         M: Matcher,

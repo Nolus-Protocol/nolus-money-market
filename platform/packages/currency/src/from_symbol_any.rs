@@ -50,14 +50,15 @@ pub trait GroupVisit
 where
     Self: Symbol,
 {
-    fn visit_any<V>(symbol: &SymbolSlice, visitor: V) -> Result<V::Output, V::Error>
+    fn visit_any<V>(
+        symbol: &SymbolSlice,
+        visitor: V,
+    ) -> Result<AnyVisitorResult<Self::Group, V>, Error>
     where
         V: AnyVisitor<Self::Group>,
-        Error: Into<V::Error>,
     {
-        Self::maybe_visit_any(symbol, visitor).unwrap_or_else(|_| {
-            Err(Error::not_in_currency_group::<_, Self, Self::Group>(symbol).into())
-        })
+        Self::maybe_visit_any(symbol, visitor)
+            .map_err(|_visitor| Error::not_in_currency_group::<_, Self, Self::Group>(symbol))
     }
 
     fn maybe_visit_any<V>(symbol: &SymbolSlice, visitor: V) -> MaybeAnyVisitResult<Self::Group, V>
@@ -200,7 +201,7 @@ mod test {
         let v_usdc = Expect::<SuperGroupTestC1, SuperGroup, SuperGroup>::new();
         assert_eq!(
             Ok(true),
-            Tickers::<SuperGroup>::visit_any(SuperGroupTestC1::ticker(), v_usdc.clone())
+            Tickers::<SuperGroup>::visit_any(SuperGroupTestC1::ticker(), v_usdc.clone()).unwrap()
         );
         assert_eq!(
             Ok(Ok(true)),
@@ -210,7 +211,7 @@ mod test {
         let v_nls = Expect::<SuperGroupTestC2, SuperGroup, SuperGroup>::new();
         assert_eq!(
             Ok(true),
-            Tickers::<SuperGroup>::visit_any(SuperGroupTestC2::ticker(), v_nls)
+            Tickers::<SuperGroup>::visit_any(SuperGroupTestC2::ticker(), v_nls).unwrap()
         );
 
         assert_eq!(
@@ -239,6 +240,7 @@ mod test {
                 SubGroupTestC10::ticker(),
                 Expect::<SubGroupTestC10, SuperGroup, SuperGroup>::new()
             )
+            .unwrap()
         );
     }
 
@@ -247,7 +249,7 @@ mod test {
         let v_usdc = Expect::<SuperGroupTestC1, SuperGroup, SuperGroup>::new();
         assert_eq!(
             Ok(false),
-            Tickers::<SuperGroup>::visit_any(SubGroupTestC10::ticker(), v_usdc)
+            Tickers::<SuperGroup>::visit_any(SubGroupTestC10::ticker(), v_usdc).unwrap()
         );
 
         let v_usdc = ExpectUnknownCurrency::<SubGroup>::new();
