@@ -12,6 +12,9 @@ license = "Apache-2.0"
 unexpected_cfgs = { level = "forbid", check-cfg = ["cfg(test)"] }
 
 [workspace.dependencies]
+# Platform packages
+sdk = { path = "../platform/packages/sdk", default-features = false }
+
 # Own packages
 json-value = { path = "json-value" }
 topology = { path = "topology" }

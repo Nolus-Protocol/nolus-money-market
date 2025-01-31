@@ -1,4 +1,4 @@
-use crate::{protocol::Protocol, protocol_name, protocol_network, release::Id};
+use crate::{protocol::Protocol, protocol_name, protocol_network, release::Id, ProtocolReleaseId};
 
 use super::Release;
 
@@ -11,7 +11,7 @@ impl Release {
         );
 
         Self {
-            id: Id::new_static(ID),
+            id: ProtocolReleaseId(Id::new_static(ID)),
             protocol: Protocol::new_static(protocol_name!(), protocol_network!()),
         }
     }

@@ -5,7 +5,13 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 
+[features]
+schema = ["dep:sdk"]
+
 [dependencies]
+# Own packages
+sdk = { workspace = true, optional = true, features = ["schema"] }
+
 # General packages
 serde = { workspace = true }
 

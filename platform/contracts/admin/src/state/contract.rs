@@ -5,15 +5,11 @@ use sdk::{
     cosmwasm_std::{Addr, StdResult, Storage},
     cw_storage_plus::Item,
 };
-use versioning::ReleaseId;
 
 const STORE: Item<Contract> = Item::new("contract_state_machine");
 
 #[derive(Serialize, Deserialize)]
 pub(crate) enum Contract {
-    AwaitContractsMigrationReply {
-        release: ReleaseId,
-    },
     Instantiate {
         expected_code_id: CodeId,
         expected_address: Addr,

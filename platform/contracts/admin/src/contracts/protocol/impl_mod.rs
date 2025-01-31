@@ -1,16 +1,20 @@
 use platform::batch::Batch;
 use sdk::cosmwasm_std::Addr;
+use versioning::{ProtocolPackageRelease, ProtocolPackageReleaseId};
 
 use crate::{result::Result, validate::Validate};
 
 use super::{
-    super::{impl_mod::migrate_contract, AsRef, MigrationSpec, TryForEach, TryForEachPair},
+    super::{
+        impl_mod::migrate_contract, HigherOrderType, Map, MigrationSpec, TryForEach, TryForEachPair,
+    },
     higher_order_type, Contracts, Protocol,
 };
 
 impl Contracts<Addr> {
     pub(crate) fn migrate_standalone(
         self,
+        release: ProtocolPackageReleaseId,
         migration_msgs: Contracts<MigrationSpec>,
     ) -> Result<Batch> {
         let mut migration_batch = Batch::default();
@@ -18,10 +22,11 @@ impl Contracts<Addr> {
         let mut post_migration_execute_batch = Batch::default();
 
         self.try_for_each_pair(migration_msgs, |address, migration_spec| {
-            migrate_contract(
+            migrate_contract::<ProtocolPackageRelease>(
                 &mut migration_batch,
                 &mut post_migration_execute_batch,
                 address,
+                release.clone(),
                 migration_spec,
             )
         })
@@ -29,10 +34,26 @@ impl Contracts<Addr> {
     }
 }
 
-impl<T> AsRef for Contracts<T> {
-    type Item = T;
+impl<T> Map for Contracts<T> {
+    type Unit = T;
 
     type HigherOrderType = higher_order_type::Contracts;
+
+    fn try_map<Unit, Err, F>(
+        self,
+        mut f: F,
+    ) -> Result<<Self::HigherOrderType as HigherOrderType>::Of<Unit>, Err>
+    where
+        F: FnMut(Self::Unit) -> Result<Unit, Err>,
+    {
+        Ok(Contracts {
+            leaser: f(self.leaser)?,
+            lpp: f(self.lpp)?,
+            oracle: f(self.oracle)?,
+            profit: f(self.profit)?,
+            reserve: f(self.reserve)?,
+        })
+    }
 
     fn as_ref(&self) -> Contracts<&T> {
         Contracts {

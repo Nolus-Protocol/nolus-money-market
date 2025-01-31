@@ -34,6 +34,9 @@ time-oracle = { path = "packages/time-oracle", default-features = false }
 tree = { path = "packages/tree", default-features = false }
 versioning = { path = "packages/versioning", default-features = false }
 
+# Tools Packages
+json-value = { path = "../tools/json-value" }
+
 # General
 anyhow = "1"
 base64 = { version = "0.22", default-features = false }

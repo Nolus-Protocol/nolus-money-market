@@ -8,8 +8,8 @@ use sdk::{
     },
 };
 use versioning::{
-    package_name, package_version, PlatformMigrationMessage, PlatformPackageRelease, ReleaseId,
-    UpdatablePackage as _, VersionSegment,
+    package_name, package_version, PlatformMigrationMessage, PlatformPackageRelease,
+    ProtocolPackageReleaseId, ReleaseId, UpdatablePackage as _, VersionSegment,
 };
 
 use crate::{
@@ -53,7 +53,7 @@ pub fn instantiate(
 #[entry_point]
 pub fn migrate(
     deps: DepsMut<'_>,
-    env: Env,
+    _env: Env,
     PlatformMigrationMessage {
         to_release,
         message: MigrateMsg {
@@ -66,14 +66,9 @@ pub fn migrate(
         .map_err(Into::into)
         .and_then(|()| {
             //TODO remove the check!!!
-            check_release_label(ReleaseId::VOID, to_release.clone())
+            check_release_label(ReleaseId::VOID, to_release.0.clone())
                 .and_then(|()| {
-                    crate::contracts::migrate(
-                        deps.storage,
-                        env.contract.address,
-                        to_release,
-                        contracts_migration,
-                    )
+                    crate::contracts::migrate(deps.storage, to_release, contracts_migration)
                 })
                 .map(response::response_only_messages)
         })
@@ -123,9 +118,12 @@ pub fn execute(
 
             register_protocol(deps.storage, deps.querier, name, protocol)
         }
-        ExecuteMsg::DeregisterProtocol(migration_spec) => {
-            deregister_protocol(deps.storage, &info.sender, migration_spec)
-        }
+        ExecuteMsg::DeregisterProtocol(migration_spec) => deregister_protocol(
+            deps.storage,
+            &info.sender,
+            ProtocolPackageReleaseId::void(),
+            migration_spec,
+        ),
         ExecuteMsg::EndOfMigration {} => {
             ensure_eq!(
                 info.sender,
@@ -141,7 +139,7 @@ pub fn execute(
 }
 
 #[entry_point]
-pub fn sudo(deps: DepsMut<'_>, env: Env, msg: SudoMsg) -> ContractResult<CwResponse> {
+pub fn sudo(deps: DepsMut<'_>, _env: Env, msg: SudoMsg) -> ContractResult<CwResponse> {
     match msg {
         SudoMsg::ChangeDexAdmin { new_dex_admin } => deps
             .api
@@ -159,34 +157,11 @@ pub fn sudo(deps: DepsMut<'_>, env: Env, msg: SudoMsg) -> ContractResult<CwRespo
         SudoMsg::MigrateContracts(MigrateContracts {
             release,
             migration_spec,
-        }) => {
-            crate::contracts::migrate(deps.storage, env.contract.address, release, migration_spec)
-                .map(response::response_only_messages)
-        }
+        }) => crate::contracts::migrate(deps.storage, release, migration_spec)
+            .map(response::response_only_messages),
         SudoMsg::ExecuteContracts(execute_messages) => {
             crate::contracts::execute(deps.storage, execute_messages)
                 .map(response::response_only_messages)
-        }
-    }
-}
-
-#[entry_point]
-pub fn reply(deps: DepsMut<'_>, _env: Env, msg: Reply) -> ContractResult<CwResponse> {
-    match ContractState::load(deps.storage)? {
-        ContractState::AwaitContractsMigrationReply { release } => migration_reply(msg, release),
-        ContractState::Instantiate {
-            expected_code_id,
-            expected_address,
-        } => {
-            ContractState::clear(deps.storage);
-
-            instantiate_reply(
-                deps.api,
-                deps.querier,
-                msg,
-                expected_code_id,
-                expected_address,
-            )
         }
     }
 }
@@ -276,6 +251,7 @@ fn register_protocol(
 fn deregister_protocol(
     storage: &mut dyn Storage,
     sender: &Addr,
+    protocol_release: ProtocolPackageReleaseId,
     migration_spec: ProtocolContracts<MigrationSpec>,
 ) -> ContractResult<CwResponse> {
     state_contracts::protocols(storage)?
@@ -291,21 +267,10 @@ fn deregister_protocol(
         })
         .unwrap_or(Err(ContractError::SenderNotARegisteredLeaser {}))
         .and_then(|protocol| {
-            ContractState::AwaitContractsMigrationReply {
-                release: ReleaseId::VOID,
-            }
-            .store(storage)
-            .map_err(Into::into)
-            .and_then(|()| protocol.migrate_standalone(migration_spec))
-            .map(response::response_only_messages)
+            protocol
+                .migrate_standalone(protocol_release, migration_spec)
+                .map(response::response_only_messages)
         })
-}
-
-fn migration_reply(msg: Reply, expected_release: ReleaseId) -> ContractResult<CwResponse> {
-    platform::reply::from_execute(msg)?
-        .ok_or(ContractError::NoMigrationResponseData {})
-        .and_then(|reported_release| check_release_label(reported_release, expected_release))
-        .map(|()| response::empty_response())
 }
 
 fn check_release_label(

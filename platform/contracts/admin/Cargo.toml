@@ -27,6 +27,8 @@ platform = { workspace = true }
 sdk = { workspace = true, features = ["contract"] }
 versioning = { workspace = true }
 
+json-value = { workspace = true, features = ["schema"] }
+
 # Required as a dependency by `entry_point` attribute macro
 cosmwasm-std = { workspace = true, optional = true }
 

@@ -15,7 +15,7 @@ pub trait UpdatablePackage
 where
     Self: Sized,
 {
-    type ReleaseId;
+    type ReleaseId: Clone + Serialize + for<'de> Deserialize<'de>;
 
     fn update_software(&self, to: &Self, to_release: &Self::ReleaseId) -> Result<(), Error>;
 
@@ -25,6 +25,16 @@ where
         to_release: &Self::ReleaseId,
     ) -> Result<(), Error>;
 }
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[repr(transparent)]
+#[serde(transparent)]
+pub struct SoftwareReleaseId(pub Id);
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[repr(transparent)]
+#[serde(transparent)]
+pub struct ProtocolReleaseId(pub(crate) Id);
 
 pub type PlatformPackageRelease = SoftwarePackageRelease;
 #[derive(Serialize, Deserialize)]
@@ -37,20 +47,27 @@ pub struct ProtocolPackageRelease {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct ProtocolPackageReleaseId {
-    software: Id,
-    protocol: Id,
+    software: SoftwareReleaseId,
+    protocol: ProtocolReleaseId,
 }
 
 impl ProtocolPackageReleaseId {
+    #[inline]
+    pub const fn new(software: SoftwareReleaseId, protocol: ProtocolReleaseId) -> Self {
+        Self { software, protocol }
+    }
+
     pub const fn void() -> Self {
-        Self {
-            software: Id::VOID,
-            protocol: Id::VOID,
+        const {
+            Self {
+                software: SoftwareReleaseId(Id::VOID),
+                protocol: ProtocolReleaseId(Id::VOID),
+            }
         }
     }
 
     #[cfg(feature = "testing")]
-    pub const fn sample(software: Id, protocol: Id) -> Self {
+    pub const fn sample(software: SoftwareReleaseId, protocol: ProtocolReleaseId) -> Self {
         Self { software, protocol }
     }
 }

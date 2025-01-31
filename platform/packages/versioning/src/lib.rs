@@ -4,10 +4,11 @@ use sdk::cosmwasm_std::Storage;
 pub use crate::software::SemVer;
 pub use crate::{
     error::Error,
+    migration::MigrationMessage,
     protocol::Release as ProtocolRelease,
     release::{
         query, Id as ReleaseId, PlatformPackageRelease, ProtocolPackageRelease,
-        ProtocolPackageReleaseId, UpdatablePackage,
+        ProtocolPackageReleaseId, ProtocolReleaseId, SoftwareReleaseId, UpdatablePackage,
     },
     software::{PackageRelease as SoftwarePackageRelease, VersionSegment},
 };
@@ -19,13 +20,13 @@ mod release;
 mod software;
 
 pub type PlatformMigrationMessage<ContractMsg> =
-    migration::MigrationMessage<PlatformPackageRelease, ContractMsg>;
+    MigrationMessage<PlatformPackageRelease, ContractMsg>;
 
 pub type ProtocolMigrationMessage<ContractMsg> =
-    migration::MigrationMessage<ProtocolPackageRelease, ContractMsg>;
+    MigrationMessage<ProtocolPackageRelease, ContractMsg>;
 
 pub struct FullUpdateOutput<MigrateStorageOutput> {
-    pub to: ReleaseId,
+    pub to: SoftwareReleaseId,
     pub storage_migration_output: MigrateStorageOutput,
 }
 
@@ -54,7 +55,7 @@ where
         .map_err(map_error)
         .and_then(|()| {
             migrate_storage(storage).map(|storage_migration_output| FullUpdateOutput {
-                to: ReleaseId::VOID, //TODO remove the release return value!!!
+                to: SoftwareReleaseId(ReleaseId::VOID), //TODO remove the release return value!!!
                 storage_migration_output,
             })
         })

@@ -1,16 +1,29 @@
-use crate::validate::Validate;
+use crate::{contracts::HigherOrderType, validate::Validate};
 
 use super::{
-    super::{AsRef, TryForEach, TryForEachPair},
+    super::{Map, TryForEach, TryForEachPair},
     Contracts,
 };
 
-impl<T> AsRef for Contracts<T> {
-    type Item = T;
+impl<T> Map for Contracts<T> {
+    type Unit = T;
 
     type HigherOrderType = super::HigherOrderType;
 
-    fn as_ref(&self) -> Contracts<&Self::Item> {
+    fn try_map<Unit, Err, F>(
+        self,
+        mut f: F,
+    ) -> Result<<Self::HigherOrderType as HigherOrderType>::Of<Unit>, Err>
+    where
+        F: FnMut(Self::Unit) -> Result<Unit, Err>,
+    {
+        Ok(Contracts {
+            timealarms: f(self.timealarms)?,
+            treasury: f(self.treasury)?,
+        })
+    }
+
+    fn as_ref(&self) -> Contracts<&Self::Unit> {
         Contracts {
             timealarms: &self.timealarms,
             treasury: &self.treasury,

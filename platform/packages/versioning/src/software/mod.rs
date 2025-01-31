@@ -12,7 +12,7 @@ pub use self::{
 
 use crate::{
     release::{Id, UpdatablePackage},
-    Error,
+    Error, SoftwareReleaseId,
 };
 
 mod package;
@@ -22,7 +22,7 @@ mod version;
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(test, derive(Debug))]
 pub struct PackageRelease {
-    id: Id,
+    id: SoftwareReleaseId,
     code: Package,
 }
 
@@ -38,7 +38,7 @@ impl PackageRelease {
         }
 
         const VERSION_STORAGE_KEY: Item<LegacyPackage> = Item::new("contract_version");
-        const PREV_ID: Id = Id::new_static("v0.7.6");
+        const PREV_ID: SoftwareReleaseId = SoftwareReleaseId(Id::new_static("v0.7.6"));
 
         impl LegacyPackage {
             fn migrate_to(self, name: &'static str) -> Package {
@@ -69,12 +69,12 @@ impl PackageRelease {
         );
 
         Self::instance(
-            Id::new_static(ID),
+            SoftwareReleaseId(Id::new_static(ID)),
             Package::new(name, SemVer::parse(version), storage),
         )
     }
 
-    const fn instance(id: Id, code: Package) -> Self {
+    const fn instance(id: SoftwareReleaseId, code: Package) -> Self {
         Self { id, code }
     }
 
@@ -91,11 +91,11 @@ impl PackageRelease {
             .and_then(|()| storage_check(self, &to.code))
     }
 
-    fn check_release_match(&self, target: &Id) -> Result<(), Error> {
+    fn check_release_match(&self, target: &SoftwareReleaseId) -> Result<(), Error> {
         if &self.id == target {
             Ok(())
         } else {
-            Err(Error::release_mismatch(&self.id, target))
+            Err(Error::release_mismatch(&self.id.0, &target.0))
         }
     }
 
@@ -134,7 +134,7 @@ impl PackageRelease {
 }
 
 impl UpdatablePackage for PackageRelease {
-    type ReleaseId = Id;
+    type ReleaseId = SoftwareReleaseId;
 
     fn update_software(&self, to: &Self, to_release: &Self::ReleaseId) -> Result<(), Error> {
         to.check_release_match(to_release)
@@ -153,10 +153,9 @@ impl UpdatablePackage for PackageRelease {
 
 #[cfg(test)]
 mod test {
-
     use crate::{
         release::{Id, UpdatablePackage},
-        Error,
+        Error, SoftwareReleaseId,
     };
 
     use super::{version::VersionSegment, Package, PackageRelease, SemVer};
@@ -168,12 +167,12 @@ mod test {
     const OTHER_NAME: &str = "package_B";
     const NEWER_VERSION: SemVer = SemVer::parse("0.3.5");
 
-    fn prod1_id() -> Id {
-        Id::new_static("v0.5.3")
+    fn prod1_id() -> SoftwareReleaseId {
+        SoftwareReleaseId(Id::new_static("v0.5.3"))
     }
 
-    fn prod2_id() -> Id {
-        Id::new_static("v0.5.4")
+    fn prod2_id() -> SoftwareReleaseId {
+        SoftwareReleaseId(Id::new_static("v0.5.4"))
     }
 
     #[test]
