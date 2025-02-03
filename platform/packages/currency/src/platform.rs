@@ -93,7 +93,7 @@ impl Group for PlatformGroup {
     fn currencies() -> impl Iterator<Item = CurrencyDTO<Self>> {
         [Nls::definition().dto(), Stable::definition().dto()]
             .into_iter()
-            .map(ToOwned::to_owned)
+            .copied()
             .map(CurrencyDTO::into_super_group)
     }
 

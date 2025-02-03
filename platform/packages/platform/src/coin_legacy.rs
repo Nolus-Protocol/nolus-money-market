@@ -47,12 +47,12 @@ where
 
 /// Transform CW coin to Nolus coin and then return the [WithCoin] result
 ///
-/// If seeking for the corresponding Nolus coin is not successfull a [V::Error] is returned.
+/// If seeking for the corresponding Nolus coin is not successfull a [V::Error::from(Error::NotInCurrencyGroup)]  is returned.
 /// Otherwise, an `v.on(Nolus_coin)` is returned
 pub(crate) fn from_cosmwasm_any<VisitedG, V>(
     coin: &CosmWasmCoin,
     v: V,
-) -> StdResult<WithCoinResult<VisitedG, V>, Error>
+) -> Result<WithCoinResult<VisitedG, V>>
 where
     VisitedG: Group,
     V: WithCoin<VisitedG>,

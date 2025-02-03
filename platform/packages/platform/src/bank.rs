@@ -128,14 +128,9 @@ impl BankAccountView for BankView<'_> {
                 self.cw_balance(currency).map_err(Into::into).map_or_else(
                     |err| Some(Err(err)),
                     |ref cw_balance| {
-                        if cw_balance.amount == Uint128::zero() {
-                            None
-                        } else {
-                            Some(coin_legacy::from_cosmwasm_any::<G, _>(
-                                cw_balance,
-                                cmd.clone(),
-                            ))
-                        }
+                        (cw_balance.amount != Uint128::zero()).then(|| {
+                            coin_legacy::from_cosmwasm_any::<G, _>(cw_balance, cmd.clone())
+                        })
                     },
                 )
             })

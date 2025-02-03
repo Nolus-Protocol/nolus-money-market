@@ -34,7 +34,7 @@ impl Group for SuperGroup {
             SuperGroupTestC5::definition().dto(),
         ]
         .into_iter()
-        .map(ToOwned::to_owned)
+        .copied()
         .chain(SubGroup::currencies().map(CurrencyDTO::into_super_group))
     }
 
@@ -183,7 +183,7 @@ impl Group for SubGroup {
             SubGroupTestC10::definition().dto(),
         ]
         .into_iter()
-        .map(ToOwned::to_owned)
+        .copied()
     }
 
     fn maybe_visit<M, V>(matcher: &M, visitor: V) -> MaybeAnyVisitResult<Self, V>
