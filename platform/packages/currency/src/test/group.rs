@@ -4,7 +4,7 @@ use crate::{
     from_symbol_any::InPoolWith,
     group::MemberOf,
     pairs::{MaybePairsVisitorResult, PairsGroup, PairsVisitor},
-    AnyVisitor, CurrencyDTO, Group, Matcher, MaybeAnyVisitResult,
+    AnyVisitor, CurrencyDTO, CurrencyDef, Group, Matcher, MaybeAnyVisitResult,
 };
 
 pub type SuperGroupTestC1 = impl_::TestC1;
@@ -24,6 +24,19 @@ impl MemberOf<Self> for SuperGroup {}
 impl Group for SuperGroup {
     const DESCR: &'static str = "super_group";
     type TopG = Self;
+
+    fn currencies() -> impl Iterator<Item = CurrencyDTO<Self>> {
+        [
+            SuperGroupTestC1::definition().dto(),
+            SuperGroupTestC2::definition().dto(),
+            SuperGroupTestC3::definition().dto(),
+            SuperGroupTestC4::definition().dto(),
+            SuperGroupTestC5::definition().dto(),
+        ]
+        .into_iter()
+        .copied()
+        .chain(SubGroup::currencies().map(CurrencyDTO::into_super_group))
+    }
 
     fn maybe_visit<M, V>(matcher: &M, visitor: V) -> MaybeAnyVisitResult<Self, V>
     where
@@ -163,6 +176,15 @@ impl MemberOf<SuperGroup> for SubGroup {}
 impl Group for SubGroup {
     const DESCR: &'static str = "sub_group";
     type TopG = SuperGroup;
+
+    fn currencies() -> impl Iterator<Item = CurrencyDTO<Self>> {
+        [
+            SubGroupTestC6::definition().dto(),
+            SubGroupTestC10::definition().dto(),
+        ]
+        .into_iter()
+        .copied()
+    }
 
     fn maybe_visit<M, V>(matcher: &M, visitor: V) -> MaybeAnyVisitResult<Self, V>
     where

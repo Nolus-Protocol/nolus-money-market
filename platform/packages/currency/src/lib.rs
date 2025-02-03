@@ -65,14 +65,6 @@ pub trait CurrencyDef: Currency {
     }
 }
 
-pub fn into_super_group<C, SuperG>(c_def: C) -> CurrencyDTO<SuperG>
-where
-    C: CurrencyDef<Group = SuperG>,
-    SuperG: Group,
-{
-    *c_def.dto()
-}
-
 impl<T> Currency for T where T: CurrencyDef {}
 
 pub fn equal<C1, C2>() -> bool

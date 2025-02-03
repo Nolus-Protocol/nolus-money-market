@@ -2,11 +2,11 @@ use std::{marker::PhantomData, result::Result as StdResult};
 
 use currency::{CurrencyDTO, CurrencyDef, Group, MemberOf};
 use finance::coin::{Coin, WithCoin, WithCoinResult};
-use sdk::cosmwasm_std::{Addr, BankMsg, Coin as CwCoin, QuerierWrapper};
+use sdk::cosmwasm_std::{Addr, BankMsg, Coin as CwCoin, QuerierWrapper, Uint128};
 
 use crate::{
     batch::Batch,
-    coin_legacy::{self, from_cosmwasm_seek_any, maybe_from_cosmwasm_any, to_cosmwasm_impl},
+    coin_legacy::{self, from_cosmwasm_seek_any, to_cosmwasm_impl},
     error::Error,
     result::Result,
 };
@@ -20,6 +20,7 @@ pub trait BankAccountView {
         C::Group: MemberOf<G>,
         G: Group;
 
+    /// Return only the non-zero balances of all currencies belonging to the group
     fn balances<G, Cmd>(&self, cmd: Cmd) -> BalancesResult<G, Cmd>
     where
         G: Group,
@@ -112,7 +113,7 @@ impl BankAccountView for BankView<'_> {
     {
         self.cw_balance(C::definition().dto())
             .and_then(|ref cw_coin| {
-                coin_legacy::from_cosmwasm_currency_not_definition::<C, C>(cw_coin)
+                coin_legacy::from_cosmwasm_currency_not_definition::<C, _>(cw_coin)
             })
     }
 
@@ -122,16 +123,19 @@ impl BankAccountView for BankView<'_> {
         Cmd: WithCoin<G> + Clone,
         Cmd::Output: Aggregate,
     {
-        self.querier
-            .query_all_balances(self.account)
-            .map_err(Error::CosmWasmQueryAllBalances)
-            .map(|cw_coins| {
-                cw_coins
-                    .into_iter()
-                    .filter_map(|cw_coin| maybe_from_cosmwasm_any::<G, _>(cw_coin, cmd.clone()))
-                    .reduce_results(Aggregate::aggregate)
+        G::currencies()
+            .filter_map(|ref currency| {
+                self.cw_balance(currency).map_err(Into::into).map_or_else(
+                    |err| Some(Err(err)),
+                    |ref cw_balance| {
+                        (cw_balance.amount != Uint128::zero()).then(|| {
+                            coin_legacy::from_cosmwasm_any::<G, _>(cw_balance, cmd.clone())
+                        })
+                    },
+                )
             })
-            .map_err(Into::into)
+            .reduce_results(Aggregate::aggregate)
+            .transpose()
     }
 }
 
@@ -373,6 +377,18 @@ impl<T> Aggregate for Vec<T> {
         self.append(&mut other);
 
         self
+    }
+}
+
+impl<T, E> Aggregate for StdResult<T, E>
+where
+    T: Aggregate,
+{
+    fn aggregate(self, other: Self) -> Self
+    where
+        Self: Sized,
+    {
+        self.and_then(|v| other.map(|v_other| v.aggregate(v_other)))
     }
 }
 
