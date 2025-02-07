@@ -1,8 +1,7 @@
 use currency::CurrencyDTO;
 use finance::percent::Percent;
 use lease::api::open::{LoanForm, NewLeaseContract, NewLeaseForm};
-use platform::batch::Batch;
-use platform::message::Response as MessageResponse;
+use platform::{batch::Batch, message::Response as MessageResponse};
 use sdk::cosmwasm_std::{Addr, Coin, Storage};
 
 use crate::{
@@ -12,6 +11,7 @@ use crate::{
 };
 
 pub struct Borrow {}
+
 impl Borrow {
     pub fn with(
         storage: &mut dyn Storage,

@@ -1,5 +1,3 @@
-use oracle::stub::SwapPath;
-use profit::stub::ProfitRef;
 use serde::{Deserialize, Serialize};
 
 use currency::CurrencyDTO;
@@ -8,10 +6,12 @@ use dex::{
     SwapTask, TransferOutState,
 };
 use finance::{coin::CoinDTO, duration::Duration};
+use oracle::stub::SwapPath;
 use platform::{
     ica::HostAccount, message::Response as MessageResponse,
     state_machine::Response as StateMachineResponse,
 };
+use profit::stub::ProfitRef;
 use sdk::cosmwasm_std::{Env, QuerierWrapper, Timestamp};
 use timealarms::stub::TimeAlarmsRef;
 

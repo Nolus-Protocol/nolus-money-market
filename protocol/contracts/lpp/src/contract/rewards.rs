@@ -1,8 +1,8 @@
-use finance::coin::Coin;
-use lpp_platform::NLpn;
 use serde::Serialize;
 
 use currency::CurrencyDef;
+use finance::coin::Coin;
+use lpp_platform::NLpn;
 use platform::{
     bank::{self, BankAccount},
     batch::Batch,

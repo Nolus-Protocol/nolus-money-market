@@ -1,16 +1,15 @@
 use std::ops::DerefMut as _;
 
-use currency::CurrencyDef;
-use finance::coin::{Coin, CoinDTO};
-use oracle::stub::convert;
-use oracle_platform::OracleRef;
 use serde::Serialize;
 
 use access_control::SingleUserAccess;
 use currencies::{
     Lpn as LpnCurrency, Lpns as LpnCurrencies, PaymentGroup, Stable as StableCurrency,
 };
-
+use currency::CurrencyDef;
+use finance::coin::{Coin, CoinDTO};
+use oracle::stub::convert;
+use oracle_platform::OracleRef;
 use platform::{
     contract::Code, error as platform_error, message::Response as PlatformResponse, response,
 };

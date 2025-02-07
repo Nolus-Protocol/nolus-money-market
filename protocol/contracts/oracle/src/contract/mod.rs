@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use currencies::{
     LeaseGroup as AlarmCurrencies, Lpn as BaseCurrency, Lpns as BaseCurrencies,
     PaymentGroup as PriceCurrencies, Stable as StableCurrency,
@@ -13,7 +15,6 @@ use sdk::{
         Timestamp,
     },
 };
-use serde::Serialize;
 use versioning::{
     package_name, package_version, ProtocolMigrationMessage, ProtocolPackageRelease,
     UpdatablePackage as _, VersionSegment,

@@ -1,14 +1,14 @@
-use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Display, Formatter},
     marker::PhantomData,
     result::Result as StdResult,
 };
 
+use serde::{Deserialize, Serialize};
+
 #[cfg(any(test, feature = "testing"))]
 use currency::CurrencyDef;
 use currency::{Currency, CurrencyDTO, Group, InPoolWith, MemberOf};
-use sdk::schemars::{self, JsonSchema};
 
 use crate::{
     coin::CoinDTO,
@@ -19,7 +19,7 @@ use crate::{
 mod unchecked;
 pub mod with_price;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     try_from = "unchecked::PriceDTO<G>",
     bound(serialize = "", deserialize = "G: Group<TopG = G>")
@@ -224,7 +224,6 @@ where
 
 #[cfg(test)]
 mod test_invariant {
-
     use currency::test::{
         SuperGroup, SuperGroupTestC1, SuperGroupTestC2, SuperGroupTestC4, SuperGroupTestC5,
     };

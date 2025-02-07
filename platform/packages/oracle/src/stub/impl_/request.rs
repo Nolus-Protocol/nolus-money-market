@@ -1,5 +1,6 @@
-use currency::{CurrencyDef, Group};
 use serde::Serialize;
+
+use currency::{CurrencyDef, Group};
 
 use crate::msg::{BaseCurrencyQueryMsg, StableCurrencyQueryMsg};
 

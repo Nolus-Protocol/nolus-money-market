@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 use currency::{CurrencyDef, Group, MemberOf};
 use finance::price::base::BasePrice;
-use serde::{Deserialize, Serialize};
 
 use super::{Alarm as ValidatedAlarm, Error};
 

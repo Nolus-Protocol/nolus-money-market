@@ -1,8 +1,8 @@
 use std::mem;
 
-use currencies::Lpns;
 use serde::{Deserialize, Serialize};
 
+use currencies::Lpns;
 use currency::{CurrencyDef, MemberOf};
 use finance::{percent::bound::BoundToHundredPercent, price::Price};
 use lpp_platform::NLpn;

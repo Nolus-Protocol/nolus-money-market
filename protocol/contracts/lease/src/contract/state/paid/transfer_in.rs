@@ -1,4 +1,3 @@
-use oracle::stub::SwapPath;
 use serde::{Deserialize, Serialize};
 
 use currency::CurrencyDTO;
@@ -7,6 +6,7 @@ use dex::{
     SwapTask, TransferInFinishState, TransferInInitState, TransferOutState,
 };
 use finance::{coin::CoinDTO, duration::Duration};
+use oracle::stub::SwapPath;
 use platform::{
     bank,
     batch::{Emit, Emitter},

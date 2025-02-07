@@ -24,7 +24,8 @@ use super::{
     close::Policy as ClosePolicy, interest::OverdueCollection, steady::Steadiness, Cause,
     CloseStrategy, Debt, DueTrait, Liquidation, PositionError, PositionResult,
 };
-pub use dto::SpecDTO;
+
+pub use self::dto::SpecDTO;
 
 mod dto;
 

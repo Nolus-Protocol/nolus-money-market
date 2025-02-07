@@ -1,6 +1,6 @@
-use currency::never;
 use serde::{Deserialize, Serialize};
 
+use currency::never;
 use dex::Enterable;
 use finance::{coin::IntoDTO, duration::Duration};
 use platform::{bank, batch::Emitter, message::Response as MessageResponse};

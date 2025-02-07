@@ -1,7 +1,8 @@
 use std::result::Result as StdResult;
 
-use finance::{error::Error as FinanceError, percent::Percent};
 use thiserror::Error;
+
+use finance::{error::Error as FinanceError, percent::Percent};
 
 use crate::finance::LpnCoinDTO;
 

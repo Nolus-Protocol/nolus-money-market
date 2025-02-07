@@ -33,7 +33,6 @@ impl From<SpecDTO> for LastVersionSpecDTO {
 
 #[cfg(test)]
 mod test_two_versions {
-
     use currencies::Lpn;
     use finance::{
         coin::{Coin, CoinDTO},
@@ -43,8 +42,9 @@ mod test_two_versions {
     };
     use sdk::cosmwasm_std;
 
-    use super::{LastVersionSpecDTO, SpecDTO};
     use crate::api::open::PositionSpecDTO;
+
+    use super::{LastVersionSpecDTO, SpecDTO};
 
     #[test]
     fn read_7_5_into_7_6() {

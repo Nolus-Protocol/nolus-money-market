@@ -1,7 +1,7 @@
-use currency::Group;
 use serde::{Deserialize, Serialize};
 
 use currencies::{Lpn as QuoteC, Lpns as QuoteG};
+use currency::Group;
 use oracle::stub::SwapPath;
 use sdk::cosmwasm_std::Addr;
 use timealarms::stub::TimeAlarmsRef;

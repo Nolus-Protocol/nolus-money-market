@@ -1,6 +1,6 @@
-use currency::Group;
 use serde::{Deserialize, Serialize};
 
+use currency::Group;
 use oracle::stub::SwapPath;
 use platform::{
     batch::Batch as LocalBatch,

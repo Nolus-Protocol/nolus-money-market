@@ -1,6 +1,5 @@
-use oracle_platform::OracleRef;
-
 use currency::{Currency, CurrencyDef, Group, MemberOf};
+use oracle_platform::OracleRef;
 use platform::batch::Batch;
 use sdk::cosmwasm_std::{wasm_execute, Addr};
 

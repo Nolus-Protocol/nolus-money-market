@@ -1,6 +1,6 @@
-use finance::duration::Duration;
 use serde::{Deserialize, Serialize};
 
+use finance::duration::Duration;
 use sdk::cosmwasm_std::{Env, MessageInfo, QuerierWrapper, Timestamp};
 
 use crate::{api::query::StateResponse, error::ContractResult};

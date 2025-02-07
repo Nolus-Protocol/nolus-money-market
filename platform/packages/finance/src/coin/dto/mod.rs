@@ -7,8 +7,6 @@ use std::{
 use serde::{Deserialize, Serialize};
 
 use currency::{never::Never, Currency, CurrencyDTO, CurrencyDef, Group, MemberOf};
-use sdk::schemars::{self, JsonSchema};
-use transformer::CoinTransformerAny;
 
 use crate::{
     coin::Amount,
@@ -16,6 +14,8 @@ use crate::{
 };
 
 use super::{Coin, WithCoin};
+
+use self::transformer::CoinTransformerAny;
 
 mod transformer;
 
@@ -26,7 +26,7 @@ mod transformer;
 /// carries also the currency ticker. The aim is to use it everywhere the cosmwasm
 /// framework does not support type parameterization or where the currency type
 /// is unknown at compile time.
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 #[serde(
     deny_unknown_fields,
     rename_all = "snake_case",
@@ -37,7 +37,6 @@ where
     G: Group,
 {
     #[serde(with = "super::amount_serde")]
-    #[schemars(with = "String")]
     amount: Amount,
     #[serde(rename = "ticker")] // it is more descriptive on the wire than currency
     currency: CurrencyDTO<G>,

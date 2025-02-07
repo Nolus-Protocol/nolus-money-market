@@ -3,7 +3,6 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-use prefix::Prefix;
 use serde::{Deserialize, Serialize};
 
 use currency::{CurrencyDef, Group, MemberOf, SymbolOwned};
@@ -20,6 +19,7 @@ use sdk::{
 };
 
 use self::errors::AlarmError;
+use self::prefix::Prefix;
 
 pub mod errors;
 pub mod prefix;

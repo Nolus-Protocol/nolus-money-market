@@ -2,10 +2,11 @@ use serde::{Deserialize, Serialize};
 
 use currency::{CurrencyDef, Group, MemberOf};
 
-use crate::coin::Coin;
-use crate::{coin::CoinDTO, error::Error};
-
-use crate::price::base::BasePrice as ValidatedBasePrice;
+use crate::{
+    coin::{Coin, CoinDTO},
+    error::Error,
+    price::base::BasePrice as ValidatedBasePrice,
+};
 
 /// Brings invariant checking as a step in deserializing and serializing a BasePrice
 #[derive(Deserialize, Serialize)]

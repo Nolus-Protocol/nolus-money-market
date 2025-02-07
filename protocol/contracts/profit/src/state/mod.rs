@@ -1,13 +1,13 @@
 use std::fmt::{Display, Formatter};
 
-use currencies::PaymentGroup;
-use finance::duration::Duration;
 use serde::{Deserialize, Serialize};
 
+use currencies::PaymentGroup;
 use dex::{
     ConnectionParams, ContinueResult, Contract, Handler, Response as DexResponse,
     Result as DexResult, StateLocalOut,
 };
+use finance::duration::Duration;
 use platform::{
     batch::Batch,
     state_machine::{self, Response as StateMachineResponse},

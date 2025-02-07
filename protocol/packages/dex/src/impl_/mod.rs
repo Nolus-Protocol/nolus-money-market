@@ -1,6 +1,6 @@
-use finance::duration::Duration;
 use serde::ser::Serialize;
 
+use finance::duration::Duration;
 use platform::batch::Batch;
 use sdk::cosmwasm_std::{Binary, Env, QuerierWrapper, Timestamp};
 

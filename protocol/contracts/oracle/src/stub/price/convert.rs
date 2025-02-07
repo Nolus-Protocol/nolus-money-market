@@ -2,12 +2,11 @@ use std::marker::PhantomData;
 
 use currency::{Currency, CurrencyDef, Group, MemberOf};
 use finance::coin::Coin;
-use sdk::cosmwasm_std::QuerierWrapper;
-
 use oracle_platform::{
     error::{Error, Result},
     Oracle, OracleRef, WithOracle,
 };
+use sdk::cosmwasm_std::QuerierWrapper;
 
 pub fn from_quote<QuoteC, QuoteG, OutC, OutG>(
     oracle_ref: OracleRef<QuoteC, QuoteG>,

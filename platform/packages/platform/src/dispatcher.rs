@@ -1,10 +1,12 @@
+use serde::Serialize;
+
+use sdk::cosmwasm_std::Addr;
+
 use crate::{
     batch::{Batch, Emit, Emitter},
     error::Error,
     message::Response as MessageResponse,
 };
-use sdk::cosmwasm_std::Addr;
-use serde::Serialize;
 
 pub type Id = u64;
 pub type AlarmsCount = u32;

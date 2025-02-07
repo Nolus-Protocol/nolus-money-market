@@ -40,7 +40,7 @@ platform = { path = "../platform/packages/platform", features = ["testing"], def
 sdk = { path = "../platform/packages/sdk", features = ["neutron", "testing"], default-features = false }
 swap = { path = "../protocol/packages/swap", features = ["testing"], default-features = false }
 tree = { path = "../platform/packages/tree", features = ["testing"], default-features = false }
-versioning ={ path = "../platform/packages/versioning", features = ["testing"], default-features = false }
+versioning = { path = "../platform/packages/versioning", features = ["testing"], default-features = false }
 
 anyhow = "1"
 thiserror = { version = "2", default-features = false }

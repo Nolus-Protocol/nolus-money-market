@@ -207,10 +207,9 @@ fn currency_definition<'r>(
         r#"
     #[derive(
         Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Serialize,
-        serde::Deserialize, sdk::schemars::JsonSchema,
+        serde::Deserialize,
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
-    #[schemars(crate = "sdk::schemars")]
     pub struct "#,
         name,
         r#"(currency::CurrencyDTO<super::super::Group>);

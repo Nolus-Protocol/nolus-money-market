@@ -5,10 +5,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use sdk::{
-    cosmwasm_std::{Timestamp, Uint128},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Timestamp, Uint128};
 
 use crate::{
     fraction::Fraction,
@@ -26,10 +23,9 @@ pub type Seconds = u32;
 ///
 /// Implementation note: We use `as` safely for numeric upcasts instead of `from/into`
 /// in order to get const result.
-#[derive(
-    Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Serialize, Deserialize)]
 pub struct Duration(Units);
+
 impl Duration {
     const UNITS_IN_SECOND: Units = 1000 * 1000 * 1000;
     const UNITS_IN_DAY: Units = Self::UNITS_IN_SECOND * Self::SECONDS_IN_DAY as Units;

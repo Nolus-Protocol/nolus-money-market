@@ -1,6 +1,7 @@
 use std::result::Result as StdResult;
 
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 use currency::{CurrencyDef, Group, MemberOf};
 use finance::{
@@ -13,16 +14,12 @@ use finance::{
         Price,
     },
 };
-use thiserror::Error;
 
-use sdk::{
-    cosmwasm_std::StdError as CosmWasmError,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::StdError as CosmWasmError;
 
 mod unchecked;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
 #[serde(deny_unknown_fields, rename_all = "snake_case", bound(serialize = ""))]
 pub enum ExecuteMsg<G, Lpn, Lpns>
@@ -49,7 +46,7 @@ pub enum Error {
     InvariantBroken(&'static str),
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(
     try_from = "unchecked::Alarm<G, Lpn, Lpns>",

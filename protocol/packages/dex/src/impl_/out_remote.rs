@@ -525,7 +525,6 @@ mod impl_display {
 
 #[cfg(feature = "migration")]
 mod impl_migration {
-
     use currency::Group;
 
     use super::{OpenIcaRespDelivery, State};

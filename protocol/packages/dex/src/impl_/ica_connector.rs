@@ -3,9 +3,9 @@ use std::{
     marker::PhantomData,
 };
 
-use finance::duration::Duration;
 use serde::{Deserialize, Serialize};
 
+use finance::duration::Duration;
 use platform::{
     batch::{Batch, Emit, Emitter},
     ica::HostAccount,

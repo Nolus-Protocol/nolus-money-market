@@ -1,5 +1,6 @@
-use dex::ForwardToInner;
 use serde::{Deserialize, Serialize};
+
+use dex::ForwardToInner;
 
 use crate::api::ExecuteMsg;
 

@@ -1,11 +1,12 @@
-use finance::duration::Duration;
-use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use serde::{Deserialize, Serialize};
 
 use dex::{
     Account, ConnectionParams, Contract as DexContract, DexConnectable, DexResult, IcaConnectee,
     TimeAlarm, TransferOut,
 };
+use finance::duration::Duration;
 use platform::batch::Batch;
 use sdk::cosmwasm_std::{QuerierWrapper, Timestamp};
 use timealarms::stub::TimeAlarmsRef;

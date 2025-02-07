@@ -1,12 +1,13 @@
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 
+use serde::{Deserialize, Serialize};
+
 use finance::{
     fraction::Fraction,
     fractionable::Percentable,
     percent::Percent,
     range::{Ascending, RightOpenRange},
 };
-use serde::{Deserialize, Serialize};
 
 use crate::api::{
     position::{ChangeCmd, ClosePolicyChange},

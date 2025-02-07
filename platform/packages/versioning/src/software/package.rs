@@ -6,13 +6,9 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-
 use super::version::{SemVer, VersionSegment};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 /// A 'reference type' representing a software package
 pub struct Package {
     /// the package name

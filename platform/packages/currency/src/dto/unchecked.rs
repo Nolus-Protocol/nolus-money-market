@@ -1,16 +1,13 @@
 use std::fmt::{Display, Formatter};
 
-use sdk::schemars::{self, JsonSchema};
 use serde::{Deserialize, Serialize};
 
-use crate::{Group, SymbolOwned, Tickers};
-
-use crate::error::Error;
+use crate::{error::Error, Group, SymbolOwned, Tickers};
 
 use super::CurrencyDTO as ValidatedDTO;
 
 /// Brings invariant checking as a step in deserializing a CurrencyDTO
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize)]
 #[serde(transparent, deny_unknown_fields, rename_all = "snake_case")]
 //TODO use Cow<'static, SymbolOwned> to avoid extra String instantiations
 pub(super) struct TickerDTO(SymbolOwned);

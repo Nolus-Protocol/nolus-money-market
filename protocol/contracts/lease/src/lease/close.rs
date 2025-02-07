@@ -1,9 +1,8 @@
-use platform::{bank::FixedAddressSender, batch::Batch};
-
 use currency::{CurrencyDef, MemberOf};
 use finance::{coin::Coin, duration::Duration};
 use lpp::stub::loan::LppLoan as LppLoanTrait;
 use oracle_platform::Oracle as OracleTrait;
+use platform::{bank::FixedAddressSender, batch::Batch};
 use reserve::stub::Reserve as ReserveTrait;
 use sdk::cosmwasm_std::Timestamp;
 

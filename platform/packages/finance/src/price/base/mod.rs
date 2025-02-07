@@ -3,8 +3,6 @@ use std::marker::PhantomData;
 use serde::{Deserialize, Serialize};
 
 use currency::{Currency, CurrencyDTO, CurrencyDef, Group, MemberOf};
-use sdk::schemars::{self, JsonSchema};
-use with_price::WithPrice;
 
 use crate::{
     coin::{Coin, CoinDTO},
@@ -13,14 +11,16 @@ use crate::{
 
 use super::Price;
 
+use self::with_price::WithPrice;
+
 mod unchecked;
 pub mod with_price;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 #[serde(
     try_from = "unchecked::BasePrice<BaseG, QuoteG>",
     into = "unchecked::BasePrice<BaseG, QuoteG>",
-    bound(serialize = "", deserialize = "",)
+    bound(serialize = "", deserialize = "")
 )]
 pub struct BasePrice<BaseG, QuoteC, QuoteG>
 where
@@ -30,7 +30,6 @@ where
     QuoteG: Group,
 {
     amount: CoinDTO<BaseG>,
-    #[schemars(with = "CoinDTO<QuoteG>")]
     // decouples this field representation on the wire from the `Coin<>`-s one
     amount_quote: Coin<QuoteC>,
     #[serde(skip)]

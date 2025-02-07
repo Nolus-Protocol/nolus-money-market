@@ -1,10 +1,11 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::marker::PhantomData;
+use std::{
+    fmt::{Display, Formatter, Result as FmtResult},
+    marker::PhantomData,
+};
 
-use finance::duration::Duration;
 use serde::{Deserialize, Serialize};
 
-use finance::coin::CoinDTO;
+use finance::{coin::CoinDTO, duration::Duration};
 use platform::batch::Batch;
 use sdk::cosmwasm_std::{Binary, Env, QuerierWrapper, Timestamp};
 

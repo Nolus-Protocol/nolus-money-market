@@ -3,7 +3,6 @@ use std::{
     marker::PhantomData,
 };
 
-use oracle::stub::SwapPath;
 use serde::{Deserialize, Serialize};
 
 use currency::{CurrencyDTO, Group, MemberOf};
@@ -12,6 +11,7 @@ use finance::{
     duration::Duration,
     zero::Zero,
 };
+use oracle::stub::SwapPath;
 use platform::{batch::Batch, trx};
 use sdk::{
     cosmos_sdk_proto::Any,

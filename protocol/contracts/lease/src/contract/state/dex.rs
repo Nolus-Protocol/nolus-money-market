@@ -1,7 +1,7 @@
-use finance::duration::Duration;
 use serde::{Deserialize, Serialize};
 
 use dex::{Contract as DexContract, Handler as DexHandler};
+use finance::duration::Duration;
 use platform::state_machine;
 use sdk::cosmwasm_std::{Binary, Env, MessageInfo, QuerierWrapper, Reply, Timestamp};
 

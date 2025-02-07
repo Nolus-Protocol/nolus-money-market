@@ -158,7 +158,6 @@ mod test_calc_borrow {
 }
 
 mod test_debt {
-
     use currencies::Lpn;
     use finance::{
         coin::Coin,

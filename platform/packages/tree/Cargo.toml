@@ -13,12 +13,9 @@ combinations = [
 ]
 
 [features]
-schema = ["dep:sdk", "sdk/schema"]
 testing = []
 
 [dependencies]
-sdk = { workspace = true, optional = true, features = ["schema"] }
-
 serde = { workspace = true, features = ["std", "derive"] }
 
 [dev-dependencies]

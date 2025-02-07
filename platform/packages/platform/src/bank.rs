@@ -412,7 +412,6 @@ where
 
 #[cfg(test)]
 mod test {
-
     use currency::{
         test::{
             SubGroup, SubGroupTestC10, SubGroupTestC6, SuperGroup, SuperGroupTestC1,

@@ -1,9 +1,10 @@
 use currency::platform::{Nls, Stable};
-use error::Result;
 use finance::coin::Coin;
 use platform::message::Response as MessageResponse;
 use sdk::cosmwasm_std::{Addr, Env, QuerierWrapper};
-use stub::Stub;
+
+use self::error::Result;
+use self::stub::Stub;
 
 pub use crate::nlpn::NLpn;
 

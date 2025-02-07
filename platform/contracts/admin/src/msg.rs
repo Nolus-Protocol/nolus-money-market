@@ -1,10 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use platform::contract::CodeId;
-use sdk::{
-    cosmwasm_std::{Addr, Uint64},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, Uint64};
 use versioning::ReleaseId;
 
 pub use crate::contracts::{
@@ -14,21 +11,21 @@ pub use crate::contracts::{
     Protocol, ProtocolContracts,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct InstantiateMsg {
     pub dex_admin: Addr,
     pub contracts: Contracts,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
 #[serde(transparent)]
 pub struct MigrateMsg {
     pub contracts_migration: ContractsMigration,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg
 where
@@ -56,7 +53,7 @@ where
     EndOfMigration {},
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum SudoMsg {
     ChangeDexAdmin {
@@ -76,14 +73,14 @@ pub enum SudoMsg {
     ExecuteContracts(ContractsExecute),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct MigrateContracts {
     pub release: ReleaseId,
     pub migration_spec: ContractsMigration,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum QueryMsg
 where

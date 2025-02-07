@@ -1,13 +1,12 @@
 use std::marker::PhantomData;
 
-use currency::{Currency, Group};
-use currency::{CurrencyDef, MemberOf};
+use currency::{Currency, CurrencyDef, Group, MemberOf};
 
-use crate::coin::{Coin, CoinDTO, WithCoin, WithCoinResult};
-use crate::error::Error;
-use crate::price::Price;
-
-use crate::price::base::BasePrice;
+use crate::{
+    coin::{Coin, CoinDTO, WithCoin, WithCoinResult},
+    error::Error,
+    price::{base::BasePrice, Price},
+};
 
 pub trait WithPrice<QuoteC>
 where

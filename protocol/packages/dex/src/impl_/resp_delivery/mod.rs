@@ -3,14 +3,14 @@ use std::{
     marker::PhantomData,
 };
 
+use serde::{Deserialize, Serialize};
+
 use finance::duration::Duration;
 use platform::{
     batch::{Batch, Emit, Emitter},
     message::Response as MessageResponse,
 };
 use sdk::cosmwasm_std::{Addr, Binary, Env, QuerierWrapper, Reply, Timestamp};
-
-use serde::{Deserialize, Serialize};
 
 use crate::{
     error::Result as DexResult,

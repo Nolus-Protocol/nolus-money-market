@@ -6,13 +6,17 @@ use crate::{
     finance::Price,
 };
 
-pub use close::Strategy as CloseStrategy;
-pub use dto::{PositionDTO, WithPosition, WithPositionResult};
-pub use error::{Error as PositionError, Result as PositionResult};
-pub use interest::{Due as DueTrait, OverdueCollection};
-pub use spec::{Spec, SpecDTO};
-pub(crate) use status::{Cause, Debt, Liquidation};
-pub(crate) use steady::Steadiness;
+pub use self::{
+    close::Strategy as CloseStrategy,
+    dto::{PositionDTO, WithPosition, WithPositionResult},
+    error::{Error as PositionError, Result as PositionResult},
+    interest::{Due as DueTrait, OverdueCollection},
+    spec::{Spec, SpecDTO},
+};
+pub(crate) use self::{
+    status::{Cause, Debt, Liquidation},
+    steady::Steadiness,
+};
 
 mod close;
 mod dto;

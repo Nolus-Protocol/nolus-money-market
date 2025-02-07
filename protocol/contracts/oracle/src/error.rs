@@ -4,7 +4,6 @@ use thiserror::Error;
 
 #[cfg(feature = "contract")]
 use currency::{CurrencyDTO, CurrencyDef, Group, MemberOf};
-
 #[cfg(feature = "contract")]
 use finance::price::dto::PriceDTO;
 use marketprice::{alarms::errors::AlarmError, error::PriceFeedsError, feeders::PriceFeedersError};
