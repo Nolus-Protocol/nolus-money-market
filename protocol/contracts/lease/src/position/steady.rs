@@ -141,7 +141,7 @@ mod tests {
                 msg: cosmwasm_std::to_json_binary(&TimeAlarmsCmd::AddAlarm {
                     time: now + recheck_in,
                 })
-                .unwrap(),
+                .expect("Time alarms serialization message should be serializable to JSON"),
                 funds: vec![],
             });
 
@@ -154,7 +154,7 @@ mod tests {
                 > {
                     alarm: exp_alarm,
                 })
-                .unwrap(),
+                .expect("Time alarms serialization message should be serializable to JSON"),
                 funds: vec![],
             });
 
