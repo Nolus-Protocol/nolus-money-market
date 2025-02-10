@@ -82,7 +82,7 @@ impl Leases {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.testing", test))]
 mod test {
     use sdk::cosmwasm_std::{testing::MockStorage, Addr, Storage};
 

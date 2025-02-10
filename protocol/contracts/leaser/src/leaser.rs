@@ -192,7 +192,7 @@ fn emit_status(next_customer: Option<Addr>) -> Emitter {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.testing", test))]
 mod test {
     use admin_contract::msg::{MigrationSpec, ProtocolContracts};
     use cosmwasm_std::Addr;

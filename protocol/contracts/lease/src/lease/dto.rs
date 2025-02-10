@@ -20,7 +20,7 @@ use super::{
 };
 
 #[derive(Serialize, Deserialize, Clone)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct LeaseDTO {
     pub(crate) addr: Addr,

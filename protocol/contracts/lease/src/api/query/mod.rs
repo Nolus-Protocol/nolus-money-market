@@ -18,10 +18,7 @@ pub(crate) mod opening;
 pub(crate) mod paid;
 
 #[derive(Deserialize)]
-#[cfg_attr(
-    any(test, feature = "testing"),
-    derive(Clone, Debug, PartialEq, Serialize)
-)]
+#[cfg_attr(feature = "skel_testing", derive(Clone, Debug, PartialEq, Serialize))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum QueryMsg {
     /// Ask for estimation of the due and overdue amounts and periods in that point of time
@@ -39,7 +36,7 @@ pub enum QueryMsg {
 
 #[derive(Serialize)]
 #[cfg_attr(
-    any(test, feature = "testing"),
+    feature = "skel_testing",
     derive(Clone, PartialEq, Eq, Debug, Deserialize)
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -78,7 +75,7 @@ pub enum StateResponse {
     Liquidated(),
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test {
     use platform::tests as platform_tests;
 

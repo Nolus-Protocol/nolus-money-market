@@ -1195,7 +1195,6 @@ name = "lease"
 version = "0.10.0"
 dependencies = [
  "access-control",
- "cosmwasm-std 2.1.5",
  "currencies",
  "currency",
  "dex",

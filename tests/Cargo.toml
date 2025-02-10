@@ -20,7 +20,7 @@ dex-osmosis = ["lease/dex-osmosis", "profit/dex-osmosis"]
 
 [dev-dependencies]
 admin_contract = { path = "../platform/contracts/admin", features = ["contract"], default-features = false }
-lease = { path = "../protocol/contracts/lease", features = ["contract", "testing"], default-features = false }
+lease = { path = "../protocol/contracts/lease", features = ["contract_testing"], default-features = false }
 leaser = { path = "../protocol/contracts/leaser", features = ["testing"], default-features = false }
 lpp = { path = "../protocol/contracts/lpp", features = ["contract", "testing"], default-features = false }
 oracle = { path = "../protocol/contracts/oracle", features = ["contract_testing"], default-features = false }

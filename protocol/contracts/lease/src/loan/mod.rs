@@ -25,7 +25,7 @@ mod state;
 type LppRef = LppGenericRef<LpnCurrency, LpnCurrencies>;
 
 #[derive(Serialize, Deserialize, Clone)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, PartialEq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub(crate) struct LoanDTO {
     lpp: LppRef,
@@ -50,7 +50,7 @@ impl LoanDTO {
 }
 
 #[cfg_attr(test, derive(Debug))]
-pub struct Loan<LppLoan> {
+pub(crate) struct Loan<LppLoan> {
     lpp_loan: LppLoan,
     due_period: Duration,
     margin_interest: Percent,
@@ -233,7 +233,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use serde::{Deserialize, Serialize};
 

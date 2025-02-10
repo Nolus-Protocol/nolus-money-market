@@ -1,4 +1,4 @@
-#[cfg(any(test, feature = "testing"))]
+#[cfg(feature = "skel_testing")]
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,7 +11,7 @@ use crate::api::{LeaseCoin, PaymentCoin};
 /// Designed for use in query responses only!
 #[derive(Serialize)]
 #[cfg_attr(
-    any(test, feature = "testing"),
+    feature = "skel_testing",
     derive(Clone, Default, PartialEq, Eq, Debug, Deserialize)
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -22,7 +22,7 @@ pub struct ClosePolicy {
 
 #[derive(Serialize)]
 #[cfg_attr(
-    any(test, feature = "testing"),
+    feature = "skel_testing",
     derive(Clone, PartialEq, Eq, Debug, Deserialize)
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -43,7 +43,7 @@ pub enum OngoingTrx {
 
 #[derive(Serialize)]
 #[cfg_attr(
-    any(test, feature = "testing"),
+    feature = "skel_testing",
     derive(Clone, PartialEq, Eq, Debug, Deserialize)
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -56,7 +56,7 @@ pub enum RepayTrx {
 
 #[derive(Serialize)]
 #[cfg_attr(
-    any(test, feature = "testing"),
+    feature = "skel_testing",
     derive(Clone, PartialEq, Eq, Debug, Deserialize)
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -66,12 +66,17 @@ pub enum PositionCloseTrx {
     TransferInFinish,
 }
 
-#[cfg(feature = "contract")]
 impl ClosePolicy {
-    pub fn new(tp: Option<Percent>, sl: Option<Percent>) -> Self {
+    #[cfg(feature = "contract")]
+    pub(crate) fn new(tp: Option<Percent>, sl: Option<Percent>) -> Self {
         Self {
             take_profit: tp,
             stop_loss: sl,
         }
+    }
+
+    #[cfg(feature = "contract_testing")]
+    pub fn new_testing(tp: Option<Percent>, sl: Option<Percent>) -> Self {
+        Self::new(tp, sl)
     }
 }

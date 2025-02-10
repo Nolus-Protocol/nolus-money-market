@@ -1,3 +1,5 @@
+use anyhow::Error;
+
 use ::lease::{
     api::{
         position::ChangeCmd,
@@ -6,7 +8,6 @@ use ::lease::{
     error::{ContractError, PositionError},
     CloseStrategy,
 };
-use anyhow::Error;
 use finance::{coin::Coin, percent::Percent};
 use sdk::{cosmwasm_std::Addr, testing};
 
@@ -165,7 +166,7 @@ fn tp_set() {
         Some(ChangeCmd::Reset),
     );
     assert_eq!(
-        ClosePolicy::new(Some(tp), None),
+        ClosePolicy::new_testing(Some(tp), None),
         query_policy(&test_case, lease.clone())
     );
 

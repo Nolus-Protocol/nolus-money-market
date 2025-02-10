@@ -2,14 +2,8 @@ use std::{fmt::Debug, ops::Add};
 
 use currency::{Currency, CurrencyDef, MemberOf};
 use finance::{
-    coin::Coin,
-    duration::Duration,
-    fraction::Fraction,
-    fractionable::Fractionable,
-    liability::Liability,
-    percent::Percent,
-    price::{self},
-    zero::Zero,
+    coin::Coin, duration::Duration, fraction::Fraction, fractionable::Fractionable,
+    liability::Liability, percent::Percent, price, zero::Zero,
 };
 
 use crate::{
@@ -29,11 +23,11 @@ pub use self::dto::SpecDTO;
 
 mod dto;
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test;
 
 #[derive(Clone, Copy)]
-#[cfg_attr(test, derive(Debug, PartialEq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq))]
 pub struct Spec {
     liability: Liability,
     close: ClosePolicy,
@@ -62,8 +56,12 @@ impl Spec {
         }
     }
 
-    #[cfg(test)]
-    pub fn no_close(liability: Liability, min_asset: LpnCoin, min_transaction: LpnCoin) -> Self {
+    #[cfg(all(feature = "internal.test.contract", test))]
+    pub(crate) fn no_close(
+        liability: Liability,
+        min_asset: LpnCoin,
+        min_transaction: LpnCoin,
+    ) -> Self {
         Self::new(
             liability,
             ClosePolicy::default(),

@@ -28,7 +28,7 @@ impl TryFrom<PositionSpecDTO> for ValidatedPositionSpec {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test {
     use finance::{duration::Duration, percent::Percent};
     use sdk::cosmwasm_std::{from_json, to_json_vec, Addr};

@@ -7,8 +7,8 @@ use super::SpecDTO as LastVersionSpecDTO;
 /// Migrate v0.7.5 Position spec to the next v0.7.6 format
 // TODO clean-up the v0.7.5 support once all leases have gone through this migration
 #[derive(Copy, Clone, Deserialize)]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq, Eq))]
 #[serde(deny_unknown_fields, rename_all = "snake_case", untagged)]
-#[cfg_attr(test, derive(Debug, PartialEq, Eq))]
 pub(super) enum SpecDTO {
     V0_7_6 {
         // this is the first variant since the untagged enum representation tries to deserialize to variants as per their order in the definition
@@ -31,7 +31,7 @@ impl From<SpecDTO> for LastVersionSpecDTO {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test_two_versions {
     use currencies::Lpn;
     use finance::{
