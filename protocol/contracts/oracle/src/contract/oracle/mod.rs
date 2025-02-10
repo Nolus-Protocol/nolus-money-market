@@ -287,7 +287,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test_normalized_price_not_found {
     use currencies::{
         Lpn as BaseCurrency, Lpns as BaseCurrencies, Nls, PaymentGroup as PriceCurrencies,

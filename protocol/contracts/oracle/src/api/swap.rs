@@ -9,7 +9,7 @@ use sdk::cosmwasm_std::StdError;
 pub type PoolId = u64;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(any(test, feature = "stub_swap_testing"), derive(Debug))]
 #[serde(
     deny_unknown_fields,
     rename_all = "snake_case",

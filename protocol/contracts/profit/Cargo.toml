@@ -15,9 +15,6 @@ combinations = [
 ]
 feature-groups = { testing = { members = ["testing"], at-least-one = false, mutually-exclusive = false } }
 
-[package.metadata.cargo-udeps]
-ignore = { development = ["swap", "timealarms"] }
-
 [lib]
 crate-type = ["cdylib", "rlib"]
 
@@ -82,10 +79,7 @@ serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 currencies = { workspace = true, features = ["testing"] }
-currency = { workspace = true, features = ["testing"] }
 dex = { workspace = true, features = ["testing"] }
-finance = { workspace = true }
-oracle = { workspace = true, features = ["contract_testing"] }
 oracle-platform = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
 timealarms = { workspace = true, features = ["testing"] }

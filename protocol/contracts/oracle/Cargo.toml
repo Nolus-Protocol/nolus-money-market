@@ -11,7 +11,7 @@ license.workspace = true
 combinations = [
     { tags = ["build", "@agnostic"], always-on = ["contract"], include-rest = false },
     { tags = ["ci", "@agnostic"], feature-groups = ["contract"], include-rest = false },
-    { tags = ["ci", "@agnostic"], feature-groups = ["stubs"], include-rest = false, generics = { "stubs" = ["stub_alarms", "stub_price", "stub_swap"] } },
+    { tags = ["ci", "@agnostic"], feature-groups = ["stub_alarms", "stub_price", "stub_swap"], include-rest = false, generics = { "stubs" = ["stub_alarms", "stub_price", "stub_swap"] } },
 ]
 
 [package.metadata.cargo-each.feature-groups]
@@ -28,47 +28,72 @@ contract = [
     "stub_alarms",
     "stub_price",
     "stub_swap",
+    "dep:currencies",
+    "dep:marketprice",
+    "dep:platform",
     "dep:sdk",
     "sdk/contract",
     "dep:serde",
     "dep:tree",
+    "dep:versioning",
 ]
 contract_testing = [
     "stub_alarms_testing",
     "stub_price_testing",
     "stub_swap_testing",
     "contract",
+    "marketprice/testing",
 ]
 "internal.test.contract" = [
     "contract_testing",
+    "platform/testing",
 ]
 stub_alarms = [
     "dep:currency",
     "dep:finance",
+    "dep:oracle-platform",
+    "dep:platform",
+    "dep:sdk",
     "dep:serde",
     "dep:thiserror",
 ]
 stub_alarms_testing = [
-    "stub_alarms"
-]
-"internal.test.stub_alarms" = [
     "stub_alarms",
 ]
+"internal.test.stub_alarms" = [
+    "stub_alarms_testing",
+    "dep:currencies",
+    "currencies/testing",
+    "currency/testing",
+    "finance/testing",
+]
 stub_price = [
+    "dep:currency",
+    "dep:finance",
+    "dep:oracle-platform",
+    "dep:sdk",
 ]
 stub_price_testing = [
-    "stub_price"
-]
-"internal.test.stub_price" = [
     "stub_price",
 ]
+"internal.test.stub_price" = [
+    "stub_price_testing",
+]
 stub_swap = [
+    "dep:currency",
+    "dep:oracle-platform",
+    "dep:sdk",
+    "dep:serde",
+    "dep:thiserror",
 ]
 stub_swap_testing = [
-    "stub_swap"
+    "stub_swap",
+    "dep:currencies",
+    "currencies/testing",
+    "dep:tree",
 ]
 "internal.test.stub_swap" = [
-    "stub_swap",
+    "stub_swap_testing",
 ]
 
 [dependencies]
