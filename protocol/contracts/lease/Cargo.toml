@@ -42,13 +42,13 @@ contract_testing = [
     "contract",
     "skel_testing",
     "lpp/testing",
+    "platform/testing",
     "profit/stub_testing",
 ]
 "internal.test.contract" = [
     "contract_testing",
     "currencies/testing",
     "oracle-platform/testing",
-    "platform/testing",
     "reserve/testing",
     "timealarms/testing",
 ]

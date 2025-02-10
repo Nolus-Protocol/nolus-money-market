@@ -20,11 +20,11 @@ crate-type = ["cdylib", "rlib"]
 [features]
 testing = [
     "lease/skel_testing",
+    "platform/testing",
 ]
 "internal.test.testing" = [
     "testing",
     "currencies/testing",
-    "platform/testing",
     "versioning/testing",
 ]
 
