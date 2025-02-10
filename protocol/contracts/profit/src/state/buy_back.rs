@@ -202,7 +202,8 @@ mod tests {
             ),
             Account::unchecked(
                 Addr::unchecked("DEADCODE"),
-                HostAccount::try_from(String::from("DEADCODE")).unwrap(),
+                HostAccount::try_from(String::from("DEADCODE"))
+                    .expect("Address should be a non-empty string"),
                 ConnectionParams {
                     connection_id: String::from("DEADCODE"),
                     transfer_channel: Ics20Channel {
