@@ -38,10 +38,10 @@ contract = [
     "dep:versioning",
 ]
 contract_testing = [
+    "contract",
     "stub_alarms_testing",
     "stub_price_testing",
     "stub_swap_testing",
-    "contract",
     "marketprice/testing",
 ]
 "internal.test.contract" = [
