@@ -22,7 +22,6 @@ testing = []
 
 [dependencies]
 currency = { workspace = true }
-sdk = { workspace = true, features = ["schema"] }
 
 thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

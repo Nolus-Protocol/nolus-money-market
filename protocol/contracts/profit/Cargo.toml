@@ -88,5 +88,4 @@ finance = { workspace = true }
 oracle = { workspace = true, features = ["testing"] }
 oracle-platform = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
 timealarms = { workspace = true, features = ["testing"] }

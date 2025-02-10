@@ -23,10 +23,11 @@ finance = { workspace = true }
 oracle = { workspace = true, features = ["stub_swap"] }
 timealarms = { workspace = true, optional = true, features = ["stub"] }
 platform = { workspace = true }
-sdk = { workspace = true, features = ["schema"] }
+sdk = { workspace = true}
 
 serde = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 
 [dev-dependencies]
 currency = { workspace = true, features = ["testing"] }
+currencies = { workspace = true, features = ["testing"] }

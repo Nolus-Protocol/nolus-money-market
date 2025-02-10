@@ -2,8 +2,6 @@ use std::ops::Sub;
 
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use crate::{
     duration::Duration,
     error::{Error, Result},
@@ -20,7 +18,7 @@ mod level;
 mod unchecked;
 mod zone;
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(
     deny_unknown_fields,

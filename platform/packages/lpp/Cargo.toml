@@ -20,7 +20,7 @@ currency = { workspace = true }
 finance = { workspace = true }
 # oracle-platform = { workspace = true }
 platform = { workspace = true }
-sdk = { workspace = true, features = ["schema"] }
+sdk = { workspace = true}
 
 serde = { workspace = true }
 thiserror = { workspace = true}

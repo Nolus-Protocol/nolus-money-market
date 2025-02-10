@@ -9,18 +9,16 @@ license.workspace = true
 
 [package.metadata.cargo-each]
 combinations = [
-    { tags = ["ci", "@agnostic"], feature-groups = ["schema-and-storage", "cosmos-or-cosmos-ibc-or-testing", "neutron"], include-rest = false },
+    { tags = ["ci", "@agnostic"], feature-groups = ["storage", "cosmos-or-cosmos-ibc-or-testing", "neutron"], include-rest = false },
     { tags = ["ci", "@agnostic"], feature-groups = ["contract", "cosmos-ibc-or-testing"], always-on = ["contract"], include-rest = true },
 ]
-feature-groups = { schema-and-storage = { members = ["schema", "storage"], at-least-one = false, mutually-exclusive = false }, contract = { members = ["contract", "schema", "storage"], at-least-one = false, mutually-exclusive = true }, cosmos-ibc-or-testing = { members = ["cosmos_ibc", "testing"], at-least-one = false, mutually-exclusive = true }, cosmos-or-cosmos-ibc-or-testing = { members = ["cosmos_ibc", "testing"], at-least-one = false, mutually-exclusive = true }, neutron = { members = ["neutron"], at-least-one = false, mutually-exclusive = false } }
+feature-groups = { storage = { members = ["storage"], at-least-one = false, mutually-exclusive = false }, contract = { members = ["contract", "storage"], at-least-one = false, mutually-exclusive = true }, cosmos-ibc-or-testing = { members = ["cosmos_ibc", "testing"], at-least-one = false, mutually-exclusive = true }, cosmos-or-cosmos-ibc-or-testing = { members = ["cosmos_ibc", "testing"], at-least-one = false, mutually-exclusive = true }, neutron = { members = ["neutron"], at-least-one = false, mutually-exclusive = false } }
 
 [features]
-contract = ["schema", "storage"]
-schema = ["dep:cosmwasm-schema"]
+contract = ["storage"]
 storage = ["dep:cw-storage-plus"]
 testing = [
     "dep:anyhow",
-    "dep:cosmwasm-schema",
     "dep:cw-multi-test",
     "cw-multi-test/cosmwasm_1_2",
     "dep:base64",
@@ -34,7 +32,6 @@ neutron = ["cosmwasm-std/stargate", "dep:neutron-sdk"]
 
 [dependencies]
 cosmwasm-std = { workspace = true }
-cosmwasm-schema = { workspace = true, optional = true }
 cw-storage-plus = { workspace = true, optional = true }
 cosmos-sdk-proto = { workspace = true, optional = true }
 ibc-proto = { workspace = true, optional = true }

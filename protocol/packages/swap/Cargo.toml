@@ -54,6 +54,7 @@ serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 currency = { workspace = true, features = ["testing"] }
+currencies = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
 
 base64 = { workspace = true, features = ["alloc"] }

@@ -14,11 +14,10 @@ combinations = [
 
 [features]
 protocol_contract = []
-schema = ["sdk/schema"]
 testing = []
 
 [dependencies]
-sdk = { workspace = true, features = ["schema", "storage"] }
+sdk = { workspace = true, features = ["storage"] }
 
 thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

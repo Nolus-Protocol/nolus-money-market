@@ -41,5 +41,4 @@ lpp-platform = { workspace = true, features = ["testing"] }
 oracle-platform = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
 
-schema = { workspace = true }
 sdk = { workspace = true, default-features = false, features = ["testing"] }

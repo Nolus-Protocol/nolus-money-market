@@ -6,9 +6,8 @@ use finance::{
     percent::{Percent, Units},
     ratio::Rational,
 };
-use sdk::schemars::{self, JsonSchema};
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(try_from = "UncheckedInterestRate")]
 pub struct InterestRate {
     base_interest_rate: Percent,
@@ -96,7 +95,7 @@ impl TryFrom<UncheckedInterestRate> for InterestRate {
     }
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize)]
 struct UncheckedInterestRate {
     base_interest_rate: Percent,
     utilization_optimal: Percent,

@@ -1,6 +1,5 @@
 use sdk::cosmwasm_std::Storage;
 
-#[cfg(feature = "schema")]
 pub use crate::software::SemVer;
 pub use crate::{
     error::Error,

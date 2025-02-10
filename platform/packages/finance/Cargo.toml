@@ -25,4 +25,4 @@ serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 currency = { workspace = true, features = ["testing"] }
-sdk = { workspace = true, features = ["schema"] }
+sdk = { workspace = true}

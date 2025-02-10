@@ -14,6 +14,8 @@ combinations = [
 ]
 feature-groups = { contract-and-testing = { members = ["contract", "testing"], at-least-one = true, mutually-exclusive = false }, stubs ={ members = ["stub_alarms", "stub_price", "stub_swap"], at-least-one = false, mutually-exclusive = false} }
 
+
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
@@ -27,40 +29,59 @@ contract = [
     "dep:marketprice",
     "dep:versioning",
 ]
-stub_alarms = ["dep:currencies"]
-stub_price = ["dep:oracle-platform"]
-stub_swap = ["dep:oracle-platform"]
+stub_alarms = [
+    "dep:currencies",
+    "dep:currency",
+    "dep:finance",
+    "dep:oracle-platform",
+    "dep:platform",
+    "dep:sdk",
+    "dep:serde",
+    "dep:thiserror",
+]
+stub_price = [
+    "dep:currency",
+    "dep:finance",
+    "dep:oracle-platform",
+    "dep:sdk",
+]
+stub_swap = [
+    "dep:currencies",
+    "dep:currency",
+    "dep:oracle-platform",
+    "dep:sdk",
+    "dep:serde",
+    "dep:thiserror",
+    "dep:tree",
+]
 testing = [
     "stub_alarms",
     "stub_price",
     "stub_swap",
-    "currencies/testing",
-    "marketprice/testing",
 ]
 
 [dependencies]
 currencies = { workspace = true, optional = true }
-currency = { workspace = true }
-finance = { workspace = true }
+currency = { workspace = true,  optional = true }
+finance = { workspace = true, optional = true }
 marketprice = { workspace = true, optional = true }
 oracle-platform = { workspace = true, optional = true }
-platform = { workspace = true }
-sdk = { workspace = true }
-tree = { workspace = true, features = ["schema"] }
-versioning = { workspace = true, optional = true, features = ["protocol_contract", "schema"] }
+platform = { workspace = true, optional = true }
+sdk = { workspace = true, optional = true }
+tree = { workspace = true, optional = true }
+versioning = { workspace = true, optional = true, features = ["protocol_contract"] }
 
 # Required as a dependency by `entry_point` attribute macro
 cosmwasm-std = { workspace = true, optional = true }
 
-thiserror = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
 
 [dev-dependencies]
 currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
-platform = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
-oracle = { workspace = true, features = ["contract"] }
 marketprice = { workspace = true, features = ["testing"] }
-tree = { workspace = true, features = ["schema", "testing"] }
+oracle = { workspace = true, features = ["testing"] }
+platform = { workspace = true, features = ["testing"] }
+tree = { workspace = true, features = ["testing"] }
