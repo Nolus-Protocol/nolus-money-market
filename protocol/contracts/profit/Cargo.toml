@@ -85,7 +85,7 @@ currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 dex = { workspace = true, features = ["testing"] }
 finance = { workspace = true }
-oracle = { workspace = true, features = ["testing"] }
+oracle = { workspace = true, features = ["contract_testing"] }
 oracle-platform = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
 timealarms = { workspace = true, features = ["testing"] }

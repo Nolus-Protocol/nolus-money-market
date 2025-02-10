@@ -23,7 +23,7 @@ admin_contract = { path = "../platform/contracts/admin", features = ["contract"]
 lease = { path = "../protocol/contracts/lease", features = ["contract", "testing"], default-features = false }
 leaser = { path = "../protocol/contracts/leaser", features = ["testing"], default-features = false }
 lpp = { path = "../protocol/contracts/lpp", features = ["contract", "testing"], default-features = false }
-oracle = { path = "../protocol/contracts/oracle", features = ["contract", "testing"], default-features = false }
+oracle = { path = "../protocol/contracts/oracle", features = ["contract", "contract_testing"], default-features = false }
 profit = { path = "../protocol/contracts/profit", features = ["contract", "testing"], default-features = false }
 reserve = { path = "../protocol/contracts/reserve", features = ["contract", "testing"], default-features = false }
 timealarms = { path = "../platform/contracts/timealarms", features = ["contract", "testing"], default-features = false }

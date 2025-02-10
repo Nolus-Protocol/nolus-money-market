@@ -577,7 +577,6 @@ dependencies = [
  "anyhow",
  "currency",
  "either",
- "sdk",
  "serde",
  "serde_json",
  "thiserror 2.0.11",
@@ -1374,18 +1373,12 @@ checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 name = "oracle"
 version = "0.5.23"
 dependencies = [
- "cosmwasm-std 2.1.5",
- "currencies",
  "currency",
  "finance",
- "marketprice",
- "oracle-platform",
- "platform",
  "sdk",
  "serde",
  "thiserror 2.0.11",
  "tree",
- "versioning",
 ]
 
 [[package]]

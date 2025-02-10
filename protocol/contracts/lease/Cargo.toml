@@ -82,7 +82,7 @@ currencies = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 finance = { workspace = true, features = ["testing"] }
 lpp = { workspace = true, features = ["testing"] }
-oracle = { workspace = true, features = ["testing"] }
+oracle = { workspace = true, features = ["contract_testing"] }
 oracle-platform = { workspace = true, features = ["testing"] }
 profit = { workspace = true, features = ["testing"] }
 reserve = { workspace = true, features = ["testing"] }
