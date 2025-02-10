@@ -12,7 +12,7 @@ combinations = [
     { tags = ["build", "@agnostic"], include-rest = false },
     { tags = ["ci", "@agnostic"], include-rest = true },
 ]
-feature-groups = { "testing" = { members = ["testing", "internal.test.contract"], at-least-one = false, mutually-exclusive = true } }
+feature-groups = { "testing" = { members = ["testing", "internal.test.testing"], at-least-one = false, mutually-exclusive = true } }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
