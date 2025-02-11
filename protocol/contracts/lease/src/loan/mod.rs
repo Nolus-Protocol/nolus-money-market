@@ -50,7 +50,7 @@ impl LoanDTO {
 }
 
 #[cfg_attr(test, derive(Debug))]
-pub struct Loan<LppLoan> {
+pub(crate) struct Loan<LppLoan> {
     lpp_loan: LppLoan,
     due_period: Duration,
     margin_interest: Percent,
