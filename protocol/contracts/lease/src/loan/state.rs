@@ -5,7 +5,7 @@ use lpp::stub::loan::LppLoan as LppLoanTrait;
 
 use crate::finance::{LpnCoin, LpnCurrencies, LpnCurrency};
 
-#[cfg_attr(test, derive(PartialEq, Eq, Debug))]
+#[cfg_attr(feature = "contract_testing", derive(PartialEq, Eq, Debug))]
 pub struct State {
     pub annual_interest: Percent,
     pub annual_interest_margin: Percent,
@@ -15,7 +15,7 @@ pub struct State {
     pub overdue: Overdue,
 }
 
-#[cfg_attr(test, derive(PartialEq, Eq, Debug))]
+#[cfg_attr(feature = "contract_testing", derive(PartialEq, Eq, Debug))]
 pub enum Overdue {
     /// No overdue interest yet
     ///
@@ -94,7 +94,7 @@ impl Overdue {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
     use finance::{coin::Coin, duration::Duration, interest, percent::Percent, period::Period};
     use lpp::{loan::Loan, stub::loan::LppLoan};

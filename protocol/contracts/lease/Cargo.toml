@@ -10,46 +10,60 @@ license.workspace = true
 [package.metadata.cargo-each]
 combinations = [
     { tags = ["build", "$dex"], always-on = ["contract", "$dex"], include-rest = false, generics = { "$dex" = ["dex-astroport_main", "dex-astroport_test", "dex-osmosis"] } },
-    { tags = ["ci", "@agnostic"], always-on = ["skel"], feature-groups = ["testing"], include-rest = false },
-    { tags = ["ci", "@agnostic"], always-on = ["contract", "dex-test_impl"], feature-groups = ["testing"], include-rest = false },
+    { tags = ["ci", "@agnostic"], feature-groups = ["skel"], include-rest = false },
+    { tags = ["ci", "@agnostic"], always-on = ["dex-test_impl"], feature-groups = ["contract"], include-rest = false },
 ]
-feature-groups = { testing = { members = ["testing"], at-least-one = false, mutually-exclusive = false } }
-
-[package.metadata.cargo-udeps]
-# these dev-dependencies are not used in 'skel'
-ignore = { development = ["lpp", "profit", "reserve"] }
+feature-groups = { contract = { members = ["contract", "contract_testing", "internal.test.contract"], at-least-one = true, mutually-exclusive = true }, skel = { members = ["skel", "skel_testing", "internal.test.skel"], at-least-one = false, mutually-exclusive = true } }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-dex-astroport_main = ["contract", "swap/dex-astroport_main"]
-dex-astroport_test = ["contract", "swap/dex-astroport_test"]
-dex-osmosis = ["contract", "swap/dex-osmosis"]
-dex-test_impl = ["contract", "swap/dex-test_impl"]
+dex-astroport_main = ["swap/dex-astroport_main"]
+dex-astroport_test = ["swap/dex-astroport_test"]
+dex-osmosis = ["swap/dex-osmosis"]
+dex-test_impl = ["swap/dex-test_impl"]
 
 contract = [
-    "dep:access-control",
-    "dep:cosmwasm-std",
-    "dep:enum_dispatch",
     "skel",
-    "sdk/contract",
+    "dep:thiserror",
+    "dep:access-control",
+    "dep:enum_dispatch",
     "dep:lpp",
-    "dep:profit",
-    "dep:reserve",
-    "dep:swap",
-]
-skel = [
     "dep:oracle",
     "dep:oracle-platform",
     "dep:platform",
+    "dep:profit",
+    "dep:reserve",
     "dep:timealarms",
+    "dep:versioning",
+]
+contract_testing = [
+    "contract",
+    "skel_testing",
+    "lpp/testing",
+    "platform/testing",
+    "profit/stub_testing",
+]
+"internal.test.contract" = [
+    "contract_testing",
+    "currencies/testing",
+    "oracle-platform/testing",
+    "reserve/testing",
+    "timealarms/testing",
+]
+skel = [
     "dep:thiserror",
 ]
-testing = [
-    "currencies/testing",
-    "currency/testing",
+skel_testing = [
+    "skel",
     "finance/testing",
+]
+"internal.test.skel" = [
+    "skel_testing",
+    "dep:platform",
+    "platform/testing",
+    "dep:versioning",
 ]
 
 [dependencies]
@@ -68,7 +82,7 @@ oracle-platform = { workspace = true, optional = true }
 platform = { workspace = true, optional = true }
 sdk = { workspace = true }
 swap = { workspace = true, optional = true }
-versioning = { workspace = true, features = ["protocol_contract"] }
+versioning = { workspace = true, optional = true, features = ["protocol_contract"] }
 
 # Required as a dependency by `entry_point` attribute macro
 cosmwasm-std = { workspace = true, optional = true }
@@ -76,16 +90,3 @@ cosmwasm-std = { workspace = true, optional = true }
 enum_dispatch = { workspace = true, optional = true }
 thiserror = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
-
-[dev-dependencies]
-currencies = { workspace = true, features = ["testing"] }
-currency = { workspace = true, features = ["testing"] }
-finance = { workspace = true, features = ["testing"] }
-lpp = { workspace = true, features = ["testing"] }
-oracle = { workspace = true, features = ["testing"] }
-oracle-platform = { workspace = true, features = ["testing"] }
-profit = { workspace = true, features = ["testing"] }
-reserve = { workspace = true, features = ["testing"] }
-platform = { workspace = true, features = ["testing"] }
-timealarms = { workspace = true, features = ["testing"] }
-

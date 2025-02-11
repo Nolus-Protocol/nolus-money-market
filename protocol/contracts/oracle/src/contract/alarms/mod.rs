@@ -134,7 +134,7 @@ where
         self.alarms.last_failed().map_err(Into::into)
     }
 
-    #[cfg(test)]
+    #[cfg(all(feature = "internal.test.contract", test))]
     fn remove(&mut self, receiver: Addr) -> Result<(), AlarmsG> {
         self.alarms.remove_all(receiver).map_err(Into::into)
     }
@@ -185,7 +185,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
     use currencies::{
         testing::{PaymentC5, PaymentC6, PaymentC7},

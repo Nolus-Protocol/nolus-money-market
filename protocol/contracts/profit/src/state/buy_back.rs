@@ -171,7 +171,7 @@ where
 
 impl<I> TryFind for I where I: Iterator {}
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use currencies::{
         testing::{PaymentC3, PaymentC4, PaymentC5, PaymentC6, PaymentC7},

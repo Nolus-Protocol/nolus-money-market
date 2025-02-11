@@ -14,7 +14,7 @@ mod migrate_v0_7_5;
 ///
 /// Designed to be used as a non-public API component! Invariant checks are not done on deserialization!
 #[derive(Serialize, Deserialize, Clone, Copy)]
-#[cfg_attr(test, derive(Debug, PartialEq, Eq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq, Eq))]
 #[serde(
     deny_unknown_fields,
     rename_all = "snake_case",

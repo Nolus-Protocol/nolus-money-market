@@ -214,7 +214,7 @@ where
     cosmwasm_std::to_json_binary(data).map_err(Error::ConvertToBinary)
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use currencies::{
         testing::{LeaseC1, PaymentC1, PaymentC9},

@@ -14,10 +14,7 @@ use super::{DownpaymentCoin, LeaseAssetCurrencies, LeaseCoin};
 pub use opened::ClosePolicy;
 
 #[derive(Deserialize)]
-#[cfg_attr(
-    any(test, feature = "testing"),
-    derive(Clone, Debug, PartialEq, Serialize)
-)]
+#[cfg_attr(feature = "skel_testing", derive(Clone, Debug, PartialEq, Serialize))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum QueryMsg {
     /// Ask for estimation of the due and overdue amounts and periods in that point of time
@@ -35,7 +32,7 @@ pub enum QueryMsg {
 
 #[derive(Serialize)]
 #[cfg_attr(
-    any(test, feature = "testing"),
+    feature = "skel_testing",
     derive(Clone, PartialEq, Eq, Debug, Deserialize)
 )]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -75,13 +72,13 @@ pub enum StateResponse {
 }
 
 pub(crate) mod opening {
-    #[cfg(any(test, feature = "testing"))]
+    #[cfg(feature = "skel_testing")]
     use serde::Deserialize;
     use serde::Serialize;
 
     #[derive(Serialize)]
     #[cfg_attr(
-        any(test, feature = "testing"),
+        feature = "skel_testing",
         derive(Clone, PartialEq, Eq, Deserialize, Debug)
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -94,7 +91,7 @@ pub(crate) mod opening {
 
 pub(crate) mod opened {
     use finance::percent::Percent;
-    #[cfg(any(test, feature = "testing"))]
+    #[cfg(feature = "skel_testing")]
     use serde::Deserialize;
     use serde::Serialize;
 
@@ -105,7 +102,7 @@ pub(crate) mod opened {
     /// Designed for use in query responses only!
     #[derive(Serialize)]
     #[cfg_attr(
-        any(test, feature = "testing"),
+        feature = "skel_testing",
         derive(Clone, Default, PartialEq, Eq, Debug, Deserialize)
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -116,7 +113,7 @@ pub(crate) mod opened {
 
     #[derive(Serialize)]
     #[cfg_attr(
-        any(test, feature = "testing"),
+        feature = "skel_testing",
         derive(Clone, PartialEq, Eq, Debug, Deserialize)
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -137,7 +134,7 @@ pub(crate) mod opened {
 
     #[derive(Serialize)]
     #[cfg_attr(
-        any(test, feature = "testing"),
+        feature = "skel_testing",
         derive(Clone, PartialEq, Eq, Debug, Deserialize)
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -150,7 +147,7 @@ pub(crate) mod opened {
 
     #[derive(Serialize)]
     #[cfg_attr(
-        any(test, feature = "testing"),
+        feature = "skel_testing",
         derive(Clone, PartialEq, Eq, Debug, Deserialize)
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -172,13 +169,13 @@ pub(crate) mod opened {
 }
 
 pub(crate) mod paid {
-    #[cfg(any(test, feature = "testing"))]
+    #[cfg(feature = "skel_testing")]
     use serde::Deserialize;
     use serde::Serialize;
 
     #[derive(Serialize)]
     #[cfg_attr(
-        any(test, feature = "testing"),
+        feature = "skel_testing",
         derive(Clone, PartialEq, Eq, Debug, Deserialize)
     )]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -188,7 +185,7 @@ pub(crate) mod paid {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test {
     use platform::tests as platform_tests;
 

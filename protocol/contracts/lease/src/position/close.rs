@@ -21,7 +21,7 @@ use super::error::{Error as PositionError, Result as PositionResult};
 /// A position is subject to close if its LTV pertains to the right-open intervals (-inf., `take_profit`),
 /// or [`stop_loss`, +inf)
 #[derive(Copy, Clone, Default, Eq, PartialEq, Serialize, Deserialize)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct Policy {
     take_profit: Option<Percent>,
@@ -157,7 +157,7 @@ impl Display for Strategy {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
 
     mod may_trigger {

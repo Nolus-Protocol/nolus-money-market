@@ -70,7 +70,7 @@ impl Feeders {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use std::collections::HashSet;
 

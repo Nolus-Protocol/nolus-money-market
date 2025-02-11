@@ -27,7 +27,7 @@ pub type LpnCoinDTO = crate::finance::LpnCoinDTO;
 pub struct MigrateMsg {}
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg {
     /// Repayment
@@ -95,13 +95,13 @@ pub enum ExecuteMsg {
 
 /// The execute message any `Finalizer` should respond to.
 #[derive(Serialize, Deserialize)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, PartialEq, Eq))]
+#[cfg_attr(feature = "skel_testing", derive(Debug, PartialEq, Eq))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum FinalizerExecuteMsg {
     FinalizeLease { customer: Addr },
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test {
     use sdk::cosmwasm_std::{from_json, to_json_vec};
 

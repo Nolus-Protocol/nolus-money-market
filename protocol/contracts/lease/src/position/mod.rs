@@ -22,7 +22,7 @@ mod spec;
 mod status;
 mod steady;
 
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub struct Position<Asset> {
     amount: Coin<Asset>,
     spec: Spec,

@@ -15,7 +15,7 @@ use crate::{
 use super::{Position, Spec, SpecDTO};
 
 #[derive(Serialize, Deserialize, Clone)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct PositionDTO {
     amount: CoinDTO<LeaseAssetCurrencies>,

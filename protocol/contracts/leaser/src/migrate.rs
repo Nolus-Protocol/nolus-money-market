@@ -11,7 +11,7 @@ pub struct Customer<LeaseIter> {
 }
 
 #[derive(Default)]
-#[cfg_attr(test, derive(Debug, Eq, PartialEq))]
+#[cfg_attr(feature = "testing", derive(Debug, Eq, PartialEq))]
 pub struct MigrationResult {
     pub msgs: Batch,
     pub next_customer: Option<Addr>,
@@ -133,7 +133,7 @@ impl From<MigrateBatch> for Batch {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.testing", test))]
 mod test {
     use std::vec::IntoIter;
 

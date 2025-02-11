@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use super::LeaseCoin;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum PositionClose {
     FullClose(FullClose),
@@ -12,19 +12,19 @@ pub enum PositionClose {
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct FullClose {}
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct PartialClose {
     pub amount: LeaseCoin,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug,))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ChangeCmd {
     Reset,
@@ -32,14 +32,14 @@ pub enum ChangeCmd {
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug,))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct ClosePolicyChange {
     pub stop_loss: Option<ChangeCmd>,
     pub take_profit: Option<ChangeCmd>,
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test {
     use finance::percent::Percent;
     use sdk::cosmwasm_std;

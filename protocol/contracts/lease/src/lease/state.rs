@@ -3,7 +3,7 @@ use sdk::cosmwasm_std::Timestamp;
 
 use crate::{api::query::opened::ClosePolicy, finance::LpnCoin};
 
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, Eq, PartialEq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, Eq, PartialEq))]
 pub struct State<Asset> {
     pub amount: Coin<Asset>,
     pub interest_rate: Percent,

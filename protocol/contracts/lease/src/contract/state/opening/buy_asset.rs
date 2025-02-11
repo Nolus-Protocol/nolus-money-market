@@ -223,7 +223,7 @@ impl ContractInSwap<SwapState> for BuyAsset {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
     use crate::contract::state::State;
 

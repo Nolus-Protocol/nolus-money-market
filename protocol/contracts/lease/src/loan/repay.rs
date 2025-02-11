@@ -75,7 +75,7 @@ impl Receipt {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use finance::{coin::Coin, zero::Zero};
 

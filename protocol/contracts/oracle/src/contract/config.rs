@@ -10,7 +10,7 @@ where
     Config::load(storage)
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use currencies::{testing::PaymentC9, Lpn, PaymentGroup as PriceCurrencies};
     use finance::{duration::Duration, percent::Percent};

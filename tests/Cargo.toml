@@ -20,10 +20,10 @@ dex-osmosis = ["lease/dex-osmosis", "profit/dex-osmosis"]
 
 [dev-dependencies]
 admin_contract = { path = "../platform/contracts/admin", features = ["contract"], default-features = false }
-lease = { path = "../protocol/contracts/lease", features = ["contract", "testing"], default-features = false }
+lease = { path = "../protocol/contracts/lease", features = ["contract_testing"], default-features = false }
 leaser = { path = "../protocol/contracts/leaser", features = ["testing"], default-features = false }
 lpp = { path = "../protocol/contracts/lpp", features = ["contract", "testing"], default-features = false }
-oracle = { path = "../protocol/contracts/oracle", features = ["contract", "testing"], default-features = false }
+oracle = { path = "../protocol/contracts/oracle", features = ["contract_testing"], default-features = false }
 profit = { path = "../protocol/contracts/profit", features = ["contract", "testing"], default-features = false }
 reserve = { path = "../protocol/contracts/reserve", features = ["contract", "testing"], default-features = false }
 timealarms = { path = "../platform/contracts/timealarms", features = ["contract", "testing"], default-features = false }
@@ -40,7 +40,7 @@ platform = { path = "../platform/packages/platform", features = ["testing"], def
 sdk = { path = "../platform/packages/sdk", features = ["neutron", "testing"], default-features = false }
 swap = { path = "../protocol/packages/swap", features = ["testing"], default-features = false }
 tree = { path = "../platform/packages/tree", features = ["testing"], default-features = false }
-versioning ={ path = "../platform/packages/versioning", features = ["testing"], default-features = false }
+versioning = { path = "../platform/packages/versioning", features = ["testing"], default-features = false }
 
 anyhow = "1"
 thiserror = { version = "2", default-features = false }

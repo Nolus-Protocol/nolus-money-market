@@ -10,37 +10,21 @@ license.workspace = true
 [package.metadata.cargo-each]
 combinations = [
     { tags = ["build", "$dex"], always-on = ["contract", "$dex"], include-rest = false, generics = { "$dex" = ["dex-astroport_main", "dex-astroport_test", "dex-osmosis"] } },
-    { tags = ["ci", "@agnostic"], always-on = ["stub"], feature-groups = ["testing"], include-rest = false },
-    { tags = ["ci", "@agnostic"], always-on = ["contract", "dex-test_impl"], feature-groups = ["testing"], include-rest = false },
+    { tags = ["ci", "@agnostic"], feature-groups = ["stub", "testing"], include-rest = false },
+    { tags = ["ci", "@agnostic"], always-on = ["dex-test_impl"], feature-groups = ["contract"], include-rest = false },
 ]
-feature-groups = { testing = { members = ["testing"], at-least-one = false, mutually-exclusive = false } }
-
-[package.metadata.cargo-udeps]
-ignore = { development = ["swap", "timealarms"] }
+feature-groups = { contract = { members = ["contract", "contract_testing", "internal.test.contract"], at-least-one = true, mutually-exclusive = true }, stub = { members = ["stub", "stub_testing", "internal.test.stub"], at-least-one = false, mutually-exclusive = true }, testing = { members = ["testing", "internal.test.testing"], at-least-one = false, mutually-exclusive = true } }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-dex-astroport_main = [
-    "contract",
-    "swap/dex-astroport_main",
-]
-dex-astroport_test = [
-    "contract",
-    "swap/dex-astroport_test",
-]
-dex-osmosis = [
-    "contract",
-    "swap/dex-osmosis",
-]
-dex-test_impl = [
-    "contract",
-    "swap/dex-test_impl",
-]
+dex-astroport_main = ["swap/dex-astroport_main"]
+dex-astroport_test = ["swap/dex-astroport_test"]
+dex-osmosis = ["swap/dex-osmosis"]
+dex-test_impl = ["swap/dex-test_impl"]
 
 contract = [
-    "sdk/contract",
     "dep:access-control",
     "dep:cosmwasm-std",
     "dep:currencies",
@@ -50,15 +34,39 @@ contract = [
     "dep:oracle",
     "dep:oracle-platform",
     "dep:platform",
-    "dep:swap",
     "dep:timealarms",
     "dep:thiserror",
+    "dep:versioning",
+]
+contract_testing = [
+    "contract",
+]
+"internal.test.contract" = [
+    "contract_testing",
+    "currencies/testing",
+    "dex/testing",
+    "oracle-platform/testing",
+    "sdk/contract",
+    "timealarms/testing",
 ]
 stub = [
     "dep:platform",
     "dep:thiserror",
 ]
-testing = []
+stub_testing = [
+    "stub",
+]
+"internal.test.stub" = [
+    "stub_testing",
+]
+testing = [
+]
+"internal.test.testing" = [
+    "testing",
+    "dep:platform",
+    "platform/testing",
+    "dep:versioning",
+]
 
 [dependencies]
 access-control = { workspace = true, optional = true }
@@ -72,20 +80,10 @@ platform = { workspace = true, optional = true }
 sdk = { workspace = true }
 swap = { workspace = true, optional = true }
 timealarms = { workspace = true, optional = true, features = ["stub"] }
-versioning = { workspace = true, features = ["protocol_contract"] }
+versioning = { workspace = true, optional = true, features = ["protocol_contract"] }
 
 # Required as a dependency by `entry_point` attribute macro
 cosmwasm-std = { workspace = true, optional = true }
 
 thiserror = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
-
-[dev-dependencies]
-currencies = { workspace = true, features = ["testing"] }
-currency = { workspace = true, features = ["testing"] }
-dex = { workspace = true, features = ["testing"] }
-finance = { workspace = true }
-oracle = { workspace = true, features = ["testing"] }
-oracle-platform = { workspace = true, features = ["testing"] }
-platform = { workspace = true, features = ["testing"] }
-timealarms = { workspace = true, features = ["testing"] }

@@ -13,7 +13,7 @@ use sdk::{
 use crate::{msg::InstantiateMsg, result::ContractResult};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "testing", derive(Debug))]
 pub struct Config {
     pub lease_code: Code,
     pub lpp: Addr,

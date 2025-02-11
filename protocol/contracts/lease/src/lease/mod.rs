@@ -42,7 +42,7 @@ pub struct Lease<Asset, Lpp, Oracle> {
     oracle: Oracle,
 }
 
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub struct IntoDTOResult {
     pub lease: LeaseDTO,
     pub batch: Batch,
@@ -154,7 +154,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 pub mod tests {
     use std::ops::Add;
 
