@@ -110,8 +110,8 @@ pub(crate) fn setup_test(
         funds: coins(1000, Nls::ticker()),
     };
 
-    let res: CwResponse =
-        instantiate(deps.as_mut(), testing::mock_env(), info.clone(), msg).unwrap();
+    let res: CwResponse = instantiate(deps.as_mut(), testing::mock_env(), info.clone(), msg)
+        .expect("Contract should be instantiatable");
     assert!(res.messages.is_empty());
 
     // register single feeder address
@@ -128,7 +128,7 @@ pub(crate) fn setup_test(
             feeder_address: sdk_testing::user(CREATOR).to_string(),
         },
     )
-    .unwrap();
+    .expect("Sudo endpoint should be able to register feeder");
 
     assert!(messages.is_empty());
     assert!(attributes.is_empty());

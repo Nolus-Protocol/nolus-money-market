@@ -315,7 +315,7 @@ mod test {
     fn add_expected(mut exp: MigrationResult, lease_addr: Addr, new_code: Code) -> MigrationResult {
         exp.msgs
             .schedule_migrate_wasm_no_reply(lease_addr, &migrate_msg(), new_code)
-            .unwrap();
+            .expect("Migration message should be serializable");
         exp
     }
 

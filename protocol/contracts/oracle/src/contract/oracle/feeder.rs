@@ -171,7 +171,7 @@ mod tests {
                 feeder_address: feeder.to_string(),
             },
         )
-        .unwrap();
+        .expect("Feeder should be removed");
 
         assert_eq!(messages.len(), 0);
         assert_eq!(attributes.len(), 0);

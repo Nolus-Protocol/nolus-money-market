@@ -238,7 +238,7 @@ mod test {
             ]
             .into_iter(),
         )
-        .unwrap();
+        .expect("Alarms should be valid and serializable");
     }
 
     #[test]
