@@ -46,5 +46,4 @@ finance = { workspace = true, features = ["testing"] }
 currency = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
 reserve = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
 versioning = { workspace = true, features = ["testing"] }

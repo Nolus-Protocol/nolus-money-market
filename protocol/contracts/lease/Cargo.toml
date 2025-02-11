@@ -87,6 +87,5 @@ oracle-platform = { workspace = true, features = ["testing"] }
 profit = { workspace = true, features = ["testing"] }
 reserve = { workspace = true, features = ["testing"] }
 platform = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
 timealarms = { workspace = true, features = ["testing"] }
 
