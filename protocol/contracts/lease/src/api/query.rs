@@ -159,11 +159,16 @@ pub(crate) mod opened {
 
     #[cfg(feature = "contract")]
     impl ClosePolicy {
-        pub fn new(tp: Option<Percent>, sl: Option<Percent>) -> Self {
+        pub(crate) fn new(tp: Option<Percent>, sl: Option<Percent>) -> Self {
             Self {
                 take_profit: tp,
                 stop_loss: sl,
             }
+        }
+
+        #[cfg(feature = "contract_testing")]
+        pub fn new_testing(tp: Option<Percent>, sl: Option<Percent>) -> Self {
+            Self::new(tp, sl)
         }
     }
 }

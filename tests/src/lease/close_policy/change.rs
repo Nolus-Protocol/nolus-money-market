@@ -165,7 +165,7 @@ fn tp_set() {
         Some(ChangeCmd::Reset),
     );
     assert_eq!(
-        ClosePolicy::new(Some(tp), None),
+        ClosePolicy::new_testing(Some(tp), None),
         query_policy(&test_case, lease.clone())
     );
 
