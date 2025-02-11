@@ -62,7 +62,11 @@ impl Spec {
     }
 
     #[cfg(all(feature = "internal.test.contract", test))]
-    pub fn no_close(liability: Liability, min_asset: LpnCoin, min_transaction: LpnCoin) -> Self {
+    pub(crate) fn no_close(
+        liability: Liability,
+        min_asset: LpnCoin,
+        min_transaction: LpnCoin,
+    ) -> Self {
         Self::new(
             liability,
             ClosePolicy::default(),
