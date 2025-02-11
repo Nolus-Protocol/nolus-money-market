@@ -1,7 +1,5 @@
 #[cfg(feature = "cosmos_proto")]
 pub use cosmos_sdk_proto;
-#[cfg(feature = "schema")]
-pub use cosmwasm_schema::{self, schemars};
 pub use cosmwasm_std;
 #[cfg(feature = "testing")]
 pub use cw_multi_test;

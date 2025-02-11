@@ -28,7 +28,6 @@ finance = { path = "packages/finance", default-features = false }
 lpp-platform = { path = "packages/lpp", default-features = false }
 oracle-platform = { path = "packages/oracle", default-features = false }
 platform = { path = "packages/platform", default-features = false }
-schema = { path = "packages/schema", default-features = false }
 sdk = { path = "packages/sdk", default-features = false }
 time-oracle = { path = "packages/time-oracle", default-features = false }
 tree = { path = "packages/tree", default-features = false }
