@@ -2,16 +2,12 @@ use std::collections::btree_map::{BTreeMap, Entry};
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-
 use crate::{
     node::{Node, NodeIndex},
     tree::{Nodes, Tree},
 };
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[repr(transparent)]
 #[serde(transparent)]
 pub struct HumanReadableTree<T> {
@@ -84,8 +80,6 @@ impl<T> HumanReadableTree<T> {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(untagged, from = "HrtNodeStruct<T>")]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "schema", schemars(untagged, deny_unknown_fields))]
 pub enum HrtNode<T> {
     Leaf { value: T },
     Branch { value: T, children: Vec<HrtNode<T>> },

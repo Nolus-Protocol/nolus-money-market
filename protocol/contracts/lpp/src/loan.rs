@@ -2,9 +2,8 @@ use sdk::cosmwasm_std::Timestamp;
 use serde::{Deserialize, Serialize};
 
 use finance::{coin::Coin, duration::Duration, interest, percent::Percent};
-use sdk::schemars::{self, JsonSchema};
 
-#[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[cfg_attr(any(test, feature = "testing"), derive(Eq, PartialEq))]
 #[serde(rename_all = "snake_case", bound(serialize = "", deserialize = ""))]
 pub struct Loan<Lpn> {

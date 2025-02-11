@@ -1,14 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 use finance::{duration::Duration, fraction::Fraction, percent::Percent};
-use sdk::{
-    cosmwasm_std::Timestamp,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Timestamp;
 
 use crate::error::{self, PriceFeedsError};
 
-#[derive(Clone, Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
+#[derive(Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(try_from = "unchecked::Config")]
 #[serde(into = "unchecked::Config")]

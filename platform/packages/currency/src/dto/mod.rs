@@ -4,7 +4,6 @@ use std::{
     marker::PhantomData,
 };
 
-use sdk::schemars::{r#gen::SchemaGenerator, schema::Schema, JsonSchema};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -206,19 +205,6 @@ where
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         unchecked::TickerDTO::from(*self).fmt(f)
-    }
-}
-
-impl<G> JsonSchema for CurrencyDTO<G>
-where
-    G: Group,
-{
-    fn schema_name() -> String {
-        unchecked::TickerDTO::schema_name()
-    }
-
-    fn json_schema(r#gen: &mut SchemaGenerator) -> Schema {
-        unchecked::TickerDTO::json_schema(r#gen)
     }
 }
 

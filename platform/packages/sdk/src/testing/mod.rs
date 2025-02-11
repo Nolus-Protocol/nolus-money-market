@@ -118,7 +118,6 @@ impl AddressGenerator for TestAddressGenerator {
 
 mod custom_msg {
     use anyhow::{bail, Result as AnyResult};
-    use cosmwasm_schema::schemars::JsonSchema;
     use cosmwasm_std::{Addr, Api, Binary, BlockInfo, CustomQuery, Empty, Querier, Storage};
     use cw_multi_test::{AppResponse, CosmosRouter, Module as ModuleTrait};
     use serde::de::DeserializeOwned;
@@ -154,7 +153,7 @@ mod custom_msg {
             msg: Self::ExecT,
         ) -> AnyResult<AppResponse>
         where
-            ExecC: std::fmt::Debug + Clone + PartialEq + JsonSchema + DeserializeOwned + 'static,
+            ExecC: std::fmt::Debug + Clone + PartialEq + DeserializeOwned + 'static,
             QueryC: CustomQuery + DeserializeOwned + 'static,
         {
             self.message_sender
@@ -172,7 +171,7 @@ mod custom_msg {
             msg: Self::SudoT,
         ) -> AnyResult<AppResponse>
         where
-            ExecC: std::fmt::Debug + Clone + PartialEq + JsonSchema + DeserializeOwned + 'static,
+            ExecC: std::fmt::Debug + Clone + PartialEq + DeserializeOwned + 'static,
             QueryC: CustomQuery + DeserializeOwned + 'static,
         {
             bail!("Unexpected sudo msg {:?}", msg)

@@ -5,10 +5,7 @@ use serde::Serialize;
 use currency::CurrencyDTO;
 pub use dex::{ConnectionParams, Ics20Channel};
 use finance::{duration::Duration, liability::Liability, percent::Percent};
-use sdk::{
-    cosmwasm_std::Addr,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Addr;
 
 #[cfg(feature = "skel")]
 use crate::error_de::ErrorDe;
@@ -19,7 +16,7 @@ use super::LeaseAssetCurrencies;
 #[cfg(feature = "skel")]
 mod unchecked;
 
-#[derive(Serialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "skel", derive(Deserialize))]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -34,7 +31,7 @@ pub struct NewLeaseContract {
     pub finalizer: Addr,
 }
 
-#[derive(Serialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "skel", derive(Deserialize))]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -59,7 +56,7 @@ pub struct NewLeaseForm {
     pub market_price_oracle: Addr,
 }
 
-#[derive(Serialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "skel", derive(Deserialize))]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -77,7 +74,7 @@ pub struct LoanForm {
     pub due_period: Duration,
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "skel",
     derive(Deserialize),

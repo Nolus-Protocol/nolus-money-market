@@ -5,8 +5,6 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use crate::{
     coin::{Amount, Coin},
     error::{Error, Result},
@@ -48,7 +46,7 @@ type IntermediateAmount = <Amount as HigherRank<Amount>>::Intermediate;
 /// Both amounts a price is composed of should be non-zero.
 ///
 /// Not designed to be used in public APIs
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(bound(serialize = "", deserialize = ""))]
 pub struct Price<C, QuoteC> {
     amount: Coin<C>,
