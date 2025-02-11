@@ -28,7 +28,6 @@ use crate::{
     test_tree,
 };
 
-#[cfg(test)]
 mod oracle_tests;
 
 pub(crate) const CREATOR: &str = "creator";
