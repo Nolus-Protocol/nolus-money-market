@@ -155,7 +155,7 @@ where
 }
 
 #[cfg(all(feature = "internal.test.contract", test))]
-pub mod tests {
+pub(crate) mod tests {
     use std::ops::Add;
 
     use serde::{Deserialize, Serialize};
