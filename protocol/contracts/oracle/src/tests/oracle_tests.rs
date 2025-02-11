@@ -10,6 +10,7 @@ use platform::{contract::testing, tests};
 use sdk::{
     cosmwasm_ext::Response as CwResponse,
     cosmwasm_std::{
+        self,
         testing::{self as cw_testing, MockQuerier},
         Addr, Event, MessageInfo,
     },

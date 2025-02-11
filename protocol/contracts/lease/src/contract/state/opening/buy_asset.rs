@@ -225,6 +225,8 @@ impl ContractInSwap<SwapState> for BuyAsset {
 
 #[cfg(all(feature = "internal.test.contract", test))]
 mod test {
+    use sdk::cosmwasm_std;
+
     use crate::contract::state::State;
 
     #[test]

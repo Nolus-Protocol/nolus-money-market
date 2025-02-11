@@ -9,7 +9,7 @@ use platform::{
 use sdk::{
     cosmwasm_ext::Response as CwResponse,
     cosmwasm_std::{
-        entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Storage, SubMsgResult,
+        self, entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Storage, SubMsgResult,
         Timestamp,
     },
 };
