@@ -6,7 +6,7 @@ use std::{
     fmt::{Debug, Display, Formatter},
     iter::Sum,
     marker::PhantomData,
-    ops::{Add, AddAssign, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, Rem, Sub, SubAssign},
 };
 
 use ::serde::{Deserialize, Serialize};
@@ -14,7 +14,11 @@ use ::serde::{Deserialize, Serialize};
 use currency::{Currency, CurrencyDef, Group, MemberOf};
 use sdk::schemars::{self, JsonSchema};
 
-use crate::{ratio::{CheckedAdd, CheckedDiv, CheckedMul, Rational}, zero::Zero};
+use crate::{
+    duration::Duration,
+    ratio::{CheckedAdd, CheckedDiv, CheckedMul, Rational},
+    zero::Zero,
+};
 
 pub use self::dto::{from_amount_ticker, CoinDTO, IntoDTO};
 
@@ -23,6 +27,38 @@ mod dto;
 mod serde;
 
 pub type Amount = u128;
+
+impl CheckedMul for Amount {
+    type Output = Self;
+
+    fn checked_mul(self, rhs: Self) -> Option<Self::Output> {
+        self.checked_mul(rhs)
+    }
+}
+
+impl CheckedDiv for Amount {
+    type Output = Self;
+
+    fn checked_div(self, rhs: Self) -> Option<Self::Output> {
+        self.checked_div(rhs)
+    }
+}
+
+impl CheckedMul<Duration> for Amount {
+    type Output = Duration;
+
+    fn checked_mul(self, rhs: Duration) -> Option<Self::Output> {
+        let rhs_amount: Amount = rhs.into();
+
+        rhs_amount.checked_mul(self).and_then(|result| {
+            result
+                .try_into()
+                .ok()
+                .map(|units: u64| Duration::from_nanos(units))
+        })
+    }
+}
+
 #[cfg(feature = "testing")]
 pub type NonZeroAmount = NonZeroU128;
 
@@ -221,6 +257,32 @@ impl<C> From<Coin<C>> for Amount {
     }
 }
 
+impl<C> Div for Coin<C> {
+    type Output = Amount;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        debug_assert!(!rhs.is_zero());
+
+        self.amount.div(rhs.amount)
+    }
+}
+
+impl<C> Rem for Coin<C> {
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        self.amount.rem(rhs.amount).into()
+    }
+}
+
+impl<C> CheckedAdd for Coin<C> {
+    type Output = Self;
+
+    fn checked_add(self, rhs: Self) -> Option<Self::Output> {
+        self.checked_add(rhs)
+    }
+}
+
 impl CheckedAdd for Amount {
     type Output = Self;
 
@@ -229,19 +291,11 @@ impl CheckedAdd for Amount {
     }
 }
 
-impl CheckedDiv for Amount {
-    type Output = Self;
+impl<C> CheckedMul<Coin<C>> for Amount {
+    type Output = Coin<C>;
 
-    fn checked_div(self, rhs: Self) -> Option<Self::Output> {
-        self.checked_div(rhs)
-    }
-}
-
-impl CheckedMul for Amount {
-    type Output = Self;
-
-    fn checked_mul(self, rhs: Self) -> Option<Self::Output> {
-        self.checked_mul(rhs)
+    fn checked_mul(self, rhs: Coin<C>) -> Option<Self::Output> {
+        rhs.checked_mul(self)
     }
 }
 

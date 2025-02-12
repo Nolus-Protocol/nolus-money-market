@@ -1,4 +1,4 @@
-use std::ops::Sub;
+use std::ops::{Div, Rem, Sub};
 
 use serde::{Deserialize, Serialize};
 
@@ -7,9 +7,9 @@ use sdk::schemars::{self, JsonSchema};
 use crate::{
     duration::Duration,
     error::{Error, Result},
-    fractionable::Percentable,
-    percent::Percent,
-    ratio::{CheckedMul, Rational},
+    fractionable::{Fractionable, Percentable},
+    percent::{Percent, Units as PercentUnits},
+    ratio::{CheckedAdd, CheckedMul, Rational},
     zero::Zero,
 };
 
@@ -110,9 +110,17 @@ impl Liability {
         self.recalc_time
     }
 
-    pub fn init_borrow_amount<P>(&self, downpayment: P, may_max_ltd: Option<Percent>) -> Option<P>
+    // ltd could be bigger than 100 %.
+    pub fn init_borrow_amount<P>(
+        &self,
+        downpayment: P,
+        may_max_ltd: Option<Rational<PercentUnits>>,
+    ) -> Option<P>
     where
-        P: Percentable + Ord + Copy + PartialOrd,
+        Percent: Div + Rem<Output = Percent>,
+        <Percent as Div>::Output: CheckedMul<P, Output = P>,
+        P: Percentable + Fractionable<Percent> + Ord + Copy + PartialOrd + CheckedAdd<Output = P>,
+        PercentUnits: Div + Rem<Output = PercentUnits> + CheckedMul<P, Output = P>,
     {
         debug_assert!(self.initial > Percent::ZERO);
         debug_assert!(self.initial < Percent::HUNDRED);
@@ -122,9 +130,9 @@ impl Liability {
             .checked_mul(downpayment)
             .and_then(|default_borrow| {
                 may_max_ltd
-                    .map(|max_ltd| max_ltd.of(downpayment)) //max_ltd.checked_mul(downpayment)
+                    .and_then(|max_ltd| max_ltd.checked_mul(downpayment))
                     .map(|requested_borrow| requested_borrow.min(default_borrow))
-                    .unwrap_or(default_borrow)
+                    .or(Some(default_borrow))
             })
     }
 
@@ -132,7 +140,15 @@ impl Liability {
     /// Otherwise, amount_to_liquidate == total_due
     pub fn amount_to_liquidate<P>(&self, lease_amount: P, total_due: P) -> Option<P>
     where
-        P: Percentable + Copy + Ord + Sub<Output = P> + Zero,
+        Percent: Div + Rem<Output = Percent>,
+        <Percent as Div>::Output: CheckedMul<P, Output = P>,
+        P: Percentable
+            + Fractionable<Percent>
+            + Copy
+            + Ord
+            + Zero
+            + Sub<Output = P>
+            + CheckedAdd<Output = P>,
     {
         if total_due < self.max.of(lease_amount) {
             return Some(P::ZERO);
@@ -338,12 +354,12 @@ mod test {
         test_init_borrow_amount(50000, 60, 25000, Some(Percent::from_percent(50)));
         test_init_borrow_amount(1000, 10, 100, Some(Percent::from_percent(10)));
         test_init_borrow_amount(1, 10, 0, Some(Percent::from_percent(5)));
-        test_init_borrow_amount(1000, 60, 1500, Some(Percent::from_percent(190)));
-        test_init_borrow_amount(4000, 55, 4800, Some(Percent::from_percent(120)));
-        test_init_borrow_amount(200, 49, 192, Some(Percent::from_percent(100)));
+        test_init_borrow_amount(1000, 60, 600, Some(Percent::from_percent(60)));
+        test_init_borrow_amount(4000, 55, 2200, Some(Percent::from_percent(55)));
+        test_init_borrow_amount(200, 49, 98, Some(Percent::from_percent(49)));
         test_init_borrow_amount(1, 65, 0, Some(Percent::from_percent(65)));
-        test_init_borrow_amount(2000, 60, 3000, Some(Percent::from_percent(250)));
-        test_init_borrow_amount(300000, 65, 450000, Some(Percent::from_percent(150)));
+        test_init_borrow_amount(2000, 60, 1200, Some(Percent::from_percent(60)));
+        test_init_borrow_amount(300000, 65, 165000, Some(Percent::from_percent(55)));
         test_init_borrow_amount(50, 45, 40, Some(Percent::from_permille(999)));
 
         test_init_borrow_amount(1000, 65, 0, Some(Percent::ZERO));
@@ -444,6 +460,7 @@ mod test {
 
         let downpayment = Coin::<Currency>::new(d);
         let percent = Percent::from_percent(p);
+        let max_p = max_p.map(|p| p.into());
         let calculated = Liability {
             initial: percent,
             healthy: Percent::from_percent(99),

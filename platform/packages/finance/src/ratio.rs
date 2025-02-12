@@ -28,11 +28,11 @@ where
         Self { parts, total }
     }
 
-    pub fn parts(&self) -> U {
+    pub(crate) fn parts(&self) -> U {
         self.parts
     }
 
-    pub fn total(&self) -> U {
+    pub(crate) fn total(&self) -> U {
         self.total
     }
 }
@@ -101,15 +101,17 @@ pub trait CheckedDiv<Rhs = Self> {
 
 impl<U> Rational<U>
 where
-    U: Zero + Debug + PartialEq<U> + Copy + PartialOrd + Div<Output = U> + Rem<Output = U>,
+    U: PartialEq<U> + Copy + PartialOrd + Div + Rem<Output = U>,
 {
     pub fn checked_mul<F>(self, rhs: F) -> Option<F>
     where
-        U: CheckedMul<F, Output = F>,
-        F: Fractionable<U> + CheckedAdd<Output = F> + Copy,
+        <U as Div>::Output: CheckedMul<F, Output = F>,
+        F: CheckedAdd<Output = F> + Copy + Fractionable<U>,
     {
         // Rational(a,b).checked_mul(c) = (a / b).checked_mul(c) + c.safe_mul(Rational(a % b, b))
-        (self.nominator / self.denominator)
+
+        self.nominator
+            .div(self.denominator)
             .checked_mul(rhs)
             .and_then(|whole_part: F| {
                 let fraction_part = rhs.safe_mul(&Ratio::new(
@@ -146,7 +148,7 @@ where
             None => unreachable!("invariant on amount != 0 should have passed!"),
             Some(gcd) => gcd,
         };
-        debug_assert_eq!(Some(gcd), rhs.nominator.checked_div(c1));
+        debug_assert_eq!(Some(gcd), rhs.denominator.checked_div(c1));
 
         let may_b_c1 = self.nominator.checked_mul(c1);
         let may_d_a1 = rhs.nominator.checked_mul(a1);
@@ -154,10 +156,7 @@ where
         let may_nominator = may_b_c1
             .zip(may_d_a1)
             .and_then(|(b_c1, d_a1)| b_c1.checked_add(d_a1));
-        let may_denominator = a1
-            .checked_mul(c1.into())
-            .and_then(|a1_c1| a1_c1.checked_mul(gcd));
-
+        let may_denominator = a1.checked_mul(c1).and_then(|a1_c1| a1_c1.checked_mul(gcd));
         may_nominator
             .zip(may_denominator)
             .map(|(nominator, denominator)| Self::new(nominator, denominator))

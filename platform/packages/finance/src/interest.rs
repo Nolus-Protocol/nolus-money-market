@@ -1,28 +1,54 @@
-use std::{cmp, fmt::Debug, ops::Sub};
+use std::{
+    cmp,
+    fmt::Debug,
+    ops::{Div, Rem, Sub},
+};
 
 use crate::{
     duration::Duration,
     fractionable::{Fractionable, TimeSliceable},
-    percent::Percent,
+    ratio::{CheckedAdd, CheckedMul, Rational},
     zero::Zero,
 };
 
 /// Computes how much interest is accrued
-pub fn interest<U, P>(rate: Percent, principal: P, period: Duration) -> Option<P>
+pub fn interest<U, P>(rate: Rational<U>, principal: P, period: Duration) -> Option<P>
 where
-    P: Fractionable<U> + TimeSliceable + Copy,
+    U: Copy + Div + PartialOrd + Rem<Output = U>,
+    <U as Div>::Output: CheckedMul<P, Output = P>,
+    P: CheckedAdd<Output = P> + Copy + Fractionable<Duration> + Fractionable<U>,
+    <Duration as Div>::Output: CheckedMul<P, Output = P>,
 {
-    let interest_per_year = rate.of(principal);
-    period.annualized_slice_of(interest_per_year)
+    rate.checked_mul(principal)
+        .and_then(|interest_per_year: P| period.annualized_slice_of(interest_per_year))
 }
 
 /// Computes how much time this payment covers, return.0, and the change, return.1
 ///
 /// The actual payment is equal to the payment minus the returned change.
-pub fn pay<U, P>(rate: Percent, principal: P, payment: P, period: Duration) -> Option<(Duration, P)>
+pub fn pay<U, P>(
+    rate: Rational<U>,
+    principal: P,
+    payment: P,
+    period: Duration,
+) -> Option<(Duration, P)>
 where
-    P: Copy + Debug + Fractionable<U> + Ord + Sub<Output = P> + TimeSliceable + Zero,
-    Duration: Fractionable<P>,
+    U: Copy + Div + PartialOrd + Rem<Output = U>,
+    <U as Div>::Output: CheckedMul<P, Output = P>,
+    P: CheckedAdd<Output = P>
+        + Copy
+        + Debug
+        + Div
+        + Fractionable<Duration>
+        + Fractionable<U>
+        + Ord
+        + Rem<Output = P>
+        + Sub<Output = P>
+        + TimeSliceable
+        + Zero,
+    <P as Div>::Output: CheckedMul<Duration, Output = Duration>,
+    Duration: Div + Fractionable<P> + CheckedAdd<Output = Duration>,
+    <Duration as Div>::Output: CheckedMul<P, Output = P>,
 {
     interest(rate, principal, period).and_then(|interest_due_per_period| {
         if interest_due_per_period == P::ZERO {
@@ -142,7 +168,7 @@ mod tests {
         let part = MyCoin::new(125);
         let r = Rational::new(part, whole);
 
-        let res = super::interest::<MyCoin, _>(r, whole, PERIOD_LENGTH);
+        let res = super::interest(r, whole, PERIOD_LENGTH);
         assert_eq!(part, res.unwrap());
     }
 
@@ -151,7 +177,7 @@ mod tests {
         let principal = MyCoin::new(1001);
         let r = Rational::new(MyCoin::ZERO, principal);
 
-        let res = super::interest::<MyCoin, _>(r, principal, PERIOD_LENGTH);
+        let res = super::interest(r, principal, PERIOD_LENGTH);
         assert_eq!(MyCoin::ZERO, res.unwrap());
     }
 
@@ -163,7 +189,8 @@ mod tests {
         exp_paid_for: Duration,
         exp_change: MyCoin,
     ) {
-        let (paid_for, change) = super::pay(rate, principal, payment, pay_for);
+        let (paid_for, change) =
+            super::pay::<u32, MyCoin>(rate.into(), principal, payment, pay_for).unwrap();
         assert_eq!(exp_paid_for, paid_for);
         assert_eq!(exp_change, change);
     }

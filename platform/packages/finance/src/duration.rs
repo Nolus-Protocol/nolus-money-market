@@ -1,30 +1,31 @@
 use std::{
     fmt::{Debug, Display, Formatter, Result as FmtResult},
-    ops::{Add, AddAssign, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, Rem, Sub, SubAssign},
 };
 
 use serde::{Deserialize, Serialize};
 
 use sdk::{
-    cosmwasm_std::{Timestamp, Uint128},
+    cosmwasm_std::{Timestamp, Uint128, Uint256},
     schemars::{self, JsonSchema},
 };
 
 use crate::{
-    fractionable::{Fractionable, TimeSliceable},
-    ratio::{CheckedMul, Rational},
+    coin::Coin,
+    fractionable::Fractionable,
+    ratio::{CheckedAdd, CheckedMul, Rational},
     zero::Zero,
 };
 
 pub type Units = u64;
 
-// impl CheckedMul for u64 {
-//     type Output = Self;
+impl<C> CheckedMul<Coin<C>> for Units {
+    type Output = Coin<C>;
 
-//     fn checked_mul(self, rhs: Self) -> Option<Self::Output> {
-//         self.checked_mul(rhs)
-//     }
-// }
+    fn checked_mul(self, rhs: Coin<C>) -> Option<Self::Output> {
+        rhs.checked_mul(self.into())
+    }
+}
 
 pub type Seconds = u32;
 
@@ -53,6 +54,8 @@ impl Duration {
     pub const YEAR: Duration = Self::from_days(365);
 
     pub const MAX: Duration = Self::from_nanos(Units::MAX);
+
+    pub const ZERO: Duration = Self::from_nanos(Units::ZERO);
 
     pub const fn from_nanos(nanos: Units) -> Self {
         Self(nanos)
@@ -96,6 +99,10 @@ impl Duration {
         self.millis() / 1000
     }
 
+    pub fn is_zero(&self) -> bool {
+        self == &Self::ZERO
+    }
+
     pub fn checked_mul(&self, rhs: u16) -> Option<Self> {
         self.nanos().checked_mul(rhs.into()).map(Self::from_nanos)
     }
@@ -103,18 +110,25 @@ impl Duration {
     #[track_caller]
     pub fn annualized_slice_of<T>(&self, annual_amount: T) -> Option<T>
     where
-        T: TimeSliceable + Copy,
+        Self: Copy + Div + Rem<Output = Self> + Zero,
+        <Self as Div>::Output: CheckedMul<T, Output = T>,
+        T: CheckedAdd<Output = T> + Copy + Fractionable<Self>,
     {
-        Rational::new(self.nanos(), Self::YEAR.nanos()).checked_mul(annual_amount)
+        Rational::new(*self, Self::YEAR).checked_mul(annual_amount)
     }
 
     pub fn into_slice_per_ratio<U>(self, amount: U, annual_amount: U) -> Option<Self>
     where
-        Self: Fractionable<U>,
-        U: Zero + Debug + PartialEq + Copy + PartialOrd,
+        U: Zero + Copy + Debug + PartialOrd + Div + Rem<Output = U>,
+        <U as Div>::Output: CheckedMul<Self, Output = Self>,
+        Self: Fractionable<U> + CheckedAdd<Output = Self>,
     {
         Rational::new(amount, annual_amount).checked_mul(self)
     }
+}
+
+impl Zero for Duration {
+    const ZERO: Self = Self::ZERO;
 }
 
 impl From<Duration> for u128 {
@@ -126,6 +140,12 @@ impl From<Duration> for u128 {
 impl From<Duration> for Uint128 {
     fn from(d: Duration) -> Self {
         u128::from(d).into()
+    }
+}
+
+impl From<Duration> for Uint256 {
+    fn from(d: Duration) -> Self {
+        Uint256::from(d.nanos())
     }
 }
 
@@ -202,6 +222,42 @@ impl Sub<Duration> for Duration {
     #[track_caller]
     fn sub(self, rhs: Duration) -> Self::Output {
         Self::from_nanos(self.nanos().sub(rhs.nanos()))
+    }
+}
+
+impl Div for Duration {
+    type Output = Units;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        debug_assert!(!rhs.is_zero());
+
+        self.nanos().div(rhs.nanos())
+    }
+}
+
+impl Rem for Duration {
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        debug_assert!(!rhs.is_zero());
+
+        Duration(self.nanos() % rhs.nanos())
+    }
+}
+
+impl CheckedMul for Duration {
+    type Output = Self;
+
+    fn checked_mul(self, rhs: Self) -> Option<Self::Output> {
+        self.0.checked_mul(rhs.0).map(Duration)
+    }
+}
+
+impl CheckedAdd for Duration {
+    type Output = Self;
+
+    fn checked_add(self, rhs: Self) -> Option<Self::Output> {
+        self.0.checked_add(rhs.0).map(Duration)
     }
 }
 

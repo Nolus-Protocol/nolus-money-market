@@ -45,6 +45,6 @@ mod tests {
             Coin::<SuperGroupTestC1>::new(u128::MAX / 2),
             Coin::<SuperGroupTestC1>::new(u128::MAX),
         ));
-        assert_eq!(Duration::from_secs(5), res);
+        assert_eq!(Duration::from_secs(5) - Duration::from_nanos(1), res);
     }
 }
