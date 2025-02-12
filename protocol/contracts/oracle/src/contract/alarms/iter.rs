@@ -46,40 +46,35 @@ where
             price_iter,
             alarm_iter: None,
         };
-        iter.alarm_iter = iter.next_alarms()?;
-        Ok(iter)
-    }
 
-    fn move_to_next_alarms(&mut self) -> Result<(), ErrorG> {
-        debug_assert!(self.next_alarm().is_none());
+        #[expect(if_let_rescope)]
+        // TODO remove once stop linting with the 'rust-2024-compatibility' group
+        if let Some(alarms_iter) = iter.next_alarms() {
+            alarms_iter.map(|alarms_iter| {
+                iter.alarm_iter = Some(alarms_iter);
 
-        self.alarm_iter = self.next_alarms()?;
-        Ok(())
-    }
-
-    fn next_alarms(&mut self) -> Result<Option<AlarmIter<'alarms, AlarmsG, ErrorG>>, ErrorG> {
-        self.price_iter
-            .next()
-            .map(|price_result| {
-                price_result.and_then(|ref price| {
-                    price::base::with_price::execute(
-                        price,
-                        Cmd {
-                            alarms: self.alarms,
-                            _base_c: PhantomData::<BaseC>,
-                            _error_g: PhantomData::<ErrorG>,
-                        },
-                    )
-                })
+                iter
             })
-            .transpose()
+        } else {
+            Ok(iter)
+        }
     }
 
-    fn next_alarm(&mut self) -> Option<Result<Addr, ErrorG>> {
-        match self.alarm_iter.as_mut() {
-            None => unimplemented!("calling 'next_alarm' on Some price alarms"),
-            Some(iter) => iter.next(),
-        }
+    fn next_alarms(&mut self) -> Option<Result<AlarmIter<'alarms, AlarmsG, ErrorG>, ErrorG>> {
+        debug_assert!(self.alarm_iter.is_none());
+
+        self.price_iter.next().map(|price_result| {
+            price_result.and_then(|price| {
+                price::base::with_price::execute(
+                    &price,
+                    Cmd {
+                        alarms: self.alarms,
+                        _base_c: PhantomData,
+                        _error_g: PhantomData,
+                    },
+                )
+            })
+        })
     }
 }
 
@@ -96,24 +91,37 @@ where
 {
     type Item = Result<Addr, ErrorG>;
 
-    #[expect(tail_expr_drop_order)] // TODO remove once stop linting with the 'rust-2024-compatibility' group
     fn next(&mut self) -> Option<Self::Item> {
-        self.alarm_iter.as_ref()?;
+        let mut result = None;
 
-        let mut result = self.next_alarm();
-        while result.is_none() && self.alarm_iter.is_some() {
-            result = {
-                // TODO remove once stop linting with the 'rust-2024-compatibility' group
-                #[expect(if_let_rescope)]
-                if let Err(error) = self.move_to_next_alarms() {
-                    Some(Err(error))
-                } else if self.alarm_iter.is_none() {
+        while let Some(ref mut alarms_iter) = self.alarm_iter {
+            result = alarms_iter.next();
+
+            if result.is_some() {
+                break;
+            }
+
+            #[cfg(debug_assertions)]
+            {
+                self.alarm_iter = None;
+            }
+
+            self.alarm_iter = match self.next_alarms() {
+                Some(Ok(iter)) => Some(iter),
+                Some(Err(error)) => {
+                    result = Some(Err(error));
+
                     None
-                } else {
-                    self.next_alarm()
                 }
+                None => None,
             };
         }
+
+        debug_assert!(matches!(
+            (&result, &self.alarm_iter),
+            (Some(Ok(_)), Some(_)) | (Some(Err(_)), None) | (None, None)
+        ));
+
         result
     }
 }
@@ -123,6 +131,7 @@ where
     S: Deref<Target = (dyn Storage + 'storage)>,
     AlarmsG: Group + Clone,
     BaseC: Currency,
+    ErrorG: Group,
 {
     alarms: &'alarms PriceAlarms<'storage, AlarmsG, S>,
     _base_c: PhantomData<BaseC>,
@@ -140,6 +149,7 @@ where
     type PriceG = AlarmsG;
 
     type Output = AlarmIter<'alarms, AlarmsG, ErrorG>;
+
     type Error = Error<ErrorG>;
 
     fn exec<C>(self, price: Price<C, BaseC>) -> std::result::Result<Self::Output, Self::Error>
@@ -150,6 +160,6 @@ where
         Ok(self
             .alarms
             .alarms(price)
-            .map(|may_alarm| may_alarm.map_err(Into::into)))
+            .map(|alarm_result| alarm_result.map_err(Into::into)))
     }
 }
