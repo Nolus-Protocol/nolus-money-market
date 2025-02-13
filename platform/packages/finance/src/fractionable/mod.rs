@@ -31,14 +31,44 @@ pub trait HigherRank<T> {
     type Intermediate;
 }
 
-impl<T, D, DIntermediate, U> Fractionable<U> for T
+pub trait CheckedMultiply<U> {
+    #[track_caller]
+    fn checked_mul(self, parts: U, total: U) -> Option<Self>
+    where
+        U: Zero + Debug + PartialEq<U>,
+        Self: Sized;
+}
+
+impl<T, D, DIntermediate, U> CheckedMultiply<U> for T
 where
     T: HigherRank<U, Type = D, Intermediate = DIntermediate> + Into<D>,
+    D: TryInto<DIntermediate>,
+    DIntermediate: Into<T>,
+    D: Mul<D, Output = D> + Div<D, Output = D>,
+    U: Zero + PartialEq + Into<D> + Debug,
+{
+    fn checked_mul(self, parts: U, total: U) -> Option<Self> {
+        if parts == total {
+            Some(self)
+        } else {
+            let res_double: D = self.into() * parts.into();
+            let res_double = res_double / total.into();
+            res_double
+                .try_into()
+                .ok()
+                .map(|res_intermediate: DIntermediate| res_intermediate.into())
+        }
+    }
+}
+
+impl<T, D, DIntermediate, U> Fractionable<U> for T
+where
+    T: HigherRank<U, Type = D, Intermediate = DIntermediate> + Into<D> + CheckedMultiply<U>,
     D: TryInto<DIntermediate>,
     <D as TryInto<DIntermediate>>::Error: Debug,
     DIntermediate: Into<T>,
     D: Mul<D, Output = D> + Div<D, Output = D>,
-    U: Zero + PartialEq + Into<D>,
+    U: Zero + PartialEq + Into<D> + Debug,
 {
     #[track_caller]
     fn safe_mul<R>(self, ratio: &R) -> Self
@@ -46,16 +76,8 @@ where
         R: Ratio<U>,
     {
         // TODO debug_assert_eq!(T::BITS * 2, D::BITS);
-
-        if ratio.parts() == ratio.total() {
-            self
-        } else {
-            let res_double: D = self.into() * ratio.parts().into();
-            let res_double = res_double / ratio.total().into();
-            let res_intermediate: DIntermediate =
-                res_double.try_into().expect("unexpected overflow");
-            res_intermediate.into()
-        }
+        self.checked_mul(ratio.parts(), ratio.total())
+            .expect("unexpected overflow")
     }
 }
 
