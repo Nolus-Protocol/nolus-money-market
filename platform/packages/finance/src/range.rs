@@ -219,6 +219,6 @@ mod test {
     }
 
     fn amount_to_price(amount: Amount) -> Price<SuperGroupTestC1, SubGroupTestC6> {
-        price::total_of(Coin::from(amount)).is(Coin::from(3))
+        price::total_of(Coin::from(amount)).is(Coin::from(3u128))
     }
 }

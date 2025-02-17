@@ -1,4 +1,4 @@
-use std::ops::Sub;
+use std::ops::{Div, Rem, Sub};
 
 use serde::{Deserialize, Serialize};
 
@@ -7,10 +7,9 @@ use sdk::schemars::{self, JsonSchema};
 use crate::{
     duration::Duration,
     error::{Error, Result},
-    fraction::Fraction,
-    fractionable::Percentable,
-    percent::{Percent, Units},
-    ratio::Rational,
+    fractionable::{Fractionable, Percentable},
+    percent::{Percent, Units as PercentUnits},
+    ratio::{CheckedAdd, CheckedMul, Rational},
     zero::Zero,
 };
 
@@ -111,39 +110,58 @@ impl Liability {
         self.recalc_time
     }
 
-    pub fn init_borrow_amount<P>(&self, downpayment: P, may_max_ltd: Option<Percent>) -> P
+    // ltd could be bigger than 100 %.
+    pub fn init_borrow_amount<P>(
+        &self,
+        downpayment: P,
+        may_max_ltd: Option<Rational<PercentUnits>>,
+    ) -> Option<P>
     where
-        P: Percentable + Ord + Copy,
+        Percent: Div + Rem<Output = Percent>,
+        <Percent as Div>::Output: CheckedMul<P, Output = P>,
+        P: Percentable + Fractionable<Percent> + Ord + Copy + PartialOrd + CheckedAdd<Output = P>,
+        PercentUnits: Div + Rem<Output = PercentUnits> + CheckedMul<P, Output = P>,
     {
         debug_assert!(self.initial > Percent::ZERO);
         debug_assert!(self.initial < Percent::HUNDRED);
 
         let default_ltd = Rational::new(self.initial, Percent::HUNDRED - self.initial);
-        let default_borrow = default_ltd.of(downpayment);
-        may_max_ltd
-            .map(|max_ltd| max_ltd.of(downpayment))
-            .map(|requested_borrow| requested_borrow.min(default_borrow))
-            .unwrap_or(default_borrow)
+        default_ltd
+            .checked_mul(downpayment)
+            .and_then(|default_borrow| {
+                may_max_ltd
+                    .and_then(|max_ltd| max_ltd.checked_mul(downpayment))
+                    .map(|requested_borrow| requested_borrow.min(default_borrow))
+                    .or(Some(default_borrow))
+            })
     }
 
     /// Post-assert: (total_due - amount_to_liquidate) / (lease_amount - amount_to_liquidate) ~= self.healthy_percent(), if total_due < lease_amount.
     /// Otherwise, amount_to_liquidate == total_due
-    pub fn amount_to_liquidate<P>(&self, lease_amount: P, total_due: P) -> P
+    pub fn amount_to_liquidate<P>(&self, lease_amount: P, total_due: P) -> Option<P>
     where
-        P: Percentable + Copy + Ord + Sub<Output = P> + Zero,
+        Percent: Div + Rem<Output = Percent>,
+        <Percent as Div>::Output: CheckedMul<P, Output = P>,
+        P: Percentable
+            + Fractionable<Percent>
+            + Copy
+            + Ord
+            + Zero
+            + Sub<Output = P>
+            + CheckedAdd<Output = P>,
     {
         if total_due < self.max.of(lease_amount) {
-            return P::ZERO;
+            return Some(P::ZERO);
         }
         if lease_amount <= total_due {
-            return lease_amount;
+            return Some(lease_amount);
         }
 
         // from 'due - liquidation = healthy% of (lease - liquidation)' follows
         // liquidation = 100% / (100% - healthy%) of (due - healthy% of lease)
         let multiplier = Rational::new(Percent::HUNDRED, Percent::HUNDRED - self.healthy);
         let extra_liability_lpn = total_due - total_due.min(self.healthy.of(lease_amount));
-        Fraction::<Units>::of(&multiplier, extra_liability_lpn)
+        multiplier.checked_mul(extra_liability_lpn)
     }
 
     fn invariant_held(&self) -> Result<()> {
@@ -192,7 +210,6 @@ mod test {
     use crate::{
         coin::{Amount, Coin},
         duration::Duration,
-        fraction::Fraction,
         percent::{Percent, Units},
         zero::Zero,
     };
@@ -337,12 +354,12 @@ mod test {
         test_init_borrow_amount(50000, 60, 25000, Some(Percent::from_percent(50)));
         test_init_borrow_amount(1000, 10, 100, Some(Percent::from_percent(10)));
         test_init_borrow_amount(1, 10, 0, Some(Percent::from_percent(5)));
-        test_init_borrow_amount(1000, 60, 1500, Some(Percent::from_percent(190)));
-        test_init_borrow_amount(4000, 55, 4800, Some(Percent::from_percent(120)));
-        test_init_borrow_amount(200, 49, 192, Some(Percent::from_percent(100)));
+        test_init_borrow_amount(1000, 60, 600, Some(Percent::from_percent(60)));
+        test_init_borrow_amount(4000, 55, 2200, Some(Percent::from_percent(55)));
+        test_init_borrow_amount(200, 49, 98, Some(Percent::from_percent(49)));
         test_init_borrow_amount(1, 65, 0, Some(Percent::from_percent(65)));
-        test_init_borrow_amount(2000, 60, 3000, Some(Percent::from_percent(250)));
-        test_init_borrow_amount(300000, 65, 450000, Some(Percent::from_percent(150)));
+        test_init_borrow_amount(2000, 60, 1200, Some(Percent::from_percent(60)));
+        test_init_borrow_amount(300000, 65, 165000, Some(Percent::from_percent(55)));
         test_init_borrow_amount(50, 45, 40, Some(Percent::from_permille(999)));
 
         test_init_borrow_amount(1000, 65, 0, Some(Percent::ZERO));
@@ -408,7 +425,7 @@ mod test {
 
     #[track_caller]
     fn amount_to_liquidate_int(liability: Liability, lease: Amount, due: Amount, exp: Amount) {
-        let liq = liability.amount_to_liquidate(lease, due);
+        let liq = liability.amount_to_liquidate(lease, due).unwrap();
         assert_eq!(exp, liq);
         if due.clamp(liability.max.of(lease), lease) == due {
             assert!(
@@ -443,6 +460,7 @@ mod test {
 
         let downpayment = Coin::<Currency>::new(d);
         let percent = Percent::from_percent(p);
+        let max_p = max_p.map(|p| p.into());
         let calculated = Liability {
             initial: percent,
             healthy: Percent::from_percent(99),
@@ -452,7 +470,8 @@ mod test {
             third_liq_warn: Percent::from_permille(998),
             recalc_time: Duration::from_secs(20000),
         }
-        .init_borrow_amount(downpayment, max_p);
+        .init_borrow_amount(downpayment, max_p)
+        .unwrap();
 
         assert_eq!(calculated, Coin::<Currency>::new(exp));
     }
