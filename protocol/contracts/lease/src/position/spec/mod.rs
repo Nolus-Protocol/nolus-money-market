@@ -28,11 +28,11 @@ pub use dto::SpecDTO;
 
 mod dto;
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test;
 
 #[derive(Clone, Copy)]
-#[cfg_attr(test, derive(Debug, PartialEq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq))]
 pub struct Spec {
     liability: Liability,
     close: ClosePolicy,
@@ -61,8 +61,12 @@ impl Spec {
         }
     }
 
-    #[cfg(test)]
-    pub fn no_close(liability: Liability, min_asset: LpnCoin, min_transaction: LpnCoin) -> Self {
+    #[cfg(all(feature = "internal.test.contract", test))]
+    pub(crate) fn no_close(
+        liability: Liability,
+        min_asset: LpnCoin,
+        min_transaction: LpnCoin,
+    ) -> Self {
         Self::new(
             liability,
             ClosePolicy::default(),

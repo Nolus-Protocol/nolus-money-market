@@ -171,7 +171,7 @@ where
 
 impl<I> TryFind for I where I: Iterator {}
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use currencies::{
         testing::{PaymentC3, PaymentC4, PaymentC5, PaymentC6, PaymentC7},
@@ -202,7 +202,8 @@ mod tests {
             ),
             Account::unchecked(
                 Addr::unchecked("DEADCODE"),
-                HostAccount::try_from(String::from("DEADCODE")).unwrap(),
+                HostAccount::try_from(String::from("DEADCODE"))
+                    .expect("Address should be a non-empty string"),
                 ConnectionParams {
                     connection_id: String::from("DEADCODE"),
                     transfer_channel: Ics20Channel {

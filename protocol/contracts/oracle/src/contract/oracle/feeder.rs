@@ -70,7 +70,7 @@ impl Feeders {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use std::collections::HashSet;
 
@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn register_feeder() {
-        let (mut deps, _info) = setup_test(dummy_default_instantiate_msg());
+        let (mut deps, _info) = setup_test(dummy_default_instantiate_msg()).unwrap();
 
         let feeder0 = testing::user("addr0000");
         let feeder1 = testing::user("addr0001");
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn remove_feeder() {
-        let (mut deps, _info) = setup_test(dummy_default_instantiate_msg());
+        let (mut deps, _info) = setup_test(dummy_default_instantiate_msg()).unwrap();
 
         let feeder0 = testing::user("addr0000");
         let feeder1 = testing::user("addr0001");
@@ -171,7 +171,7 @@ mod tests {
                 feeder_address: feeder.to_string(),
             },
         )
-        .unwrap();
+        .expect("Feeder should be removed");
 
         assert_eq!(messages.len(), 0);
         assert_eq!(attributes.len(), 0);

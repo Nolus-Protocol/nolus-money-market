@@ -5,11 +5,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(test, derive(Debug))]
 /// A 'reference type' representing a software package
 pub struct Protocol {

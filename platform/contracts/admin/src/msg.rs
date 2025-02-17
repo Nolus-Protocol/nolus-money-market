@@ -1,10 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use platform::contract::CodeId;
-use sdk::{
-    cosmwasm_std::{Addr, Uint64},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, Uint64};
 use versioning::ReleaseId;
 
 pub use crate::contracts::{
@@ -15,18 +12,18 @@ pub use crate::contracts::{
     PlatformExecute, Protocol, ProtocolContractAddresses, ProtocolContracts, ProtocolExecute,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct InstantiateMsg {
     pub dex_admin: Addr,
     pub contracts: Contracts,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct MigrateMsg {}
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg
 where
@@ -47,7 +44,7 @@ where
     DeregisterProtocol(ProtocolContracts<MigrationSpec>),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum SudoMsg {
     ChangeDexAdmin {
@@ -67,14 +64,14 @@ pub enum SudoMsg {
     ExecuteContracts(ContractsExecute),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct MigrateContracts {
     pub to_release: ReleaseId,
     pub migration_spec: ContractsMigration,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum QueryMsg
 where

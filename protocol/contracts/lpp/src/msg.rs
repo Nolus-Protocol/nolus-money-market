@@ -9,14 +9,11 @@ use finance::{
     price::Price,
 };
 use lpp_platform::NLpn;
-use sdk::{
-    cosmwasm_std::{Addr, Uint128, Uint64},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, Uint128, Uint64};
 
 use crate::{borrow::InterestRate, loan::Loan};
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct InstantiateMsg {
@@ -33,7 +30,7 @@ pub struct InstantiateMsg {
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct MigrateMsg {}
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(
     deny_unknown_fields,
@@ -67,7 +64,7 @@ where
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum SudoMsg {
@@ -79,7 +76,7 @@ pub enum SudoMsg {
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(
     deny_unknown_fields,
@@ -123,7 +120,7 @@ where
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum QueryQuoteResponse {
@@ -138,14 +135,14 @@ pub type QueryLoanResponse<Lpn> = Option<LoanResponse<Lpn>>;
 // Deposit query responses
 
 // CW20 interface
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct BalanceResponse {
     pub balance: Uint128,
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
 #[serde(
     deny_unknown_fields,
@@ -162,14 +159,14 @@ where
     pub balance_nlpn: Coin<NLpn>,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct PriceResponse<Lpn>(pub Price<NLpn, Lpn>)
 where
     Lpn: 'static;
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(any(test, feature = "testing"), derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct RewardsResponse {

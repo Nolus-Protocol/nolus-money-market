@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use super::higher_order_type::FirstOrderType;
 
 pub(super) mod higher_order_type;
 #[cfg(feature = "contract")]
 mod impl_mod;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     rename = "PlatformContractsWithoutAdmin",
     rename_all = "snake_case",
@@ -38,7 +36,7 @@ impl<T> FirstOrderType<higher_order_type::ContractsWithoutAdmin> for ContractsWi
     type Unit = T;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     rename = "PlatformContracts",
     rename_all = "snake_case",

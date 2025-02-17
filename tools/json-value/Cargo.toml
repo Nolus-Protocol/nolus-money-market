@@ -10,13 +10,7 @@ combinations = [
     { tags = ["ci", "@agnostic"], include-rest = true }
 ]
 
-[features]
-schema = ["dep:cosmwasm-schema"]
-
 [dependencies]
-# Own packages
-cosmwasm-schema = { workspace = true, optional = true }
-
 # General packages
 serde = { workspace = true }
 

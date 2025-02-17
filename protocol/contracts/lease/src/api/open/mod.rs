@@ -5,10 +5,7 @@ use serde::Serialize;
 use currency::CurrencyDTO;
 pub use dex::{ConnectionParams, Ics20Channel};
 use finance::{duration::Duration, liability::Liability, percent::Percent};
-use sdk::{
-    cosmwasm_std::Addr,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Addr;
 
 #[cfg(feature = "skel")]
 use crate::error_de::ErrorDe;
@@ -19,9 +16,9 @@ use super::LeaseAssetCurrencies;
 #[cfg(feature = "skel")]
 mod unchecked;
 
-#[derive(Serialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "skel", derive(Deserialize))]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct NewLeaseContract {
     /// An application form for opening a new lease
@@ -34,9 +31,9 @@ pub struct NewLeaseContract {
     pub finalizer: Addr,
 }
 
-#[derive(Serialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "skel", derive(Deserialize))]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct NewLeaseForm {
     /// The customer who wants to open a lease.
@@ -59,9 +56,9 @@ pub struct NewLeaseForm {
     pub market_price_oracle: Addr,
 }
 
-#[derive(Serialize, Clone, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "skel", derive(Deserialize))]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 /// The value remains intact.
 pub struct LoanForm {
@@ -77,13 +74,13 @@ pub struct LoanForm {
     pub due_period: Duration,
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "skel",
     derive(Deserialize),
     serde(deny_unknown_fields, try_from = "unchecked::PositionSpecDTO")
 )]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(rename_all = "snake_case")]
 pub struct PositionSpecDTO {
     /// Liability constraints
@@ -129,7 +126,7 @@ impl PositionSpecDTO {
         Self::new_unchecked(liability, min_asset, min_transaction)
     }
 
-    #[cfg(any(test, feature = "testing"))]
+    #[cfg(feature = "skel_testing")]
     pub fn new(liability: Liability, min_asset: LpnCoinDTO, min_transaction: LpnCoinDTO) -> Self {
         let obj = Self::new_unchecked(liability, min_asset, min_transaction);
         obj.invariant_held()
@@ -137,7 +134,7 @@ impl PositionSpecDTO {
         obj
     }
 
-    #[cfg(any(test, feature = "testing", feature = "contract"))]
+    #[cfg(any(feature = "contract", feature = "skel_testing"))]
     fn new_unchecked(
         liability: Liability,
         min_asset: LpnCoinDTO,
@@ -153,7 +150,7 @@ impl PositionSpecDTO {
     }
 }
 
-#[cfg(all(test, feature = "skel"))]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test_position_spec {
     use currencies::Lpn;
     use currency::CurrencyDef;

@@ -3,10 +3,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use currency::{CurrencyDTO, CurrencyDef, DefinitionRef, Group, MemberOf};
 use finance::price::{base::BasePrice, dto::PriceDTO};
 use marketprice::config::Config as PriceConfig;
-use sdk::{
-    cosmwasm_std::Addr,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::Addr;
 use tree::HumanReadableTree;
 
 pub use super::alarms::Alarm;
@@ -14,8 +11,8 @@ use super::swap::SwapTarget;
 
 pub type AlarmsCount = platform::dispatcher::AlarmsCount;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug, Clone))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct InstantiateMsg<PriceCurrencies>
 where
@@ -26,12 +23,12 @@ where
 }
 
 #[derive(Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct MigrateMsg {}
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug, Clone))]
 #[serde(
     deny_unknown_fields,
     rename_all = "snake_case",
@@ -55,8 +52,8 @@ where
     DispatchAlarms { max_count: AlarmsCount },
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug, Clone))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum SudoMsg<PriceCurrencies>
 where
@@ -74,8 +71,8 @@ where
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum QueryMsg<PriceCurrencies>
 where
@@ -148,22 +145,22 @@ where
     AlarmsStatus {},
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug, Clone))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct Config {
     pub price_config: PriceConfig,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteAlarmMsg {
     PriceAlarm(),
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
-#[cfg_attr(feature = "testing", derive(PartialEq, Debug))]
+#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "contract_testing", derive(PartialEq, Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct DispatchAlarmsResponse(pub AlarmsCount);
 
@@ -172,7 +169,7 @@ pub type SupportedCurrencyPairsResponse<PriceCurrencies> = Vec<SwapLeg<PriceCurr
 pub type CurrenciesResponse = Vec<Currency>;
 
 #[derive(Serialize)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, PartialEq, Eq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq, Eq))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct Currency {
     #[serde(flatten)]
@@ -188,7 +185,7 @@ where {
 }
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, PartialEq, Eq))]
+#[cfg_attr(feature = "contract_testing", derive(Debug, PartialEq, Eq))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum CurrencyGroup {
     Native,
@@ -197,8 +194,8 @@ pub enum CurrencyGroup {
     PaymentOnly,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct SwapTreeResponse<G>
 where
@@ -207,8 +204,8 @@ where
     pub tree: HumanReadableTree<SwapTarget<G>>,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(
     deny_unknown_fields,
     rename_all = "snake_case",
@@ -224,8 +221,8 @@ where
     pub prices: Vec<BasePrice<PriceCurrencies, BaseC, BaseCurrencies>>,
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct AlarmsStatusResponse {
     pub remaining_alarms: bool,
@@ -264,7 +261,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
     use crate::api::{Currency, CurrencyGroup};
 

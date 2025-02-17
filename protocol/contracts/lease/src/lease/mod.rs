@@ -42,7 +42,7 @@ pub struct Lease<Asset, Lpp, Oracle> {
     oracle: Oracle,
 }
 
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub struct IntoDTOResult {
     pub lease: LeaseDTO,
     pub batch: Batch,
@@ -154,8 +154,8 @@ where
     }
 }
 
-#[cfg(test)]
-pub mod tests {
+#[cfg(all(feature = "internal.test.contract", test))]
+pub(crate) mod tests {
     use std::ops::Add;
 
     use serde::{Deserialize, Serialize};

@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use super::higher_order_type::FirstOrderType;
 
 pub(super) mod higher_order_type;
 #[cfg(feature = "contract")]
 mod impl_mod;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     rename = "ProtocolContracts",
     rename_all = "snake_case",
@@ -26,7 +24,7 @@ impl<T> FirstOrderType<higher_order_type::Contracts> for Contracts<T> {
     type Unit = T;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct Protocol<T> {
     pub network: Network,
@@ -38,7 +36,7 @@ impl<T> FirstOrderType<higher_order_type::Protocol> for Protocol<T> {
     type Unit = T;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     rename_all = "PascalCase",
     rename_all_fields = "snake_case",
@@ -49,7 +47,7 @@ pub enum Network {
     Osmosis,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     rename_all = "PascalCase",
     rename_all_fields = "snake_case",

@@ -18,7 +18,7 @@ use super::Price;
 /// The position would be steady, i.e. no warnings, automatic close, liquidations,
 /// if the asset price is within a range and is guaranteed for a period of time.
 #[derive(Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub struct Steadiness<Asset>
 where
     Asset: 'static,
@@ -67,7 +67,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use currencies::{testing::PaymentC3, LeaseGroup, Lpn, Lpns};
     use finance::{
@@ -141,7 +141,7 @@ mod tests {
                 msg: cosmwasm_std::to_json_binary(&TimeAlarmsCmd::AddAlarm {
                     time: now + recheck_in,
                 })
-                .unwrap(),
+                .expect("Time alarms serialization message should be serializable to JSON"),
                 funds: vec![],
             });
 
@@ -154,7 +154,7 @@ mod tests {
                 > {
                     alarm: exp_alarm,
                 })
-                .unwrap(),
+                .expect("Time alarms serialization message should be serializable to JSON"),
                 funds: vec![],
             });
 

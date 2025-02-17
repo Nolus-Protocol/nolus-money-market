@@ -1,5 +1,3 @@
-#[cfg(feature = "schema")]
-pub use crate::software::SemVer;
 pub use crate::{
     error::Error,
     migration::MigrationMessage,

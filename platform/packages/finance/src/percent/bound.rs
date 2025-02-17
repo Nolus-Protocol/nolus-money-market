@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use crate::{
     error::{Error, Result},
     zero::Zero,
@@ -9,9 +7,7 @@ use crate::{
 
 use super::{Percent, Units};
 
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Serialize, Deserialize)]
 #[serde(into = "Percent", try_from = "Percent")]
 pub struct BoundPercent<const UPPER_BOUND: Units>(Percent);
 

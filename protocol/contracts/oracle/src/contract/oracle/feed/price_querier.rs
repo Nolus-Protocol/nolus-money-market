@@ -84,7 +84,7 @@ where
         .map_err(Into::into)
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
     use currencies::{
         testing::{PaymentC3, PaymentC7},

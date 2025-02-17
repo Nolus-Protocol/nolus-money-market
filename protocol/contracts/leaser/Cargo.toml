@@ -12,12 +12,21 @@ combinations = [
     { tags = ["build", "@agnostic"], include-rest = false },
     { tags = ["ci", "@agnostic"], include-rest = true },
 ]
+feature-groups = { "testing" = { members = ["testing", "internal.test.testing"], at-least-one = false, mutually-exclusive = true } }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-testing = ["currency/testing", "lease/testing"]
+testing = [
+    "lease/skel_testing",
+    "platform/testing",
+]
+"internal.test.testing" = [
+    "testing",
+    "currencies/testing",
+    "versioning/testing",
+]
 
 [dependencies]
 admin_contract = { workspace = true }
@@ -41,12 +50,4 @@ thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
-lease = { workspace = true, features = ["testing"] }
-finance = { workspace = true, features = ["testing"] }
-currency = { workspace = true, features = ["testing"] }
-platform = { workspace = true, features = ["testing"] }
-reserve = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
-versioning = { workspace = true, features = ["testing"] }
-
 json-value = { workspace = true }

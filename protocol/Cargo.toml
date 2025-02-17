@@ -41,7 +41,6 @@ finance = { path = "../platform/packages/finance", default-features = false }
 lpp-platform = { path = "../platform/packages/lpp", default-features = false }
 oracle-platform = { path = "../platform/packages/oracle", default-features = false }
 platform = { path = "../platform/packages/platform", default-features = false }
-schema = { path = "../platform/packages/schema", default-features = false }
 sdk = { path = "../platform/packages/sdk", default-features = false }
 tree = { path = "../platform/packages/tree", default-features = false }
 versioning = { path = "../platform/packages/versioning", default-features = false }

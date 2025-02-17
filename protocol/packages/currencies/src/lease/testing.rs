@@ -34,15 +34,12 @@ pub(super) mod definitions {
         CurrencyDTO, CurrencyDef, Definition, InPoolWith, Matcher, MaybePairsVisitorResult,
         PairsGroup, PairsVisitor,
     };
-    use sdk::schemars::{self, JsonSchema};
 
     use crate::{lpn::Lpn, native::Nls, payment::Group as PaymentGroup};
 
     use super::super::Group as LeaseGroup;
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC1(CurrencyDTO<LeaseGroup>);
 
@@ -75,9 +72,7 @@ pub(super) mod definitions {
         }
     }
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC2(CurrencyDTO<LeaseGroup>);
 
@@ -115,9 +110,7 @@ pub(super) mod definitions {
 
     impl InPoolWith<LeaseC4> for LeaseC2 {}
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC3(CurrencyDTO<LeaseGroup>);
 
@@ -150,9 +143,7 @@ pub(super) mod definitions {
 
     impl InPoolWith<LeaseC1> for LeaseC3 {}
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC4(CurrencyDTO<LeaseGroup>);
 
@@ -183,9 +174,7 @@ pub(super) mod definitions {
         }
     }
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC5(CurrencyDTO<LeaseGroup>);
 
@@ -216,9 +205,7 @@ pub(super) mod definitions {
         }
     }
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC6(CurrencyDTO<LeaseGroup>);
 
@@ -248,9 +235,7 @@ pub(super) mod definitions {
         }
     }
 
-    #[derive(
-        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-    )]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
     #[serde(deny_unknown_fields, rename_all = "snake_case")]
     pub struct LeaseC7(CurrencyDTO<LeaseGroup>);
 

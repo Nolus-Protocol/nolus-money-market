@@ -1,7 +1,5 @@
 use std::marker::PhantomData;
 
-use sdk::schemars::{self, JsonSchema};
-
 #[cfg(feature = "contract")]
 mod impl_mod;
 
@@ -83,7 +81,7 @@ impl<T> FirstOrderType<Identity> for T {
     type Unit = Self;
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, JsonSchema)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Identity {}
 
 impl HigherOrderType for Identity {
@@ -98,7 +96,7 @@ impl<Left, Right> FirstOrderType<HigherOrderTuple<true, Right>> for (Left, Right
     type Unit = Left;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HigherOrderTuple<const BOUND_RIGHT: bool, Bound> {
     _bound: PhantomData<Bound>,
 }
@@ -115,7 +113,7 @@ impl<T> FirstOrderType<Option> for core::option::Option<T> {
     type Unit = T;
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, JsonSchema)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Option {}
 
 impl HigherOrderType for Option {
@@ -133,7 +131,7 @@ where
     type Unit = <<Self as FirstOrderType<Outer>>::Unit as FirstOrderType<Inner>>::Unit;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Compose<Outer, Inner> {
     _outer: PhantomData<Outer>,
     _inner: PhantomData<Inner>,

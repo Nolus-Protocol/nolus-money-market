@@ -47,7 +47,7 @@ impl State {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test {
     use finance::{coin::Coin, duration::Duration, interest, percent::Percent, zero::Zero};
 

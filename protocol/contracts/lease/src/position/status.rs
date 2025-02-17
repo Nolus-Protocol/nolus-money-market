@@ -5,21 +5,21 @@ use finance::{coin::Coin, liability::Zone, percent::Percent};
 use super::steady::Steadiness;
 
 #[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub enum Cause {
     Overdue(),
     Liability { ltv: Percent, healthy_ltv: Percent },
 }
 
 #[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub enum Liquidation<Asset> {
     Partial { amount: Coin<Asset>, cause: Cause },
     Full(Cause),
 }
 
 #[derive(Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(test, derive(Debug))]
+#[cfg_attr(feature = "contract_testing", derive(Debug))]
 pub enum Debt<Asset>
 where
     Asset: 'static,
@@ -36,19 +36,19 @@ where
 }
 
 impl<Asset> Debt<Asset> {
-    #[cfg(test)]
+    #[cfg(all(feature = "internal.test.contract", test))]
     pub(crate) fn partial(amount: Coin<Asset>, cause: Cause) -> Self {
         debug_assert!(!amount.is_zero());
         Self::Bad(Liquidation::Partial { amount, cause })
     }
 
-    #[cfg(test)]
+    #[cfg(all(feature = "internal.test.contract", test))]
     pub(crate) fn full(cause: Cause) -> Self {
         Self::Bad(Liquidation::Full(cause))
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test_status {
     use currencies::Lpn;
     use finance::percent::Percent;

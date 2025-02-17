@@ -9,7 +9,7 @@ use platform::{
 use sdk::{
     cosmwasm_ext::Response as CwResponse,
     cosmwasm_std::{
-        entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Storage, SubMsgResult,
+        self, entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Storage, SubMsgResult,
         Timestamp,
     },
 };
@@ -214,7 +214,7 @@ where
     cosmwasm_std::to_json_binary(data).map_err(Error::ConvertToBinary)
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod tests {
     use currencies::{
         testing::{LeaseC1, PaymentC1, PaymentC9},
@@ -241,7 +241,7 @@ mod tests {
             Percent::from_percent(50),
             test_tree::minimal_swap_tree(),
         );
-        let (deps, _info) = setup_test(msg);
+        let (deps, _info) = setup_test(msg).unwrap();
 
         let res = query(deps.as_ref(), mock_env(), QueryMsg::Config {}).unwrap();
         let value: Config = cosmwasm_std::from_json(res).unwrap();

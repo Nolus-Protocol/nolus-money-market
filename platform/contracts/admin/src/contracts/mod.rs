@@ -4,10 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use ::platform::contract::CodeId;
 use json_value::JsonValue;
-use sdk::{
-    cosmwasm_std::{Addr, Uint64},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, Uint64};
 use versioning::ReleaseId;
 
 #[cfg(feature = "contract")]
@@ -81,7 +78,7 @@ pub type ProtocolExecute = <HigherOrderProtocolExecute as HigherOrderType>::Of<E
 
 pub type Protocols<Protocol> = BTreeMap<String, Protocol>;
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(
     rename_all = "snake_case",
     deny_unknown_fields,
@@ -92,11 +89,6 @@ pub type Protocols<Protocol> = BTreeMap<String, Protocol>;
             Protocol::Of<Unit>: Deserialize<'de>",
     )
 )]
-#[schemars(bound = "Platform: JsonSchema, \
-    Platform::Of<Unit>: JsonSchema, \
-    Protocol: JsonSchema, \
-    Protocol::Of<Unit>: JsonSchema, \
-    Unit: JsonSchema")]
 pub struct ContractsTemplate<Platform, Protocol, Unit>
 where
     Platform: HigherOrderType,
@@ -115,7 +107,7 @@ pub type ContractsMigration =
 pub type ContractsExecute =
     ContractsTemplate<HigherOrderPlatformExecute, HigherOrderProtocolExecute, ExecuteSpec>;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct MigrationSpec
 where
@@ -127,7 +119,7 @@ where
     pub post_migrate_execute: Option<ExecuteSpec>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct ExecuteSpec {
     pub message: JsonValue,

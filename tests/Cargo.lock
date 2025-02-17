@@ -578,7 +578,6 @@ dependencies = [
  "anyhow",
  "currency",
  "either",
- "sdk",
  "serde",
  "serde_json",
  "thiserror 2.0.11",
@@ -1173,7 +1172,6 @@ checksum = "d75a2a4b1b190afb6f5425f10f6a8f959d2ea0b9c2b1d79553551850539e4674"
 name = "json-value"
 version = "0.0.0"
 dependencies = [
- "cosmwasm-schema 2.2.1",
  "serde",
 ]
 
@@ -1196,7 +1194,6 @@ name = "lease"
 version = "0.11.0"
 dependencies = [
  "access-control",
- "cosmwasm-std 2.1.6",
  "currencies",
  "currency",
  "dex",
@@ -1374,7 +1371,6 @@ checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 name = "oracle"
 version = "0.6.0"
 dependencies = [
- "cosmwasm-std 2.1.6",
  "currencies",
  "currency",
  "finance",
@@ -1779,7 +1775,6 @@ dependencies = [
  "anyhow",
  "base64 0.22.1",
  "cosmos-sdk-proto 0.26.1",
- "cosmwasm-schema 2.2.1",
  "cosmwasm-std 2.1.6",
  "cw-multi-test",
  "cw-storage-plus 2.0.0",
@@ -2197,7 +2192,6 @@ dependencies = [
 name = "tree"
 version = "0.1.0"
 dependencies = [
- "sdk",
  "serde",
 ]
 

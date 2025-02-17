@@ -15,15 +15,12 @@ use finance::{
 };
 use thiserror::Error;
 
-use sdk::{
-    cosmwasm_std::StdError as CosmWasmError,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::StdError as CosmWasmError;
 
 mod unchecked;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug, Clone))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(any(test, feature = "stub_alarms_testing"), derive(Debug, Clone))]
 #[serde(deny_unknown_fields, rename_all = "snake_case", bound(serialize = ""))]
 pub enum ExecuteMsg<G, Lpn, Lpns>
 where
@@ -49,8 +46,8 @@ pub enum Error {
     InvariantBroken(&'static str),
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(any(test, feature = "stub_alarms_testing"), derive(Debug))]
 #[serde(
     try_from = "unchecked::Alarm<G, Lpn, Lpns>",
     into = "unchecked::Alarm<G, Lpn, Lpns>",
@@ -168,7 +165,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.stub_alarms", test))]
 mod test {
     use std::fmt::{Display, Formatter, Result as FmtResult};
 

@@ -82,7 +82,7 @@ impl Leases {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.testing", test))]
 mod test {
     use sdk::cosmwasm_std::{testing::MockStorage, Addr, Storage};
 
@@ -189,7 +189,7 @@ mod test {
 
     fn lease_exist(storage: &dyn Storage, lease: &Addr) -> bool {
         Leases::load_by_customer(storage, test_customer())
-            .unwrap()
+            .expect("Customer leases map should exist")
             .contains(lease)
     }
 }

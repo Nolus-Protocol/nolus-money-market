@@ -2,14 +2,12 @@ use std::marker::PhantomData;
 
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use super::higher_order_type::FirstOrderType;
 
 #[cfg(feature = "contract")]
 mod impl_mod;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     rename_all = "snake_case",
     deny_unknown_fields,
@@ -21,11 +19,6 @@ mod impl_mod;
             GranularUnitWrapperTypeConstructor::Of<StructuralTypeConstructor::Of<Unit>>: Deserialize<'de>",
     )
 )]
-#[schemars(bound = "StructuralTypeConstructor: JsonSchema, \
-    StructuralTypeConstructor::Of<GranularUnitWrapperTypeConstructor::Of<Unit>>: JsonSchema, \
-    GranularUnitWrapperTypeConstructor: JsonSchema, \
-    GranularUnitWrapperTypeConstructor::Of<StructuralTypeConstructor::Of<Unit>>: JsonSchema, \
-    Unit: JsonSchema")]
 pub enum Granularity<StructuralTypeConstructor, GranularUnitWrapperTypeConstructor, Unit>
 where
     StructuralTypeConstructor: super::HigherOrderType,
@@ -47,7 +40,7 @@ where
     type Unit = Unit;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HigherOrderType<StructuralTypeConstructor, GranularUnitWrapperTypeConstructor>(
     PhantomData<StructuralTypeConstructor>,
     PhantomData<GranularUnitWrapperTypeConstructor>,

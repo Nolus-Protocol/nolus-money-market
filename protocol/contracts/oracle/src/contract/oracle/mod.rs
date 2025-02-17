@@ -287,7 +287,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.contract", test))]
 mod test_normalized_price_not_found {
     use currencies::{
         Lpn as BaseCurrency, Lpns as BaseCurrencies, Nls, PaymentGroup as PriceCurrencies,
@@ -358,16 +358,16 @@ mod test_normalized_price_not_found {
             },
             testing::user("feeder").to_string(),
         )
-        .unwrap();
+        .expect("Feeder should be able to be registered");
 
         Config::new(price_config.clone())
             .store::<PriceCurrencies>(storage)
-            .unwrap();
+            .expect("Configuration should be valid and serializable");
 
         TestSupportedPairs::new::<StableCurrency>(test_tree::dummy_swap_tree().into_tree())
-            .unwrap()
+            .expect("Swap tree should only specify currencies declared as part of the payment group or it's subgroups")
             .save(storage)
-            .unwrap();
+            .expect("Supported pairs should be valid and serializable");
     }
 
     #[track_caller]
@@ -382,7 +382,7 @@ mod test_normalized_price_not_found {
                     Some(price::total_of(PRICE_BASE).is(PRICE_QUOTE)),
                 ),
             )
-            .unwrap();
+            .expect("Alarm should be able to be added alarm");
     }
 
     #[track_caller]
@@ -398,7 +398,7 @@ mod test_normalized_price_not_found {
                 Addr::unchecked("feeder"),
                 &[price::total_of(PRICE_BASE).is(PRICE_QUOTE).into()],
             )
-            .unwrap();
+            .expect("Fed prices should be valid and fed by registered feeder");
     }
 
     #[track_caller]
@@ -409,9 +409,12 @@ mod test_normalized_price_not_found {
             PriceCurrencies,
             BaseCurrency,
             BaseCurrencies,
-        > = Oracle::load(storage).unwrap();
+        > = Oracle::load(storage).expect("Oracle instance should exist and be loadable");
 
-        let alarms: u32 = oracle.try_notify_alarms(NOW, 16).unwrap().0;
+        let alarms: u32 = oracle
+            .try_notify_alarms(NOW, 16)
+            .expect("Oracle should be able to notify alarm subscribers")
+            .0;
 
         assert_eq!(alarms, expected_count);
     }
@@ -422,7 +425,9 @@ mod test_normalized_price_not_found {
             MarketAlarms::new(storage);
 
         for _ in 0..count {
-            alarms.last_delivered().unwrap();
+            alarms
+                .last_delivered()
+                .expect("Alarm should be in delivery queue and be delivered");
         }
     }
 

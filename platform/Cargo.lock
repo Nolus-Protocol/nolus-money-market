@@ -20,7 +20,6 @@ dependencies = [
  "finance",
  "json-value",
  "platform",
- "schema",
  "sdk",
  "serde",
  "serde_test",
@@ -800,7 +799,6 @@ checksum = "d75a2a4b1b190afb6f5425f10f6a8f959d2ea0b9c2b1d79553551850539e4674"
 name = "json-value"
 version = "0.0.0"
 dependencies = [
- "cosmwasm-schema",
  "serde",
 ]
 
@@ -1156,13 +1154,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ea1a2d0a644769cc99faa24c3ad26b379b786fe7c36fd3c546254801650e6dd"
 
 [[package]]
-name = "schema"
-version = "0.1.0"
-dependencies = [
- "thiserror 2.0.11",
-]
-
-[[package]]
 name = "schemars"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1193,7 +1184,6 @@ dependencies = [
  "anyhow",
  "base64",
  "cosmos-sdk-proto 0.26.1",
- "cosmwasm-schema",
  "cosmwasm-std",
  "cw-multi-test",
  "cw-storage-plus",
@@ -1505,7 +1495,6 @@ version = "0.5.0"
 dependencies = [
  "cosmwasm-std",
  "platform",
- "schema",
  "sdk",
  "serde",
  "thiserror 2.0.11",
@@ -1525,7 +1514,6 @@ dependencies = [
  "lpp-platform",
  "oracle-platform",
  "platform",
- "schema",
  "sdk",
  "serde",
  "thiserror 2.0.11",

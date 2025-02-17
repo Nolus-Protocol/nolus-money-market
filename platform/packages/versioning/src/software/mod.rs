@@ -2,9 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use sdk::cw_storage_plus::Item;
 
-#[cfg(feature = "schema")]
-use sdk::schemars::{self, JsonSchema};
-
 pub use self::{
     package::Package,
     version::{SemVer, VersionSegment},
@@ -19,7 +16,6 @@ mod package;
 mod version;
 
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(test, derive(Debug))]
 pub struct PackageRelease {
     id: Id,

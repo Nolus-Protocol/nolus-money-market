@@ -5,11 +5,7 @@ use serde::{
     ser::{Serialize, Serializer},
 };
 
-#[cfg(feature = "schema")]
-use cosmwasm_schema::schemars::{self, JsonSchema};
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
 pub enum JsonValue {
     Null,
     Bool(bool),

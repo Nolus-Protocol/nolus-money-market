@@ -4,15 +4,12 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 
 use currency::{CurrencyDTO, Group};
-use sdk::{
-    cosmwasm_std::StdError,
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::StdError;
 
 pub type PoolId = u64;
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(any(test, feature = "stub_swap_testing"), derive(Debug))]
 #[serde(
     deny_unknown_fields,
     rename_all = "snake_case",
@@ -41,8 +38,7 @@ pub enum Error {
     StubSwapPathQuery(StdError),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, JsonSchema)]
-#[schemars(with = "(PoolId, CurrencyDTO<G>)")]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct SwapTarget<G>
 where
     G: Group,

@@ -1,47 +1,45 @@
 use finance::percent::Percent;
 use serde::{Deserialize, Serialize};
 
-use sdk::schemars::{self, JsonSchema};
-
 use super::LeaseCoin;
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum PositionClose {
     FullClose(FullClose),
     PartialClose(PartialClose),
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct FullClose {}
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct PartialClose {
     pub amount: LeaseCoin,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug,))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ChangeCmd {
     Reset,
     Set(Percent),
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug,))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "skel_testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct ClosePolicyChange {
     pub stop_loss: Option<ChangeCmd>,
     pub take_profit: Option<ChangeCmd>,
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.skel", test))]
 mod test {
     use finance::percent::Percent;
     use sdk::cosmwasm_std;

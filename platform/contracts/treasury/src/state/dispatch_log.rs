@@ -3,12 +3,11 @@ use serde::{Deserialize, Serialize};
 use sdk::{
     cosmwasm_std::{StdResult, Storage, Timestamp},
     cw_storage_plus::Item,
-    schemars::{self, JsonSchema},
 };
 
 use crate::ContractError;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DispatchLog {
     pub last_dispatch: Timestamp,
 }

@@ -36,5 +36,4 @@ serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 platform = { workspace = true, features = ["testing"] }
-schema = { workspace = true }
 sdk = { workspace = true, features = ["testing"] }

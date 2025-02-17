@@ -16,7 +16,7 @@ combinations = [
 testing = []
 
 [dependencies]
-sdk = { workspace = true, features = ["schema"] }
+sdk = { workspace = true }
 
 thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

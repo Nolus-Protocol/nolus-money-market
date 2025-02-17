@@ -7,17 +7,14 @@ use lease::api::{
     open::{ConnectionParams, PositionSpecDTO},
     DownpaymentCoin, LeaseCoin, LpnCoinDTO,
 };
-use sdk::{
-    cosmwasm_std::{Addr, Uint64},
-    schemars::{self, JsonSchema},
-};
+use sdk::cosmwasm_std::{Addr, Uint64};
 use versioning::ProtocolPackageReleaseId;
 
 use crate::finance::LeaseCurrencies;
 pub use crate::state::config::Config;
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct InstantiateMsg {
     pub lease_code: Uint64,
@@ -39,8 +36,8 @@ pub struct MigrateMsg {}
 
 pub type MaxLeases = u32;
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ExecuteMsg {
     OpenLease {
@@ -87,8 +84,8 @@ pub enum ExecuteMsg {
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum SudoMsg {
     Config {
@@ -110,8 +107,8 @@ pub enum SudoMsg {
     },
 }
 
-#[derive(Serialize, Deserialize, Default, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ForceClose {
     #[default]
@@ -119,8 +116,8 @@ pub enum ForceClose {
     KillProtocol,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum QueryMsg {
     Config {},
@@ -138,15 +135,15 @@ pub enum QueryMsg {
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct ConfigResponse {
     pub config: Config,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
-#[cfg_attr(any(test, feature = "testing"), derive(Clone, Debug))]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "testing", derive(Clone, Debug))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct QuoteResponse {
     pub total: LeaseCoin,
@@ -155,7 +152,7 @@ pub struct QuoteResponse {
     pub annual_interest_rate_margin: Percent,
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "internal.test.testing", test))]
 mod test {
     use lease::api::FinalizerExecuteMsg;
     use platform::tests as platform_tests;
