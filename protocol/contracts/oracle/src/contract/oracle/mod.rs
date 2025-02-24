@@ -217,7 +217,7 @@ where
     BaseG: Group + MemberOf<PriceG>,
 {
     const REPLY_ID: Id = 0;
-    const EVENT_TYPE: &'static str = "pricealarm";
+    const EVENT_TYPE: &'static str = "dispatch-pricealarm";
 
     pub(super) fn try_feed_prices(
         &mut self,

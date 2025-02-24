@@ -257,7 +257,7 @@ fn overwrite_alarm_and_dispatch() {
 
     platform::tests::assert_event(
         &res.events,
-        &Event::new("wasm-pricealarm").add_attribute("receiver", &lease),
+        &Event::new("wasm-dispatch-pricealarm").add_attribute("receiver", &lease),
     );
 
     platform::tests::assert_event(
@@ -267,7 +267,7 @@ fn overwrite_alarm_and_dispatch() {
 
     platform::tests::assert_event(
         &res.events,
-        &Event::new("wasm-market-alarm").add_attribute("delivered", "success"),
+        &Event::new("wasm-results-pricealarm").add_attribute("delivered", "success"),
     );
 }
 
@@ -691,7 +691,7 @@ fn price_alarm_rescheduling() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .all(|event| {
                 event
                     .attributes
@@ -705,7 +705,7 @@ fn price_alarm_rescheduling() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .count(),
         2,
         "{:?}",
@@ -719,7 +719,7 @@ fn price_alarm_rescheduling() {
         response
             .events
             .iter()
-            .find(|event| event.ty == "wasm-market-alarm"),
+            .find(|event| event.ty == "wasm-results-pricealarm"),
         None,
         "{:?}",
         response.events
@@ -739,7 +739,7 @@ fn price_alarm_rescheduling() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .all(|event| {
                 event
                     .attributes
@@ -753,7 +753,7 @@ fn price_alarm_rescheduling() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .count(),
         1,
         "{:?}",
@@ -806,7 +806,7 @@ fn price_alarm_rescheduling_with_failing() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .filter(|event| {
                 event
                     .attributes
@@ -822,7 +822,7 @@ fn price_alarm_rescheduling_with_failing() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .filter(|event| {
                 event
                     .attributes
@@ -838,7 +838,7 @@ fn price_alarm_rescheduling_with_failing() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .count(),
         2,
         "{:?}",
@@ -854,7 +854,7 @@ fn price_alarm_rescheduling_with_failing() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .filter(|event| {
                 event
                     .attributes
@@ -870,7 +870,7 @@ fn price_alarm_rescheduling_with_failing() {
         response
             .events
             .iter()
-            .filter(|event| event.ty == "wasm-market-alarm")
+            .filter(|event| event.ty == "wasm-results-pricealarm")
             .count(),
         1,
         "{:?}",
@@ -884,7 +884,7 @@ fn price_alarm_rescheduling_with_failing() {
         response
             .events
             .iter()
-            .find(|event| event.ty == "wasm-market-alarm"),
+            .find(|event| event.ty == "wasm-results-pricealarm"),
         None,
         "{:?}",
         response.events

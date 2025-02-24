@@ -202,7 +202,7 @@ fn deliver_alarm() {
         assert!(!any_error(&dispatch_alarms_resp));
         tests::assert_event(
             &dispatch_alarms_resp.events,
-            &Event::new("pricealarm").add_attribute("receiver", receiver),
+            &Event::new("dispatch-pricealarm").add_attribute("receiver", receiver),
         );
         assert_eq!(sent_alarms(&dispatch_alarms_resp), Some(1));
         assert_eq!(1, dispatch_alarms_resp.messages.len());

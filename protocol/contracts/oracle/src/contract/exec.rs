@@ -14,7 +14,7 @@ use crate::{
 
 use super::oracle::{feeder::Feeders, Oracle};
 
-pub fn do_executute<BaseCurrency, BaseCurrencies, AlarmCurrencies, PriceCurrencies>(
+pub fn do_execute<BaseCurrency, BaseCurrencies, AlarmCurrencies, PriceCurrencies>(
     deps: DepsMut<'_>,
     env: Env,
     msg: ExecuteMsg<BaseCurrency, BaseCurrencies, AlarmCurrencies, PriceCurrencies>,

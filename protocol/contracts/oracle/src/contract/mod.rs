@@ -147,7 +147,7 @@ pub fn execute(
     info: MessageInfo,
     msg: ExecuteMsg<BaseCurrency, BaseCurrencies, AlarmCurrencies, PriceCurrencies>,
 ) -> Result<CwResponse, PriceCurrencies> {
-    exec::do_executute(deps, env, msg, info.sender)
+    exec::do_execute(deps, env, msg, info.sender)
 }
 
 #[entry_point]
@@ -173,7 +173,7 @@ pub fn sudo(
 // TODO: compare gas usage of this solution vs reply on error
 #[entry_point]
 pub fn reply(deps: DepsMut<'_>, _env: Env, msg: Reply) -> Result<CwResponse, PriceCurrencies> {
-    const EVENT_TYPE: &str = "market-alarm";
+    const EVENT_TYPE: &str = "results-pricealarm";
     const KEY_DELIVERED: &str = "delivered";
     const KEY_DETAILS: &str = "details";
 
